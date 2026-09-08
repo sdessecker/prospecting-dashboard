@@ -1,0 +1,2317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Five Star Parks — Prospecting Workspace</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#16202A; --paper:#FAF7F0; --card:#FFFFFF; --border:#E4DFD3;
+    --text:#16202A; --muted:#6B7280;
+    --teal:#1F7A6C; --teal-soft:#E4F1EE;
+    --amber:#E0932E; --amber-soft:#FBEDD8;
+    --coral:#D9583D; --coral-soft:#FBE7E1;
+    --blue:#35638F; --blue-soft:#E5EDF4;
+    --violet:#6A5A8C; --violet-soft:#ECE8F3;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1320px;margin:0 auto;padding:0 28px 64px;}
+
+  header.top{background:var(--ink);color:#fff;padding:26px 0;margin-bottom:26px;}
+  header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}
+  .brandmark{display:flex;align-items:baseline;gap:12px;}
+  .brandmark .dot{width:11px;height:11px;border-radius:50%;background:var(--amber);display:inline-block;transform:translateY(-2px);}
+  h1{font-size:24px;font-weight:700;letter-spacing:-0.02em;margin:0;}
+  header.top p{margin:5px 0 0;color:#B9C2CC;font-size:13px;}
+
+  /* tabs */
+  .tab-nav{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:26px;}
+  .tab-btn{font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);background:none;border:none;padding:12px 6px;margin-right:22px;cursor:pointer;position:relative;top:1px;}
+  .tab-btn.active{color:var(--ink);border-bottom:2px solid var(--teal);}
+  .tab-btn:hover:not(.active){color:var(--text);}
+  .me-box{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .me-field{display:flex;align-items:center;gap:8px;}
+  .me-box label{font-size:12px;color:#B9C2CC;}
+  .me-box input, .me-box select{font-size:13px;padding:7px 10px;border-radius:7px;border:1px solid #3A4756;background:#1E2A37;color:#fff;}
+  .me-box input{width:140px;}
+  .me-box select{width:200px;}
+  .me-box input::placeholder{color:#8A94A0;}
+  .ms-dropdown{position:relative;}
+  .ms-btn{font-size:13px;padding:7px 12px;border-radius:7px;border:1px solid #3A4756;background:#1E2A37;color:#fff;cursor:pointer;min-width:190px;text-align:left;}
+  .ms-btn:hover{border-color:var(--amber);}
+  .ms-panel{position:absolute;top:calc(100% + 6px);left:0;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 10px 28px rgba(0,0,0,0.2);width:290px;max-height:360px;overflow-y:auto;z-index:80;padding:10px;}
+  .ms-actions{display:flex;gap:8px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+  .ms-actions button{font-size:11.5px;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;color:var(--text);}
+  .ms-actions button:hover{border-color:var(--teal);color:var(--teal);}
+  .ms-group-label{font-size:10.5px;font-weight:700;color:var(--muted);margin:9px 0 3px;}
+  .ms-group-label:first-child{margin-top:0;}
+  .ms-item{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:4px 3px;cursor:pointer;color:var(--text);border-radius:5px;}
+  .ms-item:hover{background:var(--teal-soft);}
+  .ms-item input{width:14px;height:14px;accent-color:var(--teal);flex-shrink:0;}
+  .scope-banner{font-size:12.5px;color:var(--text);background:var(--amber-soft);border:1px solid var(--border);border-radius:8px;padding:9px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+  .scope-banner strong{color:var(--ink);}
+  .scope-banner button{font-size:12px;color:var(--teal);background:none;border:none;cursor:pointer;font-weight:600;text-decoration:underline;padding:0;}
+  .lead-main.locked, .loc-table tbody tr.inert{cursor:default;}
+  .filters select:disabled{opacity:.55;cursor:not-allowed;}
+
+  section{margin-bottom:34px;}
+  .section-head{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 12px;flex-wrap:wrap;gap:6px;}
+  .section-head h2{font-size:17px;font-weight:700;margin:0;letter-spacing:-0.01em;}
+  .section-head .hint{font-size:12.5px;color:var(--muted);}
+
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px;}
+
+  /* KPI */
+  .kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;}
+  .kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;}
+  .kpi .lbl{font-size:11.5px;color:var(--muted);font-weight:600;margin-bottom:8px;}
+  .kpi .val{font-size:26px;font-weight:700;letter-spacing:-0.02em;}
+  .kpi .sub{font-size:11.5px;color:var(--muted);margin-top:4px;}
+  .kpi.accent-teal .val{color:var(--teal);} .kpi.accent-amber .val{color:var(--amber);}
+  .kpi.accent-blue .val{color:var(--blue);} .kpi.accent-coral .val{color:var(--coral);}
+
+  /* Action queue */
+  .queue-list{display:flex;flex-direction:column;gap:0;}
+  .queue-item{border-bottom:1px solid #EFEBE1;padding:12px 4px;}
+  .queue-item:last-child{border-bottom:none;}
+  .queue-row{display:flex;align-items:center;gap:12px;cursor:pointer;}
+  .queue-row .co{flex:1;min-width:0;}
+  .queue-row .co .name{font-weight:600;}
+  .queue-row .co .meta{font-size:11.5px;color:var(--muted);}
+  .overdue-pill{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;}
+  .overdue-pill.hot{background:var(--coral-soft);color:var(--coral);}
+  .overdue-pill.warm{background:var(--amber-soft);color:var(--amber);}
+  .queue-actions{display:flex;gap:6px;}
+  .btn{font-size:12px;font-weight:600;border-radius:7px;padding:6px 11px;border:1px solid var(--border);background:#fff;color:var(--text);cursor:pointer;}
+  .btn:hover{border-color:var(--teal);color:var(--teal);}
+  .btn.primary{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .btn.primary:hover{background:#186154;color:#fff;}
+  .btn.ghost{border-color:transparent;color:var(--muted);}
+  .btn.ghost:hover{color:var(--coral);}
+  .btn.small{padding:4px 9px;font-size:11.5px;}
+  .empty-state{color:var(--muted);font-size:13px;padding:20px 4px;text-align:center;}
+
+  /* Log form */
+  .log-form{background:#FBFAF6;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-top:10px;}
+  .lf-heading{font-size:12.5px;color:var(--muted);margin-bottom:8px;}
+  .lf-heading strong{color:var(--text);}
+  .coverage-warning{font-size:12px;font-weight:600;color:var(--coral);background:var(--coral-soft);border:1px solid #F0C7BC;border-radius:6px;padding:7px 10px;margin-bottom:12px;}
+  .lf-optional{font-weight:400;color:var(--muted);text-transform:none;font-size:11px;}
+  .channel-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;}
+  .channel-chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);font-weight:500;}
+  .channel-chk input{width:15px;height:15px;accent-color:var(--teal);}
+  .lf-call-result{margin-bottom:12px;}
+  .lf-next-hint{font-size:12px;color:var(--amber);background:var(--amber-soft);border-radius:6px;padding:6px 9px;margin:-2px 0 10px;}
+  .coverage-badge{font-size:10px;font-weight:700;color:var(--coral);background:var(--coral-soft);border-radius:4px;padding:2px 6px;margin-left:6px;white-space:nowrap;}
+  .log-form .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  .log-form label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px;}
+  .log-form select, .log-form input[type=date], .log-form textarea, .log-form input[type=text]{
+    width:100%;font-family:inherit;font-size:13px;padding:7px 9px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--text);
+  }
+  .log-form input:disabled{background:#F1EEE4;color:var(--muted);}
+  .log-form textarea{resize:vertical;min-height:52px;}
+  .log-form .actions{display:flex;justify-content:space-between;align-items:center;margin-top:2px;}
+  .activity-log{margin-top:12px;border-top:1px dashed var(--border);padding-top:10px;}
+  .activity-entry{font-size:12px;color:var(--text);padding:5px 0;border-bottom:1px solid #F1EEE4;}
+  .activity-entry:last-child{border-bottom:none;}
+  .activity-entry .when{color:var(--muted);}
+  .activity-entry .who{font-weight:600;}
+
+  /* Tasks */
+  .task-form{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .task-form input[type=text]{flex:1;min-width:200px;font-family:inherit;font-size:13px;padding:8px 11px;border:1px solid var(--border);border-radius:7px;}
+  .task-form input[type=date]{font-family:inherit;font-size:13px;padding:8px 11px;border:1px solid var(--border);border-radius:7px;}
+  .task-row{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid #F1EEE4;}
+  .task-row:last-child{border-bottom:none;}
+  .task-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--teal);}
+  .task-row.done .title{text-decoration:line-through;color:var(--muted);}
+  .task-row .title{flex:1;font-size:13px;}
+  .task-row .due{font-size:11.5px;color:var(--muted);white-space:nowrap;}
+  .task-row .due.overdue{color:var(--coral);font-weight:600;}
+  .task-toggle{display:flex;gap:6px;margin-bottom:10px;}
+  .task-toggle button{font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:#fff;cursor:pointer;color:var(--muted);}
+  .task-toggle button.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+
+  /* leaderboard */
+  .week-label{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:14px;}
+  .range-controls{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+  .range-presets{display:flex;gap:6px;flex-wrap:wrap;}
+  .range-preset-btn{font-size:12px;padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:#fff;cursor:pointer;color:var(--muted);}
+  .range-preset-btn.active{background:var(--teal);color:#fff;border-color:var(--teal);}
+  .range-custom{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);}
+  .range-custom input[type=date]{font-family:inherit;font-size:12.5px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;}
+  .lb-mode-toggle{display:flex;gap:6px;margin-bottom:16px;}
+  .lb-mode-toggle button{font-size:12.5px;padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:#fff;cursor:pointer;color:var(--muted);}
+  .lb-mode-toggle button.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .week-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
+  .week-kpi{background:#FBFAF6;border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
+  .week-kpi .lbl{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px;}
+  .week-kpi .val{font-size:20px;font-weight:700;}
+  .lb-header-row{display:flex;align-items:center;gap:12px;padding:0 4px 8px;border-bottom:1px solid var(--border);font-size:10.5px;font-weight:600;color:var(--muted);}
+  .lb-header-rank{width:22px;}
+  .lb-header-info{flex:1;}
+  .lb-header-tasks{width:70px;text-align:center;}
+  .lb-header-bar{width:160px;}
+  .lb-header-status{width:150px;text-align:right;}
+  .lb-row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid #EFEBE1;}
+  .lb-row:last-child{border-bottom:none;}
+  .lb-rank{width:22px;text-align:center;font-weight:700;color:var(--muted);font-size:13px;}
+  .lb-row.rank-1 .lb-rank{color:#C9971C;}
+  .lb-row.rank-2 .lb-rank{color:#8B95A1;}
+  .lb-row.rank-3 .lb-rank{color:#B9793F;}
+  .lb-info{flex:1;min-width:0;}
+  .lb-name{font-weight:700;font-size:13.5px;}
+  .lb-name.me{color:var(--teal);}
+  .lb-breakdown{font-size:11px;color:var(--muted);margin-top:2px;}
+  .lb-tasks{width:70px;text-align:center;}
+  .task-count-badge{display:inline-block;min-width:22px;font-size:12px;font-weight:700;color:var(--amber);background:var(--amber-soft);border-radius:12px;padding:2px 8px;}
+  .task-count-zero{font-size:12px;color:var(--muted);}
+  .lb-bar-wrap{width:160px;}
+  .lb-bar{height:8px;border-radius:4px;background:#EEE9DC;overflow:hidden;}
+  .lb-bar i{display:block;height:100%;border-radius:4px;}
+  .lb-count{font-size:12.5px;color:var(--muted);margin-top:3px;text-align:right;}
+  .lb-status{width:150px;text-align:right;font-size:11.5px;font-weight:700;white-space:nowrap;display:inline-block;}
+  .lb-status.ahead{color:var(--teal);}
+  .lb-status.behind{color:var(--coral);}
+  .lb-status.pending{color:var(--muted);}
+
+  /* charts */
+  .chart-row{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;}
+  .panel canvas{max-height:300px;}
+  .panel-title{font-size:13px;font-weight:700;margin-bottom:2px;}
+  .panel-sub{font-size:11.5px;color:var(--muted);margin-bottom:10px;}
+  .legend-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);border:1px solid var(--border);border-radius:20px;padding:3px 10px 3px 8px;}
+  .chip .sw{width:8px;height:8px;border-radius:50%;}
+
+  /* locations table */
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  .loc-table th{text-align:left;font-size:11px;color:var(--muted);font-weight:600;padding:9px 10px;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;}
+  .loc-table th.num, .loc-table td.num{text-align:right;}
+  .loc-table th:hover{color:var(--ink);}
+  .loc-table td{padding:9px 10px;border-bottom:1px solid #EFEBE1;white-space:nowrap;}
+  .loc-table tbody tr{cursor:pointer;}
+  .loc-table tbody tr:hover{background:var(--teal-soft);}
+  .loc-table tbody tr.active-row{background:var(--amber-soft);}
+  .brand-tag{display:inline-block;font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:4px;}
+  .table-scroll{overflow-x:auto;background:var(--card);border:1px solid var(--border);border-radius:10px;}
+  .table-scroll table{min-width:1080px;}
+
+  /* filters */
+  .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
+  .filters select, .filters input[type="text"]{font-family:inherit;font-size:13px;padding:8px 11px;border:1px solid var(--border);border-radius:7px;background:#fff;color:var(--text);}
+  .filters input[type="text"]{flex:1;min-width:220px;}
+  .filters select{min-width:150px;}
+  .filters label.chk{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);}
+  .filters .clear-btn{font-size:12.5px;color:var(--muted);background:none;border:1px solid var(--border);border-radius:7px;padding:8px 12px;cursor:pointer;}
+  .filters .clear-btn:hover{color:var(--coral);border-color:var(--coral);}
+  .count-line{font-size:12.5px;color:var(--muted);margin-bottom:10px;}
+  .count-line strong{color:var(--text);}
+
+  .lead-row{border-bottom:1px solid #EFEBE1;}
+  .lead-row:hover{background:#FCFBF7;}
+  .lead-main{display:grid;grid-template-columns:auto 2.2fr 1.4fr 1.4fr 1.5fr 1fr auto;gap:10px;align-items:center;padding:10px 12px;cursor:pointer;}
+  .lead-main .company{font-weight:600;}
+  .lead-main .meta{font-size:11.5px;color:var(--muted);}
+  .lead-main .contact{font-size:12.5px;}
+  .lead-main .contact .t{color:var(--muted);font-size:11px;}
+  .quick-link{color:var(--teal);text-decoration:none;font-weight:600;}
+  .quick-link:hover{text-decoration:underline;}
+  .lead-select-cb{width:16px;height:16px;accent-color:var(--teal);cursor:pointer;}
+  .events-select{font-size:10.5px;font-weight:600;padding:3px 5px;border-radius:5px;border:1.5px solid;background:#fff;margin-top:5px;cursor:pointer;max-width:150px;}
+  .bulk-bar{display:none;align-items:center;justify-content:space-between;gap:12px;background:var(--ink);color:#fff;border-radius:8px;padding:10px 16px;margin-bottom:10px;flex-wrap:wrap;}
+  .bulk-bar strong{font-weight:700;}
+  .bulk-bar .actions{display:flex;gap:8px;}
+  .bulk-bar button{font-size:12.5px;font-weight:600;border-radius:7px;padding:7px 13px;border:1px solid #3A4756;background:#1E2A37;color:#fff;cursor:pointer;}
+  .bulk-bar button.primary{background:var(--amber);border-color:var(--amber);color:#1E2A37;}
+  .bulk-bar button:hover{opacity:.9;}
+  .status-badge{display:inline-block;font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:20px;white-space:nowrap;}
+  .caret{color:var(--muted);font-size:12px;transition:transform .12s;}
+  .lead-row.open .caret{transform:rotate(90deg);}
+  .lead-detail{display:none;padding:0 12px 16px;}
+  .lead-row.open .lead-detail{display:block;}
+
+  .pagination{display:flex;align-items:center;gap:10px;justify-content:flex-end;padding:12px 14px;font-size:12.5px;color:var(--muted);}
+  .pagination button{border:1px solid var(--border);background:#fff;border-radius:6px;padding:5px 11px;cursor:pointer;font-size:12.5px;color:var(--text);}
+  .pagination button:disabled{opacity:.4;cursor:default;}
+  .pagination button:hover:not(:disabled){border-color:var(--teal);color:var(--teal);}
+
+  .loading-overlay{position:fixed;inset:0;background:var(--paper);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;z-index:999;}
+  .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loading-overlay .msg{font-size:13px;color:var(--muted);}
+
+  .shared-note{font-size:11.5px;color:var(--muted);background:var(--blue-soft);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:16px;}
+
+  /* add prospect */
+  .explorer-toolbar{display:flex;justify-content:flex-end;margin-bottom:12px;}
+  .modal-overlay{position:fixed;inset:0;background:rgba(22,32,42,0.55);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;}
+  .modal-box{background:#fff;border-radius:12px;padding:22px 24px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;}
+  .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .modal-head h3{margin:0;font-size:17px;font-weight:700;}
+  .modal-close{background:none;border:none;font-size:16px;color:var(--muted);cursor:pointer;padding:2px 6px;}
+  .modal-close:hover{color:var(--coral);}
+  .modal-box label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin:10px 0 4px;}
+  .modal-box select, .modal-box input[type=text], .modal-box input[type=email], .modal-box input[type=password], .modal-box textarea{
+    width:100%;font-family:inherit;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:7px;background:#fff;color:var(--text);
+  }
+  .modal-box textarea{resize:vertical;min-height:56px;}
+  .modal-box .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;}
+  .new-badge{display:inline-block;font-size:10px;font-weight:700;color:var(--teal);background:var(--teal-soft);border-radius:4px;padding:2px 6px;margin-left:6px;}
+
+  footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 0 6px;}
+
+  @media (max-width:980px){
+    .kpi-row{grid-template-columns:repeat(3,1fr);}
+    .chart-row{grid-template-columns:1fr;}
+    .lead-main{grid-template-columns:1fr;}
+  }
+  @media (max-width:640px){ .kpi-row{grid-template-columns:repeat(2,1fr);} }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading-overlay" style="display:none;">
+  <div class="spinner"></div>
+  <div class="msg">Loading shared workspace data…</div>
+</div>
+
+<div class="modal-overlay" id="login-overlay" style="display:flex;">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Sign in</h3>
+    </div>
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 4px;">Five Star Parks — Prospecting Workspace</p>
+    <label>Email</label>
+    <input type="email" id="login-email" placeholder="you@fivestarparks.com">
+    <label>Password</label>
+    <input type="password" id="login-password" placeholder="Password">
+    <div id="login-error" style="color:#D9583D;font-size:12.5px;margin-top:10px;display:none;"></div>
+    <div class="modal-actions">
+      <button class="btn primary" id="login-submit-btn" style="width:100%;">Log in</button>
+    </div>
+  </div>
+</div>
+
+<header class="top">
+  <div class="wrap">
+    <div>
+      <div class="brandmark"><span class="dot"></span><h1>Five Star Parks — Prospecting Workspace</h1></div>
+      <p>Live, shared with the team · log outcomes, set tasks, and follow the reminders below</p>
+    </div>
+    <div class="me-box">
+      <div class="me-field"><label for="me-input">Your name</label><input id="me-input" type="text" placeholder="e.g. Jordan"></div>
+      <div class="me-field ms-dropdown">
+        <label>Viewing</label>
+        <button type="button" class="ms-btn" id="loc-ms-btn">All locations ▾</button>
+        <div class="ms-panel" id="loc-ms-panel" style="display:none;">
+          <div class="ms-actions">
+            <button type="button" id="loc-ms-all">Select all</button>
+            <button type="button" id="loc-ms-clear">Show all (clear)</button>
+          </div>
+          <div class="ms-list" id="loc-ms-list"></div>
+        </div>
+      </div>
+      <button type="button" class="btn small ghost" id="logout-btn" style="border-color:#3A4756;color:#B9C2CC;">Log out</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="tab-nav">
+    <button class="tab-btn active" id="tab-btn-work" data-tab="work">Work</button>
+    <button class="tab-btn" id="tab-btn-analytics" data-tab="analytics">Analytics</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="shared-note">This is a live, shared workspace — everyone using this link sees the same leads, outcomes, and tasks in real time. The "Logged / Called / Emailed" baseline totals on the Analytics tab are a one-time snapshot from the original tracker export and won't update further; everything else here is fully live.</div>
+  <div class="scope-banner" id="scope-banner" style="display:none;"></div>
+
+  <div id="tab-work">
+
+  <section>
+    <div class="section-head">
+      <h2>Follow-up queue</h2>
+      <span class="hint" id="queue-hint"></span>
+    </div>
+    <div class="panel">
+      <div class="queue-list" id="queue-list"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>New prospects</h2>
+      <span class="hint" id="new-prospects-hint">Recently added accounts — get the first call or email logged</span>
+    </div>
+    <div class="panel">
+      <div class="explorer-toolbar" style="margin-bottom:14px;">
+        <button class="btn primary" id="add-prospect-btn">+ Add new prospect</button>
+      </div>
+      <div id="new-prospects-list"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Tasks</h2>
+      <span class="hint">Manual reminders your team sets, separate from the automatic follow-up queue</span>
+    </div>
+    <div class="panel">
+      <div class="task-form">
+        <input type="text" id="task-title" placeholder="Task, e.g. Call back about pricing">
+        <input type="text" id="task-company" placeholder="Company (optional)">
+        <input type="text" id="task-assignee" placeholder="Assigned to">
+        <select id="task-location"><option value="">General (visible to everyone)</option></select>
+        <input type="date" id="task-due">
+        <button class="btn primary" id="task-add-btn">Add task</button>
+      </div>
+      <div class="task-toggle">
+        <button class="active" data-f="open">Open</button>
+        <button data-f="all">All</button>
+      </div>
+      <div id="task-list"></div>
+    </div>
+  </section>
+
+  <section id="explorer">
+    <div class="section-head">
+      <h2>Lead explorer</h2>
+      <span class="hint">Click a lead to log an outcome, change status, or add a task</span>
+    </div>
+    <div class="filters">
+      <input type="text" id="f-search" placeholder="Search company, contact, or notes…">
+      <select id="f-brand"><option value="">All brands</option></select>
+      <select id="f-location"><option value="">All locations</option></select>
+      <select id="f-status"><option value="">All statuses</option></select>
+      <select id="f-events"><option value="">All events statuses</option></select>
+      <label class="chk"><input type="checkbox" id="f-due"> Due for follow-up only</label>
+      <label class="chk"><input type="checkbox" id="f-flag"> ⚠️ Email-only (never called)</label>
+      <button class="clear-btn" id="f-clear">Clear filters</button>
+    </div>
+    <div class="count-line" id="count-line"></div>
+    <div class="bulk-bar" id="bulk-bar">
+      <span><strong id="bulk-count">0</strong> selected</span>
+      <div class="actions">
+        <button id="bulk-log-btn">Log outcome for selected</button>
+        <button id="bulk-clear-btn">Clear selection</button>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <div id="lead-list"></div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </section>
+
+  </div>
+
+  <div id="tab-analytics" style="display:none;">
+
+  <div class="explorer-toolbar" style="justify-content:space-between;align-items:center;">
+    <span class="hint">Export a snapshot of every lead in view, with current status and activity history</span>
+    <button class="btn" id="export-csv-btn">⬇ Export to CSV</button>
+  </div>
+
+  <section class="kpi-row" id="kpi-row"></section>
+
+  <section>
+    <div class="section-head">
+      <h2>Leaderboards</h2>
+      <span class="hint" id="leaderboard-hint">Goal: 50 prospecting attempts per person this week</span>
+    </div>
+    <div class="panel">
+      <div class="lb-mode-toggle">
+        <button class="active" data-mode="person">By Salesperson</button>
+        <button data-mode="park">By Park</button>
+        <button data-mode="accounts">Accounts Reached</button>
+      </div>
+      <div class="range-controls">
+        <div class="range-presets">
+          <button class="range-preset-btn active" data-preset="week">This Week</button>
+          <button class="range-preset-btn" data-preset="lastweek">Last Week</button>
+          <button class="range-preset-btn" data-preset="month">This Month</button>
+          <button class="range-preset-btn" data-preset="30d">Last 30 Days</button>
+          <button class="range-preset-btn" data-preset="all">All Time</button>
+        </div>
+        <div class="range-custom">
+          <input type="date" id="range-start-input">
+          <span>to</span>
+          <input type="date" id="range-end-input">
+          <button class="btn small" id="range-apply-btn">Apply</button>
+        </div>
+      </div>
+      <div class="week-label" id="week-label">Week of —</div>
+      <div class="week-kpis" id="week-kpis"></div>
+      <div class="lb-header-row" id="lb-header-row">
+        <div class="lb-header-rank"></div>
+        <div class="lb-header-info">Rep</div>
+        <div class="lb-header-tasks">Open tasks</div>
+        <div class="lb-header-bar">Attempts this week</div>
+        <div class="lb-header-status">To hit 50</div>
+      </div>
+      <div id="leaderboard-list"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Portfolio overview</h2>
+      <span class="hint">Status mix reflects live team activity; volumes are from the original tracker export</span>
+    </div>
+    <div class="chart-row">
+      <div class="panel">
+        <div class="panel-title" id="chart-logged-title">Leads logged by location</div>
+        <div class="panel-sub" id="chart-logged-sub">Sorted by volume, colored by brand</div>
+        <canvas id="chart-logged" height="300"></canvas>
+        <div class="legend-chips" id="brand-legend"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title" id="chart-status-title">Where leads stand right now</div>
+        <div class="panel-sub" id="chart-status-sub">Live status mix, including outcomes your team has logged</div>
+        <canvas id="chart-status" height="300"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Locations</h2>
+      <span class="hint" id="loc-table-hint">Portfolio-wide totals for context · your location is highlighted</span>
+    </div>
+    <div class="table-scroll">
+      <table class="loc-table" id="loc-table">
+        <thead>
+          <tr>
+            <th data-key="brand">Brand</th>
+            <th data-key="location">Location</th>
+            <th data-key="rep">Rep</th>
+            <th class="num" data-key="logged">Logged</th>
+            <th class="num" data-key="called">Called</th>
+            <th class="num" data-key="contacted">Contacted</th>
+            <th class="num" data-key="booked">Booked</th>
+            <th class="num" data-key="bookedRate">Booked rate</th>
+            <th class="num" data-key="in_conv">In Conv.</th>
+            <th class="num" data-key="touched">Team activity</th>
+          </tr>
+        </thead>
+        <tbody id="loc-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  </div>
+
+  <div class="modal-overlay" id="add-prospect-overlay" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>Add a new prospect</h3>
+        <button class="modal-close" id="add-prospect-close">✕</button>
+      </div>
+      <label>Park / location</label>
+      <select id="np-location"></select>
+      <div class="grid2">
+        <div><label>Company *</label><input type="text" id="np-company" placeholder="Company name"></div>
+        <div><label>Contact name</label><input type="text" id="np-contact" placeholder="First + Last"></div>
+      </div>
+      <div class="grid2">
+        <div><label>Title</label><input type="text" id="np-title" placeholder="e.g. HR Director"></div>
+        <div><label>Phone</label><input type="text" id="np-phone" placeholder="Direct line"></div>
+      </div>
+      <label>Email</label>
+      <input type="text" id="np-email" placeholder="Direct email">
+      <label>Notes</label>
+      <textarea id="np-notes" placeholder="Where this lead came from, anything worth knowing…"></textarea>
+      <div class="modal-actions">
+        <button class="btn small ghost" id="add-prospect-cancel">Cancel</button>
+        <button class="btn primary" id="add-prospect-save">Add prospect</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="bulk-log-overlay" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>Log outcome for <span id="bulk-log-count">0</span> leads</h3>
+        <button class="modal-close" id="bulk-log-close">✕</button>
+      </div>
+      <div id="bulk-log-form-slot"></div>
+    </div>
+  </div>
+
+  <footer>Built from the Five Star Parks Prospecting Tracker · Volumes come from the Portfolio Summary tab; statuses, outcomes, and tasks update live and are shared with your team.</footer>
+</div>
+
+<script>
+/* ---------------- SUPABASE CONFIG ---------------- */
+const SUPABASE_URL = 'https://utiozccjdfsetpnmwtuo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ik4x5iUJymrt_fqNny-qFQ_4YSu58hc';
+
+/* ---------------- AUTH ---------------- */
+let authAccessToken = null;
+let authRefreshToken = null;
+let authUserEmail = null;
+
+function authHeaders(){
+  return {
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + (authAccessToken || SUPABASE_KEY),
+    'Content-Type': 'application/json'
+  };
+}
+function saveSession(){
+  localStorage.setItem('fsp_auth', JSON.stringify({access_token: authAccessToken, refresh_token: authRefreshToken, email: authUserEmail}));
+}
+function restoreSession(){
+  try {
+    const raw = localStorage.getItem('fsp_auth');
+    if (!raw) return false;
+    const parsed = JSON.parse(raw);
+    if (!parsed.access_token) return false;
+    authAccessToken = parsed.access_token;
+    authRefreshToken = parsed.refresh_token;
+    authUserEmail = parsed.email;
+    return true;
+  } catch(e){ return false; }
+}
+async function refreshSession(){
+  if (!authRefreshToken) return false;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: authRefreshToken })
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    authAccessToken = data.access_token;
+    authRefreshToken = data.refresh_token;
+    saveSession();
+    return true;
+  } catch(e){ return false; }
+}
+async function loginWithPassword(email, password){
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error_description || data.msg || 'Login failed — check your email and password.');
+  authAccessToken = data.access_token;
+  authRefreshToken = data.refresh_token;
+  authUserEmail = data.user && data.user.email;
+  saveSession();
+}
+function logout(){
+  authAccessToken = null; authRefreshToken = null; authUserEmail = null;
+  localStorage.removeItem('fsp_auth');
+  location.reload();
+}
+async function authFetch(url, opts={}, retried){
+  const res = await fetch(url, {...opts, headers: {...authHeaders(), ...(opts.headers||{})}});
+  if (res.status === 401 && !retried && authRefreshToken){
+    const ok = await refreshSession();
+    if (ok) return authFetch(url, opts, true);
+  }
+  return res;
+}
+
+/* ---------------- SUPABASE DATA HELPERS ---------------- */
+async function supaSelect(table, query){
+  let all = [];
+  let offset = 0;
+  const pageSize = 1000;
+  while (true){
+    const url = `${SUPABASE_URL}/rest/v1/${table}?${query||''}`;
+    const res = await authFetch(url, { headers: { 'Range': `${offset}-${offset+pageSize-1}` } });
+    if (!res.ok) throw new Error(`Supabase select from ${table} failed: ${res.status}`);
+    const batch = await res.json();
+    all = all.concat(batch);
+    if (batch.length < pageSize) break;
+    offset += pageSize;
+  }
+  return all;
+}
+async function supaUpsert(table, rows){
+  const res = await authFetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: {'Prefer': 'resolution=merge-duplicates,return=minimal'},
+    body: JSON.stringify(rows)
+  });
+  if (!res.ok) throw new Error(`Supabase upsert into ${table} failed: ${res.status} ${await res.text()}`);
+}
+async function supaInsert(table, rows){
+  const res = await authFetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: {'Prefer': 'return=minimal'},
+    body: JSON.stringify(rows)
+  });
+  if (!res.ok) throw new Error(`Supabase insert into ${table} failed: ${res.status} ${await res.text()}`);
+}
+async function supaDelete(table, matchQuery){
+  const res = await authFetch(`${SUPABASE_URL}/rest/v1/${table}?${matchQuery}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error(`Supabase delete from ${table} failed: ${res.status}`);
+}
+
+const LEADS = [];
+const LOCS = [{"brand":"Scene75","location":"Chicagoland","logged":426,"called":113,"emailed":375,"linkedin":152,"contacted":16,"booked":49,"in_conv":13,"tours":1},{"brand":"Scene75","location":"Columbus","logged":409,"called":192,"emailed":393,"linkedin":10,"contacted":8,"booked":1,"in_conv":6,"tours":0},{"brand":"Scene75","location":"Cleveland","logged":717,"called":73,"emailed":637,"linkedin":0,"contacted":1,"booked":1,"in_conv":17,"tours":0},{"brand":"Scene75","location":"Cincinnati","logged":178,"called":54,"emailed":95,"linkedin":0,"contacted":0,"booked":7,"in_conv":18,"tours":1},{"brand":"Scene75","location":"Dayton","logged":597,"called":593,"emailed":98,"linkedin":0,"contacted":22,"booked":22,"in_conv":49,"tours":0},{"brand":"Malibu Jacks","location":"N. Richland Hills","logged":314,"called":300,"emailed":307,"linkedin":167,"contacted":188,"booked":1,"in_conv":3,"tours":0},{"brand":"Malibu Jacks","location":"Lexington","logged":688,"called":688,"emailed":679,"linkedin":74,"contacted":2,"booked":0,"in_conv":7,"tours":0},{"brand":"Malibu Jacks","location":"Louisville","logged":233,"called":173,"emailed":101,"linkedin":89,"contacted":8,"booked":0,"in_conv":2,"tours":0},{"brand":"Malibu Jacks","location":"Ashland","logged":402,"called":255,"emailed":91,"linkedin":27,"contacted":35,"booked":0,"in_conv":0,"tours":0},{"brand":"Malibu Jacks","location":"Lafayette","logged":608,"called":173,"emailed":601,"linkedin":38,"contacted":157,"booked":5,"in_conv":5,"tours":0},{"brand":"Fun Land","location":"Fairfax (A)","logged":190,"called":74,"emailed":190,"linkedin":0,"contacted":0,"booked":0,"in_conv":1,"tours":0},{"brand":"Fun Land","location":"Fairfax (L)","logged":222,"called":93,"emailed":179,"linkedin":2,"contacted":22,"booked":0,"in_conv":18,"tours":2},{"brand":"Fun Land","location":"Fredericksburg (A)","logged":45,"called":20,"emailed":45,"linkedin":0,"contacted":1,"booked":0,"in_conv":1,"tours":0},{"brand":"Fun Land","location":"Fredericksburg (L)","logged":408,"called":217,"emailed":175,"linkedin":15,"contacted":64,"booked":0,"in_conv":94,"tours":5},{"brand":"Celebration Station","location":"OKC","logged":145,"called":130,"emailed":88,"linkedin":0,"contacted":6,"booked":0,"in_conv":0,"tours":0},{"brand":"Celebration Station","location":"Mesquite","logged":198,"called":161,"emailed":119,"linkedin":1,"contacted":10,"booked":0,"in_conv":0,"tours":0},{"brand":"Celebration Station","location":"Clearwater","logged":277,"called":202,"emailed":195,"linkedin":61,"contacted":78,"booked":0,"in_conv":6,"tours":1},{"brand":"Celebration Station","location":"Baton Rouge","logged":153,"called":118,"emailed":91,"linkedin":1,"contacted":18,"booked":0,"in_conv":0,"tours":0},{"brand":"Celebration Station","location":"Greensboro","logged":209,"called":122,"emailed":134,"linkedin":0,"contacted":4,"booked":1,"in_conv":6,"tours":0},{"brand":"Craig's Cruisers","location":"Grand Rapids","logged":661,"called":620,"emailed":529,"linkedin":87,"contacted":87,"booked":13,"in_conv":73,"tours":0},{"brand":"Branson Parks","location":"Branson Parks","logged":312,"called":211,"emailed":81,"linkedin":12,"contacted":6,"booked":0,"in_conv":7,"tours":2},{"brand":"Pigeon Forge","location":"Pigeon Forge Parks","logged":217,"called":117,"emailed":101,"linkedin":3,"contacted":5,"booked":5,"in_conv":7,"tours":1}];
+const TOTAL = {"logged":7609,"called":4699,"emailed":5304,"linkedin":739,"contacted":738,"booked":105,"in_conv":333,"tours":13};
+const LEAD_BY_ID = new Map();
+
+/* Pull the base lead list from Supabase and rebuild LEADS/LEAD_BY_ID in the same shape the rest of the app expects. */
+async function loadLeadsFromSupabase(){
+  try{
+    const rows = await supaSelect('leads', 'select=*');
+    rows.forEach(row=>{
+      const r = {
+        id: row.id, b: row.brand, l: row.location, c: row.company, n: row.contact, t: row.title,
+        p: row.phone, e: row.email, dc: row.date_called, de: row.date_emailed, li: row.linkedin,
+        dt: row.date_contacted, s: row.base_status || 'No Status', note: row.notes,
+        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at
+      };
+      LEADS.push(r);
+      LEAD_BY_ID.set(r.id, r);
+    });
+  } catch(e){
+    console.error('Failed to load leads from Supabase', e);
+    const ov = document.getElementById('loading-overlay');
+    if (ov) ov.innerHTML = '<div class="msg" style="color:#D9583D;max-width:360px;text-align:center;">Could not reach the database. Check your connection and refresh the page.</div>';
+    throw e;
+  }
+}
+
+
+const BRAND_COLORS = {
+  'Scene75':'#1F7A6C','Malibu Jacks':'#35638F','Fun Land':'#E0932E',
+  'Celebration Station':'#D9583D',"Craig's Cruisers":'#6A5A8C',
+  'Branson Parks':'#9C6B3E','Pigeon Forge':'#3F8F8F'
+};
+const BRAND_SOFT = {
+  'Scene75':'#E4F1EE','Malibu Jacks':'#E5EDF4','Fun Land':'#FBEDD8',
+  'Celebration Station':'#FBE7E1',"Craig's Cruisers":'#ECE8F3',
+  'Branson Parks':'#F3E9DD','Pigeon Forge':'#E4F1F1'
+};
+const STATUS_COLORS = {
+  'Day 1 Sent':'#35638F','Called – No Answer':'#8B95A1','No Status':'#B7AF98',
+  'Day 3 Sent':'#5C87AD','Day 7 Sent':'#7FA3C2','In Conversation':'#E0932E',
+  'Not Interested':'#D9583D','Booked':'#1F7A6C','Paused':'#B98A55',
+  'Follow-up Sent':'#C7A25E','In Person Visit':'#6A5A8C','Tour Scheduled':'#2FA294',
+  'Follow-up/Assigned':'#A8916B','Developing':'#9C6B3E','Proposal Sent':'#3F8F8F',
+  'Sent over intro email with corp deck':'#B0A98F'
+};
+const ALL_STATUSES = ['No Status','Day 1 Sent','Called – No Answer','Day 3 Sent','Day 7 Sent','In Conversation',
+  'Follow-up Sent','Tour Scheduled','Proposal Sent','Paused','Developing','In Person Visit','Booked','Not Interested'];
+
+const CADENCE_DAYS = {
+  'Day 1 Sent':3, 'Called – No Answer':3, 'Day 3 Sent':4, 'Day 7 Sent':7,
+  'In Conversation':3, 'Follow-up Sent':3, 'Follow-up/Assigned':3,
+  'Paused':14, 'Developing':5, 'Proposal Sent':3, 'Tour Scheduled':2
+};
+const NO_FOLLOWUP = new Set(['Booked','Not Interested']);
+
+const CHANNELS = [
+  {v:'call', label:'Called'},
+  {v:'email', label:'Emailed'},
+  {v:'linkedin', label:'LinkedIn'},
+  {v:'in_person', label:'In person'}
+];
+const CALL_RESULTS = [
+  {v:'no_answer', label:'No answer', status:'Called – No Answer'},
+  {v:'voicemail', label:'Left voicemail', status:'Called – No Answer'},
+  {v:'spoke', label:'Spoke with contact', status:'In Conversation'},
+  {v:'gatekeeper', label:'Blocked by gatekeeper / not available', status:'Called – No Answer'},
+];
+const OUTCOME_OPTIONS = [
+  {v:'continue', label:'Continue normal sequence', status:null},
+  {v:'interested', label:'Interested / wants more info', status:'In Conversation'},
+  {v:'not_interested', label:'Not interested', status:'Not Interested'},
+  {v:'booked', label:'Booked', status:'Booked'},
+  {v:'tour_scheduled', label:'Tour scheduled', status:'Tour Scheduled'},
+  {v:'pause', label:'Pausing – try a new contact', status:'Paused'},
+];
+
+/* Separate from pipeline status — a quick tag for whether this account books events at all. */
+const EVENTS_OPTIONS = [
+  {v:'', label:'Events: —', color:'#8B95A1'},
+  {v:'no_events', label:'🚫 No events', color:'#D9583D'},
+  {v:'does_events_not_us', label:'🎪 Does events – not with us', color:'#E0932E'},
+  {v:'does_events_with_us', label:'✅ Does events – with us', color:'#1F7A6C'},
+];
+function eventsLabel(v){ return (EVENTS_OPTIONS.find(o=>o.v===v)||EVENTS_OPTIONS[0]).label; }
+function eventsColor(v){ return (EVENTS_OPTIONS.find(o=>o.v===v)||EVENTS_OPTIONS[0]).color; }
+async function saveEventsStatus(leadId, value){
+  const existing = overrides[leadId] || {activity:[]};
+  const merged = {...existing, eventsStatus: value};
+  overrides[leadId] = merged;
+  try { await persistLeadState(leadId, merged); }
+  catch(e){ console.error('events status save failed', e); alert('Could not save — try again.'); }
+}
+
+function fmt(n){ return (n||0).toLocaleString('en-US'); }
+function pct(a,b){ return b>0 ? Math.round((a/b)*100) : 0; }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function daysBetween(a,b){ return Math.round((new Date(b+'T00:00:00') - new Date(a+'T00:00:00')) / 86400000); }
+function hexToSoft(hex){ const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return `rgba(${r},${g},${b},0.16)`; }
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------------- STATE ---------------- */
+let overrides = {};      // leadId(string) -> {status, lastContactDate, nextFollowUp, activity:[], updatedBy, updatedAt}
+let tasks = [];          // array of task objects
+let myName = '';
+let viewLocations = new Set(); // "brand|||location" keys currently in view; empty Set = all locations
+
+const LOCATION_OPTIONS = [...new Set(LOCS.map(l=>l.brand+'|||'+l.location))].sort();
+
+/* Sales rep assigned to each park. "2" is a secondary/backup rep where given. */
+const REP_ASSIGNMENTS = {
+  'Scene75|||Chicagoland': {primary:'Sherry Kenny'},
+  'Scene75|||Columbus': {primary:'Zach Jordan'},
+  'Scene75|||Cleveland': {primary:'Dan Edwards'},
+  'Scene75|||Cincinnati': {primary:'Erika Rogers'},
+  'Scene75|||Dayton': {primary:'Curtis Mann III'},
+  'Malibu Jacks|||N. Richland Hills': {primary:'Aman Mahmood'},
+  'Malibu Jacks|||Lexington': {primary:'Katie Owen'},
+  'Malibu Jacks|||Louisville': {primary:'Mckensie Johnson'},
+  'Malibu Jacks|||Ashland': {primary:'Derrick Harshbarger'},
+  'Malibu Jacks|||Lafayette': {primary:'Susan Dawson'},
+  'Fun Land|||Fairfax (A)': {primary:'Amanda Minniti', secondary:'Leah Merideth'},
+  'Fun Land|||Fairfax (L)': {primary:'Amanda Minniti', secondary:'Leah Merideth'},
+  'Fun Land|||Fredericksburg (A)': {primary:'Amanda Minniti', secondary:'Leah Merideth'},
+  'Fun Land|||Fredericksburg (L)': {primary:'Amanda Minniti', secondary:'Leah Merideth'},
+  'Celebration Station|||OKC': {primary:'Vicki Bush'},
+  'Celebration Station|||Mesquite': {primary:'Vicki Bush'},
+  'Celebration Station|||Baton Rouge': {primary:'Vicki Bush'},
+  'Celebration Station|||Clearwater': {primary:'Taylor Darragh'},
+  'Celebration Station|||Greensboro': {primary:'Amanda Minniti'},
+  "Craig's Cruisers|||Grand Rapids": {primary:'Cait Black', secondary:'Heather Walcott'},
+  'Branson Parks|||Branson Parks': {primary:'Grace Tate'},
+  'Pigeon Forge|||Pigeon Forge Parks': {primary:'Grace Tate'},
+};
+function repFor(brand, location){ return REP_ASSIGNMENTS[locKey(brand,location)] || null; }
+function repLabel(brand, location){
+  const r = repFor(brand, location);
+  if (!r) return null;
+  return r.secondary ? `${r.primary} (+ ${r.secondary})` : r.primary;
+}
+function locKey(brand, location){ return brand+'|||'+location; }
+function inScope(brand, location){
+  return viewLocations.size===0 || viewLocations.has(locKey(brand, location));
+}
+/* The set of locations currently in view, as an array of {brand,location}.
+   Empty array means "all locations" — nothing is narrowing the view. */
+function selectedLocsArray(){
+  return [...viewLocations].sort().map(k=>{ const [brand,location]=k.split('|||'); return {brand,location}; });
+}
+/* Back-compat single-location helper: returns {brand,location} only when
+   exactly one location is selected, otherwise null. */
+function activeLocationFilter(){
+  const arr = selectedLocsArray();
+  return arr.length===1 ? arr[0] : null;
+}
+function scopeSuffix(){
+  const n = viewLocations.size;
+  if (!n) return '';
+  if (n===1){ const a = selectedLocsArray()[0]; return ` — ${a.brand} · ${a.location} only`; }
+  return ` — ${n} locations selected`;
+}
+function newLeadsCountFor(brand, location){
+  let n = 0;
+  LEADS.forEach(r=>{ if (r.isNew && r.b===brand && r.l===location) n++; });
+  return n;
+}
+function locsWithLiveCounts(){
+  return LOCS.map(l=>({...l, logged: l.logged + newLeadsCountFor(l.brand, l.location)}));
+}
+
+function advanceSequence(current){
+  if (!current || current==='No Status') return 'Day 1 Sent';
+  if (current==='Day 1 Sent') return 'Day 3 Sent';
+  if (current==='Day 3 Sent') return 'Day 7 Sent';
+  return current;
+}
+function baseLastDate(r){
+  const dates = [r.dc, r.de, r.dt].filter(Boolean);
+  if (!dates.length) return null;
+  return dates.sort().slice(-1)[0];
+}
+function getEffective(r){
+  const ov = overrides[r.id];
+  const status = (ov && ov.status) || r.s;
+  const lastDate = (ov && ov.lastContactDate) || baseLastDate(r);
+  let nextFollowUp = ov && ov.nextFollowUp !== undefined ? ov.nextFollowUp : undefined;
+  if (nextFollowUp === undefined){
+    if (NO_FOLLOWUP.has(status) || !lastDate){ nextFollowUp = null; }
+    else {
+      const days = CADENCE_DAYS[status] ?? 5;
+      const d = new Date(lastDate+'T00:00:00'); d.setDate(d.getDate()+days);
+      nextFollowUp = d.toISOString().slice(0,10);
+    }
+  }
+  return { status, lastDate, nextFollowUp, activity: (ov && ov.activity) || [], eventsStatus: (ov && ov.eventsStatus) || '' };
+}
+function hasCalledEver(r){
+  if (r.dc) return true;
+  const ov = overrides[r.id];
+  return !!(ov && ov.activity && ov.activity.some(a=> a.channels && a.channels.includes('call')));
+}
+function hasEmailedEver(r){
+  if (r.de) return true;
+  const ov = overrides[r.id];
+  return !!(ov && ov.activity && ov.activity.some(a=> a.channels && a.channels.includes('email')));
+}
+function coverageFlag(r){
+  const eff = getEffective(r);
+  if (NO_FOLLOWUP.has(eff.status)) return null; // booked / not interested — coverage no longer matters
+  const called = hasCalledEver(r), emailed = hasEmailedEver(r);
+  if (emailed && !called) return 'Email only — never called';
+  return null;
+}
+function lastActivity(r){
+  const ov = overrides[r.id];
+  if (!ov || !ov.activity || !ov.activity.length) return null;
+  const a = ov.activity[ov.activity.length-1];
+  return { by: a.by || 'someone', date: a.date, daysAgo: daysBetween(a.date, todayISO()) };
+}
+function lastTouchedLabel(r){
+  const la = lastActivity(r);
+  if (!la) return '';
+  const when = la.daysAgo<=0 ? 'today' : la.daysAgo===1 ? '1d ago' : `${la.daysAgo}d ago`;
+  return `Last: ${la.by}, ${when}`;
+}
+function telHref(p){ return p ? 'tel:'+String(p).replace(/[^\d+]/g,'') : ''; }
+function mailtoHref(e){ return e ? 'mailto:'+e : ''; }
+
+
+async function loadAll(){
+  await loadLeadsFromSupabase(); // note: new prospects are already rows in the leads table (is_new=true), so no separate step needed
+
+  myName = localStorage.getItem('fsp_me') || '';
+  if (myName){
+    document.getElementById('me-input').value = myName;
+    const ta = document.getElementById('task-assignee'); if (ta) ta.value = myName;
+  }
+
+  try {
+    const rawLocs = localStorage.getItem('fsp_view_locations');
+    if (rawLocs){
+      const parsed = JSON.parse(rawLocs);
+      if (Array.isArray(parsed)) viewLocations = new Set(parsed.filter(k=>LOCATION_OPTIONS.includes(k)));
+    }
+  } catch(e){}
+
+  try {
+    const stateRows = await supaSelect('lead_state', 'select=*');
+    stateRows.forEach(row=>{
+      overrides[row.lead_id] = {
+        status: row.status, lastContactDate: row.last_contact_date,
+        nextFollowUp: row.next_follow_up, eventsStatus: row.events_status || '', activity: []
+      };
+    });
+  } catch(e){ console.error('lead_state load failed', e); }
+
+  try {
+    const activityRows = await supaSelect('lead_activity', 'select=*&order=id.asc');
+    activityRows.forEach(row=>{
+      if (!overrides[row.lead_id]) overrides[row.lead_id] = {activity:[]};
+      if (!overrides[row.lead_id].activity) overrides[row.lead_id].activity = [];
+      overrides[row.lead_id].activity.push({
+        date: row.activity_date, channels: row.channels || [], callResult: row.call_result,
+        outcome: row.outcome, note: row.note, by: row.logged_by
+      });
+    });
+    Object.keys(overrides).forEach(id=>{
+      if (overrides[id].activity && overrides[id].activity.length > 50) overrides[id].activity = overrides[id].activity.slice(-50);
+    });
+  } catch(e){ console.error('lead_activity load failed', e); }
+
+  try {
+    const taskRows = await supaSelect('tasks', 'select=*');
+    taskRows.forEach(row=>{
+      tasks.push({
+        id: row.id, title: row.title, company: row.company, leadId: row.lead_id,
+        brand: row.brand, location: row.location, dueDate: row.due_date,
+        assignedTo: row.assigned_to, done: !!row.done, createdBy: row.created_by, createdAt: row.created_at
+      });
+    });
+  } catch(e){ console.error('task load failed', e); }
+
+  document.getElementById('loading-overlay').style.display = 'none';
+  renderLocationPicker();
+  renderAll();
+}
+
+async function persistLeadState(leadId, merged){
+  await supaUpsert('lead_state', [{
+    lead_id: String(leadId), status: merged.status || 'No Status',
+    last_contact_date: merged.lastContactDate || null, next_follow_up: merged.nextFollowUp || null,
+    events_status: merged.eventsStatus || '', updated_at: new Date().toISOString()
+  }]);
+}
+
+async function saveOverride(leadId, patch){
+  const existing = overrides[leadId] || {activity:[]};
+  const priorActivityLen = (existing.activity||[]).length;
+  const merged = {...existing, ...patch};
+  const newEntry = (merged.activity && merged.activity.length > priorActivityLen) ? merged.activity[merged.activity.length-1] : null;
+  if (merged.activity && merged.activity.length > 50) merged.activity = merged.activity.slice(-50);
+  overrides[leadId] = merged;
+  try {
+    await persistLeadState(leadId, merged);
+    if (newEntry){
+      await supaInsert('lead_activity', [{
+        lead_id: String(leadId), activity_date: newEntry.date, channels: newEntry.channels || [],
+        call_result: newEntry.callResult || null, outcome: newEntry.outcome || null,
+        note: newEntry.note || null, logged_by: newEntry.by || null
+      }]);
+    }
+  } catch(e){ console.error('save failed', e); alert('Could not save — check your connection and try again.'); }
+  renderAll();
+}
+
+async function saveTask(task){
+  try {
+    await supaUpsert('tasks', [{
+      id: task.id, title: task.title, company: task.company || null, lead_id: task.leadId ? String(task.leadId) : null,
+      brand: task.brand || null, location: task.location || null, due_date: task.dueDate || null,
+      assigned_to: task.assignedTo || null, done: !!task.done, created_by: task.createdBy || null
+    }]);
+  } catch(e){ console.error('task save failed', e); alert('Could not save the task — try again.'); }
+}
+
+document.getElementById('me-input').addEventListener('change', (e)=>{
+  myName = e.target.value.trim();
+  const ta = document.getElementById('task-assignee');
+  if (ta && !ta.value.trim()) ta.value = myName;
+  localStorage.setItem('fsp_me', myName);
+});
+
+/* ---------------- LOCATION PICKER (multi-select "Viewing" control) ---------------- */
+const msBtn = document.getElementById('loc-ms-btn');
+const msPanel = document.getElementById('loc-ms-panel');
+const msList = document.getElementById('loc-ms-list');
+
+// Build the checklist, grouped by brand
+const brandGroups = {};
+LOCATION_OPTIONS.forEach(opt=>{
+  const [brand, location] = opt.split('|||');
+  if (!brandGroups[brand]) brandGroups[brand] = [];
+  brandGroups[brand].push({opt, location});
+});
+msList.innerHTML = Object.keys(brandGroups).sort().map(brand=>`
+  <div class="ms-group-label">${esc(brand)}</div>
+  ${brandGroups[brand].map(item=>`
+    <label class="ms-item"><input type="checkbox" class="ms-check" value="${esc(item.opt)}"> ${esc(item.location)}</label>
+  `).join('')}
+`).join('');
+
+function syncMsCheckboxes(){
+  msList.querySelectorAll('.ms-check').forEach(cb=>{ cb.checked = viewLocations.has(cb.value); });
+}
+function renderLocationPicker(){
+  syncMsCheckboxes();
+  const n = viewLocations.size;
+  msBtn.textContent = (n===0 ? 'All locations' : n===1 ? selectedLocsArray()[0].location : `${n} locations selected`) + ' ▾';
+  const banner = document.getElementById('scope-banner');
+  if (n>0){
+    const names = selectedLocsArray().map(a=>a.location).join(', ');
+    banner.style.display='flex';
+    banner.innerHTML = `<span>Viewing <strong>${n} location${n===1?'':'s'}</strong>: ${esc(names)}. Everything below — queue, tasks, leaderboard, charts — is scoped to just these.</span><button id="banner-clear">Show all locations</button>`;
+    document.getElementById('banner-clear').addEventListener('click', ()=> setViewLocations(new Set()));
+  } else {
+    banner.style.display='none';
+  }
+  const tl = document.getElementById('task-location');
+  if (tl && n===1) tl.value = locKey(selectedLocsArray()[0].brand, selectedLocsArray()[0].location);
+}
+function persistViewLocations(){
+  try { localStorage.setItem('fsp_view_locations', JSON.stringify([...viewLocations])); } catch(e){}
+}
+function setViewLocations(newSet){
+  viewLocations = newSet;
+  renderLocationPicker();
+  refreshScopedViews();
+  renderTasks();
+  renderLocTable();
+  applyFilters();
+  persistViewLocations();
+}
+msBtn.addEventListener('click', (e)=>{ e.stopPropagation(); msPanel.style.display = msPanel.style.display==='none' ? 'block' : 'none'; });
+document.addEventListener('click', (e)=>{
+  if (msPanel.style.display!=='none' && !e.target.closest('.ms-dropdown')) msPanel.style.display = 'none';
+});
+msList.addEventListener('change', (e)=>{
+  if (!e.target.classList.contains('ms-check')) return;
+  const next = new Set(viewLocations);
+  if (e.target.checked) next.add(e.target.value); else next.delete(e.target.value);
+  setViewLocations(next);
+});
+document.getElementById('loc-ms-all').addEventListener('click', ()=> setViewLocations(new Set(LOCATION_OPTIONS)));
+document.getElementById('loc-ms-clear').addEventListener('click', ()=> setViewLocations(new Set()));
+
+
+
+/* ---------------- KPIs ---------------- */
+function scopedLeads(){
+  return viewLocations.size===0 ? LEADS : LEADS.filter(r=>inScope(r.b, r.l));
+}
+function scopedTasks(){
+  return viewLocations.size===0 ? tasks : tasks.filter(t=> !t.brand || inScope(t.brand, t.location));
+}
+function renderKPIs(){
+  const leads = scopedLeads();
+  let loggedToday = 0;
+  const todayStr = todayISO();
+  leads.forEach(r=>{
+    const ov = overrides[r.id];
+    if (ov) (ov.activity||[]).forEach(a=>{ if (a.date === todayStr) loggedToday++; });
+  });
+  const liveBooked = leads.filter(r=>getEffective(r).status==='Booked').length;
+  const liveInConv = leads.filter(r=>getEffective(r).status==='In Conversation').length;
+  const openTasks = scopedTasks().filter(t=>!t.done).length;
+
+  let totalLogged, totalCalled;
+  if (viewLocations.size===0){
+    totalLogged = TOTAL.logged + LEADS.filter(r=>r.isNew).length;
+    totalCalled = TOTAL.called;
+  } else {
+    totalLogged = 0; totalCalled = 0;
+    selectedLocsArray().forEach(sel=>{
+      const row = LOCS.find(l=>l.brand===sel.brand && l.location===sel.location);
+      totalLogged += (row ? row.logged : 0) + newLeadsCountFor(sel.brand, sel.location);
+      totalCalled += row ? row.called : 0;
+    });
+  }
+
+  const kpis = [
+    {lbl:'Leads Logged', val:totalLogged, cls:''},
+    {lbl:'Called (all-time)', val:totalCalled, cls:'accent-blue', sub:pct(totalCalled,totalLogged)+'% of logged'},
+    {lbl:'Booked (live)', val:liveBooked, cls:'accent-teal', sub:pct(liveBooked,totalLogged)+'% conversion'},
+    {lbl:'In Conversation (live)', val:liveInConv, cls:'accent-amber'},
+    {lbl:'Open Tasks', val:openTasks, cls:'accent-coral'},
+    {lbl:'Logged Today', val:loggedToday, cls:'accent-teal', sub:'activity entries logged'}
+  ];
+  document.getElementById('kpi-row').innerHTML = kpis.map(k=>`
+    <div class="kpi ${k.cls}"><div class="lbl">${k.lbl}</div><div class="val">${fmt(k.val)}</div>${k.sub?`<div class="sub">${k.sub}</div>`:''}</div>
+  `).join('');
+}
+
+/* ---------------- FOLLOW-UP QUEUE ---------------- */
+function getQueueItems(){
+  const today = todayISO();
+  const items = [];
+  scopedLeads().forEach(r=>{
+    const eff = getEffective(r);
+    if (eff.nextFollowUp && eff.nextFollowUp <= today){
+      items.push({lead:r, eff, overdueDays: daysBetween(eff.nextFollowUp, today), flag: coverageFlag(r)});
+    }
+  });
+  items.sort((a,b)=> b.overdueDays - a.overdueDays);
+  return items;
+}
+let queueExpandedId = null;
+function renderQueue(){
+  const items = getQueueItems();
+  document.getElementById('queue-hint').textContent = (items.length
+    ? `${items.length} lead${items.length===1?'':'s'} due for another attempt`
+    : 'Nothing due right now') + scopeSuffix();
+  const shown = items.slice(0, 25);
+  const list = document.getElementById('queue-list');
+  if (!shown.length){
+    list.innerHTML = `<div class="empty-state">Nothing is due for follow-up. Logged outcomes will schedule the next attempt automatically.</div>`;
+    return;
+  }
+  list.innerHTML = shown.map(it=>{
+    const r = it.lead;
+    const col = STATUS_COLORS[it.eff.status] || '#8B95A1';
+    const pillClass = it.overdueDays >= 3 ? 'hot' : 'warm';
+    const overdueLabel = it.overdueDays <= 0 ? 'Due today' : `${it.overdueDays}d overdue`;
+    const rep = repLabel(r.b, r.l);
+    const touched = lastTouchedLabel(r);
+    return `<div class="queue-item" data-id="${r.id}">
+      <div class="queue-row" data-toggle="${r.id}">
+        <span class="overdue-pill ${pillClass}">${overdueLabel}</span>
+        <div class="co">
+          <div class="name">${esc(r.c)}</div>
+          <div class="meta">${esc(r.b)} · ${esc(r.l)}${rep?' · '+esc(rep):''} · <span class="status-badge" style="background:${hexToSoft(col)};color:${col}">${esc(it.eff.status)}</span>${it.flag?`<span class="coverage-badge">${esc(it.flag)}</span>`:''}</div>
+          ${touched?`<div class="meta" style="color:var(--teal);">${esc(touched)}</div>`:''}
+        </div>
+        <div class="queue-actions">
+          <button class="btn small" data-log="${r.id}">Log attempt</button>
+          <button class="btn small ghost" data-snooze="${r.id}">Snooze 3d</button>
+        </div>
+      </div>
+      <div class="qform-slot" id="qform-${r.id}"></div>
+    </div>`;
+  }).join('') + (items.length > 25 ? `<div class="empty-state">+${items.length-25} more — check "Due for follow-up only" in the Lead Explorer below to see the full list.</div>` : '');
+
+  list.querySelectorAll('[data-toggle]').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      if (e.target.closest('button')) return;
+      const id = el.dataset.toggle;
+      toggleQueueForm(id);
+    });
+  });
+  list.querySelectorAll('[data-log]').forEach(el=>{
+    el.addEventListener('click', ()=> toggleQueueForm(el.dataset.log));
+  });
+  list.querySelectorAll('[data-snooze]').forEach(el=>{
+    el.addEventListener('click', async ()=>{
+      const id = el.dataset.snooze;
+      const d = new Date(); d.setDate(d.getDate()+3);
+      await saveOverride(id, { nextFollowUp: d.toISOString().slice(0,10) });
+    });
+  });
+  if (queueExpandedId && shown.find(it=>String(it.lead.id)===String(queueExpandedId))){
+    renderLogForm(document.getElementById('qform-'+queueExpandedId), queueExpandedId);
+  }
+}
+function toggleQueueForm(id){
+  const slot = document.getElementById('qform-'+id);
+  if (!slot) return;
+  if (queueExpandedId === id){ slot.innerHTML=''; queueExpandedId = null; return; }
+  const prev = document.getElementById('qform-'+queueExpandedId);
+  if (prev) prev.innerHTML = '';
+  queueExpandedId = id;
+  renderLogForm(slot, id);
+}
+
+/* ---------------- NEW PROSPECTS ---------------- */
+function renderNewProspects(){
+  const el = document.getElementById('new-prospects-list');
+  if (!el) return;
+  const list = LEADS.filter(r=> r.isNew && inScope(r.b, r.l))
+    .sort((a,b)=> (b.addedAt||'').localeCompare(a.addedAt||''));
+  document.getElementById('new-prospects-hint').textContent = list.length
+    ? `${list.length} added so far${scopeSuffix()}`
+    : 'Recently added accounts — get the first call or email logged';
+  if (!list.length){
+    el.innerHTML = `<div class="empty-state">No prospects added yet. Use the button above to add your first one.</div>`;
+    return;
+  }
+  el.innerHTML = list.slice(0,8).map(r=>{
+    const eff = getEffective(r);
+    const when = r.addedAt ? new Date(r.addedAt).toLocaleDateString('en-US',{month:'short', day:'numeric'}) : '';
+    return `<div class="queue-item">
+      <div class="queue-row" data-open="${r.id}">
+        <span class="new-badge" style="margin-left:0;">New</span>
+        <div class="co">
+          <div class="name">${esc(r.c)}</div>
+          <div class="meta">${esc(r.b)} · ${esc(r.l)}${r.addedBy?' · added by '+esc(r.addedBy):''}${when?' · '+when:''}</div>
+        </div>
+        <div class="queue-actions">
+          <button class="btn small" data-log-new="${r.id}">Log first attempt</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('') + (list.length>8 ? `<div class="empty-state">+${list.length-8} more — use "Due for follow-up only" off and search in the Lead Explorer to see all of them.</div>` : '');
+  el.querySelectorAll('[data-open]').forEach(row=>{
+    row.addEventListener('click', (e)=>{ if (e.target.closest('button')) return; openLeadInExplorer(row.dataset.open); });
+  });
+  el.querySelectorAll('[data-log-new]').forEach(btn=>{
+    btn.addEventListener('click', ()=> openLeadInExplorer(btn.dataset.logNew));
+  });
+}
+
+/* Jump to a lead in the Lead Explorer (same tab) with its log form open */
+function openLeadInExplorer(id){
+  brandSel.value = ''; locSel.value = ''; statusSel.value = ''; dueCheckbox.checked = false; flagCheckbox.checked = false;
+  updateLocationOptions();
+  const lead = LEAD_BY_ID.get(Number(id)) || LEAD_BY_ID.get(id);
+  searchInput.value = lead ? lead.c : '';
+  applyFilters();
+  leadExpandedId = id;
+  renderLeadList();
+  document.getElementById('detail-'+id)?.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+/* ---------------- LOG FORM (shared by queue + explorer) ---------------- */
+function activitySummary(a){
+  if (a.channels){
+    const chLabels = a.channels.map(c => (CHANNELS.find(x=>x.v===c)||{}).label || c).join(' + ');
+    const resultLabel = a.callResult ? (CALL_RESULTS.find(x=>x.v===a.callResult)||{}).label : null;
+    const outcomeLabel = (a.outcome && a.outcome!=='continue') ? (OUTCOME_OPTIONS.find(x=>x.v===a.outcome)||{}).label : null;
+    return [chLabels || 'Logged', resultLabel, outcomeLabel].filter(Boolean).join(' — ');
+  }
+  return a.outcome || 'Logged'; // legacy entries
+}
+function renderLogForm(container, leadId){
+  const r = LEAD_BY_ID.get(Number(leadId)) || LEAD_BY_ID.get(leadId);
+  const eff = getEffective(r);
+  const flag = coverageFlag(r);
+  const todayLabel = new Date().toLocaleDateString('en-US',{weekday:'short', month:'short', day:'numeric'});
+  container.innerHTML = `
+    <div class="log-form">
+      <div class="lf-heading">Logging an attempt for <strong>${todayLabel}</strong> — current status: <span class="status-badge" style="background:${hexToSoft(STATUS_COLORS[eff.status]||'#8B95A1')};color:${STATUS_COLORS[eff.status]||'#8B95A1'}">${esc(eff.status)}</span></div>
+      ${flag ? `<div class="coverage-warning">⚠️ ${esc(flag)} — consider calling before another email.</div>` : ''}
+
+      <label>How did you reach out today? <span class="lf-optional">(pick at least one)</span></label>
+      <div class="channel-row">
+        ${CHANNELS.map(c=>`<label class="chk channel-chk"><input type="checkbox" class="lf-channel" value="${c.v}"> ${c.label}</label>`).join('')}
+      </div>
+
+      <div class="lf-call-result" style="display:none;">
+        <label>Result of the call</label>
+        <select class="lf-callresult">
+          ${CALL_RESULTS.map(cr=>`<option value="${cr.v}">${cr.label}</option>`).join('')}
+        </select>
+      </div>
+
+      <div class="grid">
+        <div>
+          <label>Outcome</label>
+          <select class="lf-outcome">
+            ${OUTCOME_OPTIONS.map(o=>`<option value="${o.v}">${o.label}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Status after this attempt</label>
+          <select class="lf-status">
+            ${ALL_STATUSES.map(s=>`<option value="${esc(s)}" ${s===eff.status?'selected':''}>${esc(s)}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="grid">
+        <div>
+          <label>Next attempt — when</label>
+          <input type="date" class="lf-next" value="">
+        </div>
+        <div>
+          <label>Logged by</label>
+          <input type="text" class="lf-by" value="${esc(myName)}" placeholder="Your name">
+        </div>
+      </div>
+      <div class="lf-next-hint" style="display:none;"></div>
+      <label>Note</label>
+      <textarea class="lf-note" placeholder="What happened, what's next…"></textarea>
+      <div class="actions">
+        <button class="btn small ghost lf-cancel">Cancel</button>
+        <button class="btn primary lf-save">Save attempt</button>
+      </div>
+      ${eff.activity.length ? `<div class="activity-log">${eff.activity.slice().reverse().map(a=>`
+        <div class="activity-entry"><span class="when">${esc(a.date)}</span> — <span class="who">${esc(a.by||'someone')}</span>: ${esc(activitySummary(a))}${a.note?' — '+esc(a.note):''}</div>
+      `).join('')}</div>` : ''}
+    </div>
+  `;
+  const channelChecks = [...container.querySelectorAll('.lf-channel')];
+  const callResultWrap = container.querySelector('.lf-call-result');
+  const callResultSel = container.querySelector('.lf-callresult');
+  const outcomeSel = container.querySelector('.lf-outcome');
+  const statusSel = container.querySelector('.lf-status');
+  const nextInput = container.querySelector('.lf-next');
+  const nextHint = container.querySelector('.lf-next-hint');
+
+  function suggestStatus(){
+    const o = OUTCOME_OPTIONS.find(x=>x.v===outcomeSel.value);
+    if (o && o.status) return o.status;
+    const calling = channelChecks.find(c=>c.value==='call' && c.checked);
+    if (calling){
+      const cr = CALL_RESULTS.find(x=>x.v===callResultSel.value);
+      if (cr && cr.status) return cr.status;
+    }
+    return advanceSequence(eff.status);
+  }
+  function refreshNext(){
+    const newStatus = suggestStatus();
+    statusSel.value = newStatus;
+    if (NO_FOLLOWUP.has(newStatus)){
+      nextInput.value = '';
+      nextInput.disabled = true;
+      nextHint.style.display = 'none';
+    } else {
+      nextInput.disabled = false;
+      const days = CADENCE_DAYS[newStatus] ?? 3;
+      const d = new Date(); d.setDate(d.getDate()+days);
+      nextInput.value = d.toISOString().slice(0,10);
+    }
+    // coverage-driven suggestion for which channel to try next
+    const willHaveCalled = hasCalledEver(r) || channelChecks.some(c=>c.value==='call' && c.checked);
+    const willHaveEmailed = hasEmailedEver(r) || channelChecks.some(c=>c.value==='email' && c.checked);
+    if (!NO_FOLLOWUP.has(newStatus) && willHaveEmailed && !willHaveCalled){
+      nextHint.style.display = 'block';
+      nextHint.textContent = '💡 Next time, try calling — this account has only ever been emailed.';
+    } else {
+      nextHint.style.display = 'none';
+    }
+  }
+  channelChecks.forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const callChecked = channelChecks.find(c=>c.value==='call').checked;
+      callResultWrap.style.display = callChecked ? 'block' : 'none';
+      refreshNext();
+    });
+  });
+  callResultSel.addEventListener('change', refreshNext);
+  outcomeSel.addEventListener('change', refreshNext);
+  statusSel.addEventListener('change', ()=>{
+    if (NO_FOLLOWUP.has(statusSel.value)){ nextInput.value=''; nextInput.disabled=true; }
+    else { nextInput.disabled=false; }
+  });
+  refreshNext();
+
+  container.querySelector('.lf-cancel').addEventListener('click', ()=>{ container.innerHTML=''; queueExpandedId=null; leadExpandedId=null; });
+  container.querySelector('.lf-save').addEventListener('click', async ()=>{
+    const selectedChannels = channelChecks.filter(c=>c.checked).map(c=>c.value);
+    if (!selectedChannels.length){ alert('Pick at least one way you reached out today (call, email, LinkedIn, or in person).'); return; }
+    const by = container.querySelector('.lf-by').value.trim() || 'someone';
+    if (container.querySelector('.lf-by').value.trim()){
+      myName = container.querySelector('.lf-by').value.trim();
+      document.getElementById('me-input').value = myName;
+      localStorage.setItem('fsp_me', myName);
+    }
+    const note = container.querySelector('.lf-note').value.trim();
+    const today = todayISO();
+    const callChecked = selectedChannels.includes('call');
+    const entry = {
+      date: today, channels: selectedChannels,
+      callResult: callChecked ? callResultSel.value : null,
+      outcome: outcomeSel.value, note, by
+    };
+    const existing = overrides[leadId] || {activity:[]};
+    const activity = [...(existing.activity||[]), entry];
+    await saveOverride(leadId, {
+      status: statusSel.value,
+      lastContactDate: today,
+      nextFollowUp: nextInput.value || null,
+      activity
+    });
+  });
+}
+
+/* ---------------- TASKS ---------------- */
+let taskFilter = 'open';
+function renderTasks(){
+  const base = scopedTasks();
+  const list = taskFilter==='open' ? base.filter(t=>!t.done) : base;
+  const sorted = [...list].sort((a,b)=>{
+    if (!!a.done !== !!b.done) return a.done ? 1 : -1;
+    return (a.dueDate||'9999').localeCompare(b.dueDate||'9999');
+  });
+  const el = document.getElementById('task-list');
+  if (!sorted.length){ el.innerHTML = `<div class="empty-state">No ${taskFilter==='open'?'open ':''}tasks yet.</div>`; return; }
+  const today = todayISO();
+  el.innerHTML = sorted.map(t=>{
+    const overdue = t.dueDate && t.dueDate < today && !t.done;
+    const tag = (viewLocations.size!==1 && t.location) ? ` <span style="color:var(--muted);font-size:11px;">[${esc(t.location)}]</span>` : '';
+    const who = t.assignedTo ? ` <span style="color:var(--teal);font-size:11px;font-weight:600;">→ ${esc(t.assignedTo)}</span>` : '';
+    return `<div class="task-row ${t.done?'done':''}" data-id="${t.id}">
+      <input type="checkbox" ${t.done?'checked':''} data-toggle-task="${t.id}">
+      <span class="title">${esc(t.title)}${t.company?` <span style="color:var(--muted);">— ${esc(t.company)}</span>`:''}${who}${tag}</span>
+      <span class="due ${overdue?'overdue':''}">${t.dueDate ? (overdue?'Overdue ':'')+t.dueDate : 'No date'}</span>
+      ${!t.done?`<button class="btn small ghost" data-snooze-task="${t.id}">Snooze 3d</button>`:''}
+      <button class="btn small ghost" data-del-task="${t.id}">Remove</button>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('[data-snooze-task]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const t = tasks.find(x=>x.id===btn.dataset.snoozeTask);
+      const base = (t.dueDate && t.dueDate > todayISO()) ? new Date(t.dueDate+'T00:00:00') : new Date();
+      base.setDate(base.getDate()+3);
+      t.dueDate = base.toISOString().slice(0,10);
+      await saveTask(t);
+      renderTasks();
+    });
+  });
+  el.querySelectorAll('[data-toggle-task]').forEach(cb=>{
+    cb.addEventListener('change', async ()=>{
+      const t = tasks.find(x=>x.id===cb.dataset.toggleTask);
+      t.done = cb.checked;
+      await saveTask(t);
+      renderTasks();
+      renderMetrics();
+    });
+  });
+  el.querySelectorAll('[data-del-task]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const id = btn.dataset.delTask;
+      try { await supaDelete('tasks', 'id=eq.'+encodeURIComponent(id)); } catch(e){ console.error('task delete failed', e); }
+      tasks = tasks.filter(x=>x.id!==id);
+      renderTasks();
+      renderMetrics();
+    });
+  });
+}
+document.querySelectorAll('.task-toggle button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('.task-toggle button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    taskFilter = b.dataset.f;
+    renderTasks();
+  });
+});
+const taskLocSel = document.getElementById('task-location');
+LOCATION_OPTIONS.forEach(opt=>{
+  const [brand, location] = opt.split('|||');
+  taskLocSel.insertAdjacentHTML('beforeend', `<option value="${esc(opt)}">${esc(brand)} — ${esc(location)}</option>`);
+});
+
+/* ---------------- ADD NEW PROSPECT ---------------- */
+const npLocSel = document.getElementById('np-location');
+LOCATION_OPTIONS.forEach(opt=>{
+  const [brand, location] = opt.split('|||');
+  npLocSel.insertAdjacentHTML('beforeend', `<option value="${esc(opt)}">${esc(brand)} — ${esc(location)}</option>`);
+});
+const npOverlay = document.getElementById('add-prospect-overlay');
+function openAddProspectModal(){
+  ['np-company','np-contact','np-title','np-phone','np-email','np-notes'].forEach(id=>{ document.getElementById(id).value=''; });
+  if (viewLocations.size===1){ const a = selectedLocsArray()[0]; npLocSel.value = locKey(a.brand, a.location); }
+  npOverlay.style.display = 'flex';
+  document.getElementById('np-company').focus();
+}
+function closeAddProspectModal(){ npOverlay.style.display = 'none'; }
+document.getElementById('add-prospect-btn').addEventListener('click', openAddProspectModal);
+document.getElementById('add-prospect-close').addEventListener('click', closeAddProspectModal);
+document.getElementById('add-prospect-cancel').addEventListener('click', closeAddProspectModal);
+npOverlay.addEventListener('click', (e)=>{ if (e.target===npOverlay) closeAddProspectModal(); });
+
+document.getElementById('add-prospect-save').addEventListener('click', async ()=>{
+  const company = document.getElementById('np-company').value.trim();
+  if (!company){ alert('Company name is required.'); document.getElementById('np-company').focus(); return; }
+  if (!npLocSel.value){ alert('Pick a park / location for this prospect.'); return; }
+  const [brand, location] = npLocSel.value.split('|||');
+  const dupe = LEADS.find(r => r.b===brand && r.l===location && r.c.trim().toLowerCase()===company.toLowerCase());
+  if (dupe){
+    const eff = getEffective(dupe);
+    const ok = confirm(`"${dupe.c}" already exists at ${brand} — ${location} (status: ${eff.status}). Add it again anyway?`);
+    if (!ok) return;
+  }
+  const id = 'new_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+  const rec = {
+    id, b: brand, l: location, c: company,
+    n: document.getElementById('np-contact').value.trim(),
+    t: document.getElementById('np-title').value.trim(),
+    p: document.getElementById('np-phone').value.trim(),
+    e: document.getElementById('np-email').value.trim(),
+    dc: null, de: null, li: null, dt: null,
+    s: 'No Status',
+    note: document.getElementById('np-notes').value.trim(),
+    isNew: true, addedBy: myName || 'someone', addedAt: new Date().toISOString()
+  };
+  try {
+    await supaInsert('leads', [{
+      id, brand, location, company,
+      contact: rec.n, title: rec.t, phone: rec.p, email: rec.e,
+      date_called: null, date_emailed: null, linkedin: null, date_contacted: null,
+      base_status: 'No Status', notes: rec.note, is_new: true, added_by: rec.addedBy
+    }]);
+  }
+  catch(e){ console.error('save prospect failed', e); alert('Could not save — check your connection and try again.'); return; }
+  LEADS.push(rec);
+  LEAD_BY_ID.set(id, rec);
+  closeAddProspectModal();
+  renderKPIs(); renderQueue(); renderNewProspects(); renderMetrics(); renderCharts(); renderLocTable();
+  openLeadInExplorer(id);
+});
+document.getElementById('task-add-btn').addEventListener('click', async ()=>{
+  const title = document.getElementById('task-title').value.trim();
+  if (!title) return;
+  const company = document.getElementById('task-company').value.trim();
+  const assignee = document.getElementById('task-assignee').value.trim() || myName || 'Unassigned';
+  const due = document.getElementById('task-due').value;
+  const locVal = taskLocSel.value;
+  const [tb, tl] = locVal ? locVal.split('|||') : [null, null];
+  const task = {
+    id: 't'+Date.now()+Math.random().toString(36).slice(2,7),
+    title, company, leadId:null, brand: tb, location: tl, dueDate: due||null,
+    assignedTo: assignee, done:false, createdBy: myName||'someone', createdAt: new Date().toISOString()
+  };
+  tasks.push(task);
+  document.getElementById('task-title').value='';
+  document.getElementById('task-company').value='';
+  document.getElementById('task-due').value='';
+  renderTasks();
+  renderMetrics();
+  await saveTask(task);
+});
+function addTaskForLead(r){
+  const title = prompt('Task for '+r.c+':', 'Follow up');
+  if (!title) return;
+  const assignee = prompt('Assign to (name):', myName||'') || myName || 'Unassigned';
+  const due = prompt('Due date (YYYY-MM-DD), optional:', '');
+  const task = {
+    id: 't'+Date.now()+Math.random().toString(36).slice(2,7),
+    title, company: r.c, leadId: r.id, brand: r.b, location: r.l, dueDate: due||null,
+    assignedTo: assignee, done:false, createdBy: myName||'someone', createdAt: new Date().toISOString()
+  };
+  tasks.push(task);
+  renderTasks();
+  renderMetrics();
+  saveTask(task);
+}
+
+/* ---------------- CHARTS ---------------- */
+let loggedChart, statusChart;
+function renderCharts(){
+  if (loggedChart) loggedChart.destroy();
+  const legendEl = document.getElementById('brand-legend');
+  const sel = selectedLocsArray();
+  if (sel.length===1){
+    const f = sel[0];
+    const row = LOCS.find(l=>l.brand===f.brand && l.location===f.location) || {logged:0,called:0,emailed:0,linkedin:0,contacted:0,booked:0,in_conv:0,tours:0};
+    const liveLogged = row.logged + newLeadsCountFor(f.brand, f.location);
+    document.getElementById('chart-logged-title').textContent = f.brand+' — '+f.location+' funnel';
+    document.getElementById('chart-logged-sub').textContent = `${f.brand} — ${f.location}, all-time`;
+    const stages = [['Logged',liveLogged],['Called',row.called],['Emailed',row.emailed],['Contacted',row.contacted],['In Conv.',row.in_conv],['Booked',row.booked],['Tours',row.tours]];
+    loggedChart = new Chart(document.getElementById('chart-logged'), {
+      type:'bar',
+      data:{ labels: stages.map(s=>s[0]), datasets:[{ data: stages.map(s=>s[1]), backgroundColor: BRAND_COLORS[f.brand]||'#1F7A6C', borderRadius:4, barThickness:22 }] },
+      options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false}, tooltip:{callbacks:{label:(c)=>fmt(c.parsed.x)}}},
+        scales:{ x:{beginAtZero:true, grid:{color:'#EFEBE1'}}, y:{grid:{display:false}, ticks:{font:{size:11}}} } }
+    });
+    legendEl.innerHTML = '';
+  } else {
+    const isSubset = sel.length>1;
+    document.getElementById('chart-logged-title').textContent = isSubset ? 'Leads logged — selected locations' : 'Leads logged by location';
+    document.getElementById('chart-logged-sub').textContent = isSubset ? `${sel.length} locations you're viewing, colored by brand` : 'Sorted by volume, colored by brand';
+    let locsSorted = locsWithLiveCounts();
+    if (isSubset) locsSorted = locsSorted.filter(l=>viewLocations.has(locKey(l.brand,l.location)));
+    locsSorted = locsSorted.sort((a,b)=>b.logged-a.logged);
+    loggedChart = new Chart(document.getElementById('chart-logged'), {
+      type:'bar',
+      data:{ labels: locsSorted.map(l=>l.location),
+        datasets:[{ data: locsSorted.map(l=>l.logged), backgroundColor: locsSorted.map(l=>BRAND_COLORS[l.brand]||'#999'), borderRadius:4, barThickness: isSubset?22:14 }] },
+      options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false}, tooltip:{callbacks:{label:(c)=>`${fmt(c.parsed.x)} leads logged`}}},
+        scales:{ x:{beginAtZero:true, grid:{color:'#EFEBE1'}}, y:{grid:{display:false}, ticks:{font:{size:11}}} } }
+    });
+    const brandsShown = isSubset ? [...new Set(locsSorted.map(l=>l.brand))] : Object.keys(BRAND_COLORS);
+    legendEl.innerHTML = brandsShown.map(b=>`<span class="chip"><span class="sw" style="background:${BRAND_COLORS[b]}"></span>${b}</span>`).join('');
+  }
+
+  document.getElementById('chart-status-sub').textContent = sel.length===1
+    ? `Live status mix for ${sel[0].brand} — ${sel[0].location}`
+    : sel.length>1
+      ? `Live status mix across ${sel.length} selected locations`
+      : 'Live status mix, including outcomes your team has logged';
+  const statusCounts = {};
+  scopedLeads().forEach(r=>{ const s = getEffective(r).status; statusCounts[s] = (statusCounts[s]||0)+1; });
+  const entries = Object.entries(statusCounts).sort((a,b)=>b[1]-a[1]);
+  if (statusChart) statusChart.destroy();
+  statusChart = new Chart(document.getElementById('chart-status'), {
+    type:'doughnut',
+    data:{ labels: entries.map(e=>e[0]), datasets:[{ data: entries.map(e=>e[1]), backgroundColor: entries.map(e=>STATUS_COLORS[e[0]]||'#AAA'), borderColor:'#fff', borderWidth:2 }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'right', labels:{boxWidth:10, font:{size:10.5}, padding:8}},
+        tooltip:{callbacks:{label:(c)=>{ const t=entries.reduce((s,e)=>s+e[1],0); return ` ${c.label}: ${fmt(c.parsed)} (${pct(c.parsed,t)}%)`; }}} },
+      cutout:'60%' }
+  });
+}
+
+/* ---------------- LOCATIONS TABLE ---------------- */
+let locSort = {key:'logged', dir:-1};
+function touchedCountFor(brand, location){
+  let n = 0;
+  LEADS.forEach(r=>{ if (r.b===brand && r.l===location && overrides[r.id]) n++; });
+  return n;
+}
+function liveBookedCountFor(brand, location){
+  let n = 0;
+  LEADS.forEach(r=>{ if (r.b===brand && r.l===location && getEffective(r).status==='Booked') n++; });
+  return n;
+}
+function renderLocTable(){
+  const rows = locsWithLiveCounts().map(l=>{
+    const liveBooked = liveBookedCountFor(l.brand, l.location);
+    return {...l, touched: touchedCountFor(l.brand,l.location), liveBooked, bookedRate: pct(liveBooked, l.logged)};
+  });
+  rows.sort((a,b)=>{
+    const k = locSort.key;
+    if (typeof a[k]==='string') return a[k].localeCompare(b[k]) * locSort.dir;
+    return (a[k]-b[k]) * locSort.dir;
+  });
+  document.getElementById('loc-table-hint').textContent = 'Click a row to add or remove it from "Viewing" above';
+  document.getElementById('loc-tbody').innerHTML = rows.map(l=>{
+    const selected = viewLocations.has(locKey(l.brand,l.location));
+    const rep = repLabel(l.brand, l.location);
+    return `<tr data-brand="${esc(l.brand)}" data-location="${esc(l.location)}" class="${selected?'active-row':''}">
+      <td><span class="brand-tag" style="background:${BRAND_SOFT[l.brand]};color:${BRAND_COLORS[l.brand]}">${esc(l.brand)}</span></td>
+      <td>${esc(l.location)}${selected?' <span style="color:var(--teal);font-size:11px;font-weight:700;">· viewing</span>':''}</td>
+      <td>${rep ? esc(rep) : '<span style="color:var(--muted);">Unassigned</span>'}</td>
+      <td class="num">${fmt(l.logged)}</td>
+      <td class="num">${fmt(l.called)}</td>
+      <td class="num">${fmt(l.contacted)}</td>
+      <td class="num">${fmt(l.liveBooked)}</td>
+      <td class="num">${l.bookedRate}%</td>
+      <td class="num">${fmt(l.in_conv)}</td>
+      <td class="num">${l.touched ? fmt(l.touched) : '—'}</td>
+    </tr>`;
+  }).join('');
+  document.querySelectorAll('#loc-tbody tr').forEach(tr=>{
+    tr.addEventListener('click', ()=>{
+      const key = locKey(tr.dataset.brand, tr.dataset.location);
+      const next = new Set(viewLocations);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      setViewLocations(next);
+    });
+  });
+}
+document.querySelectorAll('.loc-table th[data-key]').forEach(th=>{
+  th.addEventListener('click', ()=>{
+    const key = th.dataset.key;
+    locSort.dir = (locSort.key===key) ? -locSort.dir : -1;
+    locSort.key = key;
+    renderLocTable();
+  });
+});
+
+/* ---------------- LEAD EXPLORER ---------------- */
+const brandSel = document.getElementById('f-brand');
+const locSel = document.getElementById('f-location');
+const statusSel = document.getElementById('f-status');
+const eventsSel = document.getElementById('f-events');
+const searchInput = document.getElementById('f-search');
+const dueCheckbox = document.getElementById('f-due');
+const flagCheckbox = document.getElementById('f-flag');
+
+Object.keys(BRAND_COLORS).sort().forEach(b=> brandSel.insertAdjacentHTML('beforeend', `<option value="${esc(b)}">${esc(b)}</option>`));
+ALL_STATUSES.forEach(s=> statusSel.insertAdjacentHTML('beforeend', `<option value="${esc(s)}">${esc(s)}</option>`));
+EVENTS_OPTIONS.filter(o=>o.v).forEach(o=> eventsSel.insertAdjacentHTML('beforeend', `<option value="${o.v}">${o.label}</option>`));
+function updateLocationOptions(){
+  const b = brandSel.value;
+  const opts = [...new Set(LEADS.filter(r=>!b || r.b===b).map(r=>r.l))].sort();
+  locSel.innerHTML = '<option value="">All locations</option>' + opts.map(l=>`<option value="${esc(l)}">${esc(l)}</option>`).join('');
+}
+updateLocationOptions();
+function refreshScopedViews(){
+  renderKPIs();
+  renderQueue();
+  renderNewProspects();
+  renderMetrics();
+  renderCharts();
+}
+brandSel.addEventListener('change', ()=>{ updateLocationOptions(); applyFilters(); refreshScopedViews(); });
+
+let page = 1;
+const PAGE_SIZE = 40;
+let filtered = LEADS;
+let leadExpandedId = null;
+let selectedLeadIds = new Set();
+
+function applyFilters(){
+  const b = brandSel.value;
+  const l = locSel.value;
+  const s = statusSel.value;
+  const ev = eventsSel.value;
+  const q = searchInput.value.trim().toLowerCase();
+  const dueOnly = dueCheckbox.checked;
+  const today = todayISO();
+  filtered = LEADS.filter(r=>{
+    if (!inScope(r.b, r.l)) return false;
+    if (b && r.b!==b) return false;
+    if (l && r.l!==l) return false;
+    const eff = getEffective(r);
+    if (s && eff.status!==s) return false;
+    if (ev && eff.eventsStatus!==ev) return false;
+    if (dueOnly && !(eff.nextFollowUp && eff.nextFollowUp<=today)) return false;
+    if (flagCheckbox.checked && !coverageFlag(r)) return false;
+    if (q){
+      const hay = `${r.c||''} ${r.n||''} ${r.note||''} ${r.e||''}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  page = 1;
+  renderLeadList();
+  renderBulkBar();
+}
+
+function renderLeadList(){
+  const total = filtered.length;
+  document.getElementById('count-line').innerHTML = `<strong>${fmt(total)}</strong> lead${total===1?'':'es'} match your filters`;
+  const start = (page-1)*PAGE_SIZE;
+  const pageRows = filtered.slice(start, start+PAGE_SIZE);
+  const el = document.getElementById('lead-list');
+  if (!pageRows.length){
+    el.innerHTML = `<div class="empty-state">No leads match these filters</div>`;
+  } else {
+    el.innerHTML = pageRows.map(r=>{
+      const eff = getEffective(r);
+      const col = STATUS_COLORS[eff.status] || '#8B95A1';
+      const flag = coverageFlag(r);
+      const isOpen = String(leadExpandedId)===String(r.id);
+      const touched = lastTouchedLabel(r);
+      const rep = repLabel(r.b, r.l);
+      return `<div class="lead-row ${isOpen?'open':''}" data-id="${r.id}">
+        <div class="lead-main" data-toggle="${r.id}">
+          <input type="checkbox" class="lead-select-cb" data-lead-select="${r.id}" ${selectedLeadIds.has(String(r.id))?'checked':''}>
+          <div>
+            <div class="company">${esc(r.c)}${r.isNew?'<span class="new-badge">New</span>':''}</div>
+            <div class="meta">${esc(r.b)} · ${esc(r.l)}${rep?` · <span title="Assigned rep">${esc(rep)}</span>`:''}</div>
+            ${touched?`<div class="meta" style="color:var(--teal);">${esc(touched)}</div>`:''}
+          </div>
+          <div class="contact">${esc(r.n)}<div class="t">${esc(r.t)}</div></div>
+          <div class="contact">${r.p?`<a href="${telHref(r.p)}" class="quick-link">${esc(r.p)}</a>`:''}<div class="t">${r.e?`<a href="${mailtoHref(r.e)}" class="quick-link">${esc(r.e)}</a>`:''}</div></div>
+          <div><span class="status-badge" style="background:${hexToSoft(col)};color:${col}">${esc(eff.status)}</span>${flag?`<span class="coverage-badge">${esc(flag)}</span>`:''}${eff.nextFollowUp?`<div class="t" style="font-size:11px;color:var(--muted);margin-top:3px;">next: ${eff.nextFollowUp}</div>`:''}
+            <select class="events-select" data-events-select="${r.id}" style="color:${eventsColor(eff.eventsStatus)};border-color:${eventsColor(eff.eventsStatus)};">
+              ${EVENTS_OPTIONS.map(o=>`<option value="${o.v}" ${o.v===eff.eventsStatus?'selected':''}>${o.label}</option>`).join('')}
+            </select>
+          </div>
+          <div><button class="btn small" data-task="${r.id}">+ Task</button></div>
+          <div class="caret">▸</div>
+        </div>
+        <div class="lead-detail" id="detail-${r.id}"></div>
+      </div>`;
+    }).join('');
+    el.querySelectorAll('[data-lead-select]').forEach(cb=>{
+      cb.addEventListener('click', (e)=> e.stopPropagation());
+      cb.addEventListener('change', (e)=>{
+        const id = cb.dataset.leadSelect;
+        if (cb.checked) selectedLeadIds.add(id); else selectedLeadIds.delete(id);
+        renderBulkBar();
+      });
+    });
+    el.querySelectorAll('[data-events-select]').forEach(sel=>{
+      sel.addEventListener('click', (e)=> e.stopPropagation());
+      sel.addEventListener('change', async (e)=>{
+        const id = sel.dataset.eventsSelect;
+        sel.style.color = eventsColor(sel.value);
+        sel.style.borderColor = eventsColor(sel.value);
+        await saveEventsStatus(id, sel.value);
+      });
+    });
+    el.querySelectorAll('[data-toggle]').forEach(row=>{
+      row.addEventListener('click', (e)=>{
+        if (e.target.closest('button') || e.target.closest('a') || e.target.closest('input') || e.target.closest('select')) return;
+        toggleLead(row.dataset.toggle);
+      });
+    });
+    el.querySelectorAll('[data-task]').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{ e.stopPropagation(); addTaskForLead(LEAD_BY_ID.get(btn.dataset.task)); });
+    });
+    if (leadExpandedId){
+      const slot = document.getElementById('detail-'+leadExpandedId);
+      if (slot) renderLogForm(slot, String(leadExpandedId));
+    }
+  }
+  const totalPages = Math.max(1, Math.ceil(total/PAGE_SIZE));
+  document.getElementById('pagination').innerHTML = `
+    <span>Page ${page} of ${totalPages}</span>
+    <button id="prev-page" ${page<=1?'disabled':''}>Previous</button>
+    <button id="next-page" ${page>=totalPages?'disabled':''}>Next</button>`;
+  const prevBtn = document.getElementById('prev-page'), nextBtn = document.getElementById('next-page');
+  if (prevBtn) prevBtn.addEventListener('click', ()=>{ if(page>1){page--; renderLeadList();}});
+  if (nextBtn) nextBtn.addEventListener('click', ()=>{ if(page<totalPages){page++; renderLeadList();}});
+}
+function renderBulkBar(){
+  const bar = document.getElementById('bulk-bar');
+  const n = selectedLeadIds.size;
+  bar.style.display = n>0 ? 'flex' : 'none';
+  document.getElementById('bulk-count').textContent = n;
+}
+document.getElementById('bulk-clear-btn').addEventListener('click', ()=>{
+  selectedLeadIds.clear();
+  renderBulkBar();
+  renderLeadList();
+});
+document.getElementById('bulk-log-btn').addEventListener('click', ()=>{
+  if (!selectedLeadIds.size) return;
+  document.getElementById('bulk-log-count').textContent = selectedLeadIds.size;
+  renderBulkLogForm();
+  document.getElementById('bulk-log-overlay').style.display = 'flex';
+});
+document.getElementById('bulk-log-close').addEventListener('click', ()=>{
+  document.getElementById('bulk-log-overlay').style.display = 'none';
+});
+document.getElementById('bulk-log-overlay').addEventListener('click', (e)=>{
+  if (e.target.id==='bulk-log-overlay') document.getElementById('bulk-log-overlay').style.display = 'none';
+});
+function renderBulkLogForm(){
+  const slot = document.getElementById('bulk-log-form-slot');
+  slot.innerHTML = `
+    <div class="log-form" style="margin-top:0;">
+      <div class="lf-heading">This logs the same outcome across all <strong>${selectedLeadIds.size}</strong> selected leads — handy for email blasts or batch call sessions. Each lead's status still advances based on its own current stage.</div>
+      <label>How did you reach out today? <span class="lf-optional">(pick at least one)</span></label>
+      <div class="channel-row">
+        ${CHANNELS.map(c=>`<label class="chk channel-chk"><input type="checkbox" class="blf-channel" value="${c.v}"> ${c.label}</label>`).join('')}
+      </div>
+      <div class="grid">
+        <div>
+          <label>Outcome</label>
+          <select class="blf-outcome">
+            ${OUTCOME_OPTIONS.map(o=>`<option value="${o.v}">${o.label}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>Logged by</label>
+          <input type="text" class="blf-by" value="${esc(myName)}" placeholder="Your name">
+        </div>
+      </div>
+      <label>Note</label>
+      <textarea class="blf-note" placeholder="e.g. Sent Q3 group email to all Baptist church leads"></textarea>
+      <div class="actions">
+        <button class="btn small ghost" id="blf-cancel">Cancel</button>
+        <button class="btn primary" id="blf-save">Save for all ${selectedLeadIds.size}</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('blf-cancel').addEventListener('click', ()=>{
+    document.getElementById('bulk-log-overlay').style.display = 'none';
+  });
+  document.getElementById('blf-save').addEventListener('click', async ()=>{
+    const channels = [...slot.querySelectorAll('.blf-channel')].filter(c=>c.checked).map(c=>c.value);
+    if (!channels.length){ alert('Pick at least one way you reached out (call, email, LinkedIn, or in person).'); return; }
+    const outcomeVal = slot.querySelector('.blf-outcome').value;
+    const o = OUTCOME_OPTIONS.find(x=>x.v===outcomeVal);
+    const by = slot.querySelector('.blf-by').value.trim() || myName || 'someone';
+    const note = slot.querySelector('.blf-note').value.trim();
+    const today = todayISO();
+    const saveBtn = document.getElementById('blf-save');
+    saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+    const ids = [...selectedLeadIds];
+    await Promise.all(ids.map(async (id)=>{
+      const r = LEAD_BY_ID.get(Number(id)) || LEAD_BY_ID.get(id);
+      if (!r) return;
+      const eff = getEffective(r);
+      const newStatus = o.status || advanceSequence(eff.status);
+      let nextFollowUp = null;
+      if (!NO_FOLLOWUP.has(newStatus)){
+        const days = CADENCE_DAYS[newStatus] ?? 3;
+        const d = new Date(); d.setDate(d.getDate()+days);
+        nextFollowUp = d.toISOString().slice(0,10);
+      }
+      const existing = overrides[id] || {activity:[]};
+      const newEntry = { date: today, channels, callResult: null, outcome: outcomeVal, note, by };
+      const activity = [...(existing.activity||[]), newEntry];
+      const merged = {...existing, status: newStatus, lastContactDate: today, nextFollowUp, activity: activity.length>50?activity.slice(-50):activity};
+      overrides[id] = merged;
+      try {
+        await persistLeadState(id, merged);
+        await supaInsert('lead_activity', [{
+          lead_id: String(id), activity_date: newEntry.date, channels: newEntry.channels || [],
+          call_result: newEntry.callResult || null, outcome: newEntry.outcome || null,
+          note: newEntry.note || null, logged_by: newEntry.by || null
+        }]);
+      } catch(e){ console.error('bulk save failed for', id, e); }
+    }));
+    saveBtn.disabled = false; saveBtn.textContent = `Save for all ${ids.length}`;
+    document.getElementById('bulk-log-overlay').style.display = 'none';
+    selectedLeadIds.clear();
+    renderBulkBar();
+    renderAll();
+  });
+}
+
+function toggleLead(id){
+  leadExpandedId = (String(leadExpandedId)===String(id)) ? null : id;
+  renderLeadList();
+  if (leadExpandedId){
+    document.getElementById('detail-'+leadExpandedId)?.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+}
+
+let searchTimer;
+searchInput.addEventListener('input', ()=>{ clearTimeout(searchTimer); searchTimer = setTimeout(applyFilters, 180); });
+locSel.addEventListener('change', ()=>{ applyFilters(); refreshScopedViews(); });
+statusSel.addEventListener('change', applyFilters);
+eventsSel.addEventListener('change', applyFilters);
+dueCheckbox.addEventListener('change', applyFilters);
+flagCheckbox.addEventListener('change', applyFilters);
+document.getElementById('f-clear').addEventListener('click', ()=>{
+  brandSel.value=''; locSel.value=''; statusSel.value=''; eventsSel.value=''; searchInput.value=''; dueCheckbox.checked=false; flagCheckbox.checked=false;
+  updateLocationOptions();
+  document.querySelectorAll('#loc-tbody tr').forEach(r=>r.classList.remove('active-row'));
+  applyFilters();
+  refreshScopedViews();
+});
+
+/* ---------------- THIS WEEK'S LEADERBOARD ---------------- */
+const GOAL_PER_WEEK = 50;
+function mondayOf(d){
+  const date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const day = date.getDay();
+  const diff = (day===0 ? -6 : 1-day);
+  date.setDate(date.getDate()+diff);
+  return date;
+}
+function toISO(d){ const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
+function weekEndOf(ws){ const e = new Date(ws); e.setDate(e.getDate()+6); return e; }
+function fmtShort(d){ return d.toLocaleDateString('en-US',{month:'short', day:'numeric'}); }
+function fmtShortISO(iso){ return fmtShort(new Date(iso+'T00:00:00')); }
+
+/* ---- reporting date range (drives all three leaderboards) ---- */
+let rangeStart = toISO(mondayOf(new Date()));
+let rangeEnd = toISO(weekEndOf(mondayOf(new Date())));
+let rangePreset = 'week';
+const EARLIEST_DATE = '2015-01-01'; // sentinel floor for "All time"
+document.getElementById('range-start-input').value = rangeStart;
+document.getElementById('range-end-input').value = rangeEnd;
+
+function goalForRange(){
+  const days = daysBetween(rangeStart, rangeEnd) + 1;
+  return Math.max(1, Math.round(GOAL_PER_WEEK * days / 7));
+}
+function rangeProgress(){
+  const today = todayISO();
+  const days = Math.max(1, daysBetween(rangeStart, rangeEnd) + 1);
+  let elapsed;
+  if (today < rangeStart) elapsed = 0;
+  else if (today > rangeEnd) elapsed = days;
+  else elapsed = daysBetween(rangeStart, today) + 1;
+  return { days, elapsed, complete: today > rangeEnd };
+}
+function rangeLabel(){
+  if (rangePreset === 'all') return 'All time';
+  return `${fmtShortISO(rangeStart)} – ${fmtShortISO(rangeEnd)}, ${rangeEnd.slice(0,4)}`;
+}
+function applyRangePreset(preset){
+  const today = new Date();
+  if (preset === 'week'){
+    const ws = mondayOf(today);
+    rangeStart = toISO(ws); rangeEnd = toISO(weekEndOf(ws));
+  } else if (preset === 'lastweek'){
+    const ws = mondayOf(today); ws.setDate(ws.getDate()-7);
+    rangeStart = toISO(ws); rangeEnd = toISO(weekEndOf(ws));
+  } else if (preset === 'month'){
+    const s = new Date(today.getFullYear(), today.getMonth(), 1);
+    const e = new Date(today.getFullYear(), today.getMonth()+1, 0);
+    rangeStart = toISO(s); rangeEnd = toISO(e);
+  } else if (preset === '30d'){
+    const s = new Date(today); s.setDate(s.getDate()-29);
+    rangeStart = toISO(s); rangeEnd = toISO(today);
+  } else if (preset === 'all'){
+    rangeStart = EARLIEST_DATE; rangeEnd = toISO(today);
+  }
+  rangePreset = preset;
+  document.getElementById('range-start-input').value = rangeStart;
+  document.getElementById('range-end-input').value = rangeEnd;
+  document.querySelectorAll('.range-preset-btn').forEach(b=> b.classList.toggle('active', b.dataset.preset===preset));
+  renderMetrics();
+}
+document.querySelectorAll('.range-preset-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=> applyRangePreset(btn.dataset.preset));
+});
+document.getElementById('range-apply-btn').addEventListener('click', ()=>{
+  const s = document.getElementById('range-start-input').value;
+  const e = document.getElementById('range-end-input').value;
+  if (!s || !e){ alert('Pick both a start and end date.'); return; }
+  if (s > e){ alert('Start date must be before end date.'); return; }
+  rangeStart = s; rangeEnd = e; rangePreset = 'custom';
+  document.querySelectorAll('.range-preset-btn').forEach(b=> b.classList.remove('active'));
+  renderMetrics();
+});
+
+let leaderboardMode = 'person'; // 'person' | 'park' | 'accounts'
+
+function computeLeaderboard(){
+  const scopedIds = new Set(scopedLeads().map(r=>r.id));
+  const byPerson = {};
+  function ensure(person){
+    if (!byPerson[person]) byPerson[person] = {total:0, call:0, email:0, linkedin:0, in_person:0, other:0, openTasks:0};
+    return byPerson[person];
+  }
+  LEADS.forEach(r=>{
+    if (!scopedIds.has(r.id)) return;
+    const ov = overrides[r.id];
+    if (!ov || !ov.activity) return;
+    ov.activity.forEach(a=>{
+      if (a.date < rangeStart || a.date > rangeEnd) return;
+      const person = (a.by||'Unknown').trim() || 'Unknown';
+      const rec = ensure(person);
+      const chans = (a.channels && a.channels.length) ? a.channels : ['other'];
+      chans.forEach(c=>{ rec.total++; if (rec[c] !== undefined) rec[c]++; else rec.other++; });
+    });
+  });
+  scopedTasks().forEach(t=>{
+    if (t.done) return;
+    const person = (t.assignedTo || t.createdBy || '').trim();
+    if (!person) return;
+    ensure(person).openTasks++;
+  });
+  return byPerson;
+}
+
+function computeParkLeaderboard(){
+  const scopedIds = new Set(scopedLeads().map(r=>r.id));
+  const byPark = {};
+  function ensure(key, brand, location){
+    if (!byPark[key]) byPark[key] = {brand, location, total:0, call:0, email:0, linkedin:0, in_person:0, other:0, openTasks:0};
+    return byPark[key];
+  }
+  LEADS.forEach(r=>{
+    if (!scopedIds.has(r.id)) return;
+    const ov = overrides[r.id];
+    if (!ov || !ov.activity) return;
+    ov.activity.forEach(a=>{
+      if (a.date < rangeStart || a.date > rangeEnd) return;
+      const rec = ensure(locKey(r.b,r.l), r.b, r.l);
+      const chans = (a.channels && a.channels.length) ? a.channels : ['other'];
+      chans.forEach(c=>{ rec.total++; if (rec[c] !== undefined) rec[c]++; else rec.other++; });
+    });
+  });
+  scopedTasks().forEach(t=>{
+    if (t.done || !t.brand) return;
+    ensure(locKey(t.brand,t.location), t.brand, t.location).openTasks++;
+  });
+  return byPark;
+}
+
+function computeAccountsReachedLeaderboard(){
+  // Distinct companies each person has logged activity against, within the selected range.
+  const scopedIds = new Set(scopedLeads().map(r=>r.id));
+  const byPerson = {}; // person -> Set of lead ids
+  LEADS.forEach(r=>{
+    if (!scopedIds.has(r.id)) return;
+    const ov = overrides[r.id];
+    if (!ov || !ov.activity) return;
+    const people = new Set();
+    ov.activity.forEach(a=>{
+      if (a.date < rangeStart || a.date > rangeEnd) return;
+      people.add((a.by||'Unknown').trim() || 'Unknown');
+    });
+    people.forEach(p=>{
+      if (!byPerson[p]) byPerson[p] = new Set();
+      byPerson[p].add(r.id);
+    });
+  });
+  const out = {};
+  Object.entries(byPerson).forEach(([p,set])=>{ out[p] = {total: set.size}; });
+  return out;
+}
+
+document.querySelectorAll('.lb-mode-toggle button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.lb-mode-toggle button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    leaderboardMode = btn.dataset.mode;
+    renderMetrics();
+  });
+});
+
+function renderMetrics(){
+  const headerRow = document.getElementById('lb-header-row');
+  const weekLabelEl = document.getElementById('week-label');
+  const weekKpisEl = document.getElementById('week-kpis');
+  const listEl = document.getElementById('leaderboard-list');
+  const goal = goalForRange();
+  const rangeSuffix = ` (${rangeLabel()})`;
+
+  if (leaderboardMode === 'accounts'){
+    document.getElementById('leaderboard-hint').textContent = `Distinct companies each person has logged activity against${rangeSuffix}` + scopeSuffix();
+    weekLabelEl.textContent = rangeLabel();
+    weekKpisEl.innerHTML = '';
+    headerRow.innerHTML = `<div class="lb-header-rank"></div><div class="lb-header-info">Rep</div><div class="lb-header-bar">Accounts reached</div><div class="lb-header-status"></div>`;
+    const board = computeAccountsReachedLeaderboard();
+    const people = Object.entries(board).sort((a,b)=>b[1].total-a[1].total);
+    if (!people.length){
+      listEl.innerHTML = `<div class="empty-state">No accounts logged in this range${scopeSuffix()}.</div>`;
+      return;
+    }
+    const max = Math.max(...people.map(p=>p[1].total), 1);
+    listEl.innerHTML = people.map((p,i)=>{
+      const [name, d] = p;
+      const rank = i+1;
+      const isMe = myName && name.toLowerCase()===myName.toLowerCase();
+      const pctBar = Math.round((d.total/max)*100);
+      return `<div class="lb-row rank-${rank<=3?rank:''}">
+        <div class="lb-rank">${rank<=3 ? ['🥇','🥈','🥉'][rank-1] : rank}</div>
+        <div class="lb-info"><div class="lb-name ${isMe?'me':''}">${esc(name)}${isMe?' (you)':''}</div></div>
+        <div class="lb-bar-wrap">
+          <div class="lb-bar"><i style="width:${pctBar}%;background:#35638F;"></i></div>
+          <div class="lb-count">${fmt(d.total)} companies</div>
+        </div>
+        <div class="lb-status-wrap"></div>
+      </div>`;
+    }).join('');
+    return;
+  }
+
+  document.getElementById('leaderboard-hint').textContent = (leaderboardMode==='park'
+    ? `Prospecting attempts by park${rangeSuffix}`
+    : `Goal: ${fmt(goal)} prospecting attempts per person${rangeSuffix}`) + scopeSuffix();
+  weekLabelEl.textContent = rangeLabel();
+
+  const prog = rangeProgress();
+  const expected = Math.round(goal * Math.min(prog.elapsed,prog.days)/prog.days);
+
+  if (leaderboardMode === 'park'){
+    headerRow.innerHTML = `<div class="lb-header-rank"></div><div class="lb-header-info">Park</div><div class="lb-header-tasks">Open tasks</div><div class="lb-header-bar">Attempts</div><div class="lb-header-status"></div>`;
+    const board = computeParkLeaderboard();
+    const parks = Object.entries(board).sort((a,b)=>b[1].total-a[1].total);
+    const teamTotal = parks.reduce((s,p)=>s+p[1].total,0);
+    const teamAvg = parks.length ? Math.round(teamTotal/parks.length) : 0;
+    weekKpisEl.innerHTML = `
+      <div class="week-kpi"><div class="lbl">Team attempts in range</div><div class="val">${fmt(teamTotal)}</div></div>
+      <div class="week-kpi"><div class="lbl">Average per park</div><div class="val">${fmt(teamAvg)}</div></div>
+      <div class="week-kpi"><div class="lbl">Parks active in range</div><div class="val">${parks.length}</div></div>
+    `;
+    if (!parks.length){
+      listEl.innerHTML = `<div class="empty-state">No attempts logged in this range${scopeSuffix()}.</div>`;
+      return;
+    }
+    const max = Math.max(...parks.map(p=>p[1].total), 1);
+    listEl.innerHTML = parks.map((p,i)=>{
+      const [key, d] = p;
+      const rank = i+1;
+      const pctBar = Math.round((d.total/max)*100);
+      const rep = repLabel(d.brand, d.location);
+      const breakdown = [d.call?`${d.call} calls`:null, d.email?`${d.email} emails`:null, d.linkedin?`${d.linkedin} LinkedIn`:null, d.in_person?`${d.in_person} in-person`:null, d.other?`${d.other} other`:null].filter(Boolean).join(' · ');
+      return `<div class="lb-row rank-${rank<=3?rank:''}">
+        <div class="lb-rank">${rank<=3 ? ['🥇','🥈','🥉'][rank-1] : rank}</div>
+        <div class="lb-info">
+          <div class="lb-name">${esc(d.brand)} — ${esc(d.location)}</div>
+          <div class="lb-breakdown">${rep?esc(rep)+' · ':''}${breakdown||'—'}</div>
+        </div>
+        <div class="lb-tasks">${d.openTasks ? `<span class="task-count-badge">${d.openTasks}</span>` : '<span class="task-count-zero">0</span>'}</div>
+        <div class="lb-bar-wrap">
+          <div class="lb-bar"><i style="width:${pctBar}%;background:${BRAND_COLORS[d.brand]||'#1F7A6C'};"></i></div>
+          <div class="lb-count">${fmt(d.total)} attempts</div>
+        </div>
+        <div class="lb-status-wrap"></div>
+      </div>`;
+    }).join('');
+    return;
+  }
+
+  // person mode (default)
+  headerRow.innerHTML = `<div class="lb-header-rank"></div><div class="lb-header-info">Rep</div><div class="lb-header-tasks">Open tasks</div><div class="lb-header-bar">Attempts</div><div class="lb-header-status">To hit ${goal}</div>`;
+  const board = computeLeaderboard();
+  const people = Object.entries(board).sort((a,b)=>b[1].total-a[1].total);
+  const teamTotal = people.reduce((s,p)=>s+p[1].total,0);
+  const teamAvg = people.length ? Math.round(teamTotal/people.length) : 0;
+  const behindCount = people.filter(p=> p[1].total < expected).length;
+
+  weekKpisEl.innerHTML = `
+    <div class="week-kpi"><div class="lbl">Team attempts in range</div><div class="val">${fmt(teamTotal)}</div></div>
+    <div class="week-kpi"><div class="lbl">Average per person</div><div class="val">${fmt(teamAvg)} <span style="font-size:12px;color:var(--muted);font-weight:500;">/ ${goal} goal</span></div></div>
+    <div class="week-kpi"><div class="lbl">${prog.complete?'Missed goal':'Behind pace'}</div><div class="val" style="color:${behindCount?'var(--coral)':'var(--teal)'};">${behindCount} ${behindCount===1?'person':'people'}</div></div>
+  `;
+
+  if (!people.length){
+    listEl.innerHTML = `<div class="empty-state">No attempts logged in this range${scopeSuffix()}. Log an outcome above to get on the board.</div>`;
+    return;
+  }
+  listEl.innerHTML = people.map((p,i)=>{
+    const [name, d] = p;
+    const rank = i+1;
+    const remaining = Math.max(0, goal - d.total);
+    const pctOfGoal = Math.min(100, Math.round((d.total/goal)*100));
+    const hitGoal = d.total>=goal;
+    const onPace = d.total>=expected;
+    const barColor = hitGoal ? '#1F7A6C' : (onPace ? '#E0932E' : '#D9583D');
+    let statusHtml;
+    if (hitGoal){
+      statusHtml = `<span class="lb-status ahead">Goal hit 🎉</span>`;
+    } else if (prog.complete){
+      statusHtml = `<span class="lb-status behind">${remaining} short of goal</span>`;
+    } else if (onPace){
+      statusHtml = `<span class="lb-status ahead">${remaining} more to go</span>`;
+    } else {
+      statusHtml = `<span class="lb-status behind">${remaining} more — behind pace</span>`;
+    }
+    const isMe = myName && name.toLowerCase()===myName.toLowerCase();
+    const breakdown = [d.call?`${d.call} calls`:null, d.email?`${d.email} emails`:null, d.linkedin?`${d.linkedin} LinkedIn`:null, d.in_person?`${d.in_person} in-person`:null, d.other?`${d.other} other`:null].filter(Boolean).join(' · ');
+    return `<div class="lb-row rank-${rank<=3?rank:''}">
+      <div class="lb-rank">${rank<=3 ? ['🥇','🥈','🥉'][rank-1] : rank}</div>
+      <div class="lb-info">
+        <div class="lb-name ${isMe?'me':''}">${esc(name)}${isMe?' (you)':''}</div>
+        <div class="lb-breakdown">${breakdown||'—'}</div>
+      </div>
+      <div class="lb-tasks">${d.openTasks ? `<span class="task-count-badge">${d.openTasks}</span>` : '<span class="task-count-zero">0</span>'}</div>
+      <div class="lb-bar-wrap">
+        <div class="lb-bar"><i style="width:${pctOfGoal}%;background:${barColor};"></i></div>
+        <div class="lb-count">${fmt(d.total)} / ${goal}</div>
+      </div>
+      <div class="lb-status-wrap">${statusHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------------- MASTER RENDER ---------------- */
+function renderAll(){
+  renderKPIs();
+  renderQueue();
+  renderNewProspects();
+  renderTasks();
+  renderMetrics();
+  renderCharts();
+  renderLocTable();
+  applyFilters();
+}
+
+/* ---------------- CSV EXPORT ---------------- */
+function csvCell(v){
+  const s = (v==null?'':String(v));
+  return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+}
+document.getElementById('export-csv-btn').addEventListener('click', ()=>{
+  const rows = scopedLeads();
+  const header = ['Brand','Location','Assigned Rep','Company','Contact','Title','Phone','Email','Status','Events Status','Last Contact Date','Next Follow-up','Coverage Flag','Notes','Activity Log'];
+  const lines = [header.map(csvCell).join(',')];
+  rows.forEach(r=>{
+    const eff = getEffective(r);
+    const rep = repLabel(r.b, r.l) || '';
+    const flag = coverageFlag(r) || '';
+    const activityStr = (eff.activity||[]).map(a=>`${a.date} ${a.by||''}: ${activitySummary(a)}${a.note?' - '+a.note:''}`).join(' | ');
+    lines.push([
+      r.b, r.l, rep, r.c, r.n||'', r.t||'', r.p||'', r.e||'',
+      eff.status, eventsLabel(eff.eventsStatus), eff.lastDate||'', eff.nextFollowUp||'', flag, r.note||'', activityStr
+    ].map(csvCell).join(','));
+  });
+  const csv = lines.join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const stamp = todayISO();
+  const scope = viewLocations.size===1 ? selectedLocsArray()[0].location.replace(/[^a-z0-9]+/gi,'_') : viewLocations.size>1 ? `${viewLocations.size}_locations` : 'all_locations';
+  a.href = url; a.download = `prospecting_export_${scope}_${stamp}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+/* ---------------- TABS ---------------- */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    document.getElementById('tab-work').style.display = tab==='work' ? 'block' : 'none';
+    document.getElementById('tab-analytics').style.display = tab==='analytics' ? 'block' : 'none';
+    if (tab==='analytics'){
+      requestAnimationFrame(()=>{
+        if (loggedChart) loggedChart.resize();
+        if (statusChart) statusChart.resize();
+      });
+    }
+  });
+});
+
+/* ---------------- LOGIN GATE ---------------- */
+function showApp(){
+  document.getElementById('login-overlay').style.display = 'none';
+  document.getElementById('loading-overlay').style.display = 'flex';
+  loadAll();
+}
+async function attemptLogin(){
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+  if (!email || !password){ errEl.textContent = 'Enter your email and password.'; errEl.style.display = 'block'; return; }
+  const btn = document.getElementById('login-submit-btn');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  try {
+    await loginWithPassword(email, password);
+    showApp();
+  } catch(e){
+    errEl.textContent = e.message || 'Login failed.';
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Log in';
+  }
+}
+document.getElementById('login-submit-btn').addEventListener('click', attemptLogin);
+document.getElementById('login-password').addEventListener('keydown', (e)=>{ if (e.key==='Enter') attemptLogin(); });
+document.getElementById('login-email').addEventListener('keydown', (e)=>{ if (e.key==='Enter') document.getElementById('login-password').focus(); });
+document.getElementById('logout-btn').addEventListener('click', logout);
+
+if (restoreSession()){
+  showApp();
+}
+</script>
+</body>
+</html>
