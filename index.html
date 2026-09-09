@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,14 +19,14 @@
   html,body{margin:0;padding:0;}
   body{background:var(--paper);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;}
   .wrap{max-width:1320px;margin:0 auto;padding:0 28px 64px;}
-
+ 
   header.top{background:var(--ink);color:#fff;padding:26px 0;margin-bottom:26px;}
   header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}
   .brandmark{display:flex;align-items:baseline;gap:12px;}
   .brandmark .dot{width:11px;height:11px;border-radius:50%;background:var(--amber);display:inline-block;transform:translateY(-2px);}
   h1{font-size:24px;font-weight:700;letter-spacing:-0.02em;margin:0;}
   header.top p{margin:5px 0 0;color:#B9C2CC;font-size:13px;}
-
+ 
   /* tabs */
   .tab-nav{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:26px;}
   .tab-btn{font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);background:none;border:none;padding:12px 6px;margin-right:22px;cursor:pointer;position:relative;top:1px;}
@@ -57,14 +56,14 @@
   .scope-banner button{font-size:12px;color:var(--teal);background:none;border:none;cursor:pointer;font-weight:600;text-decoration:underline;padding:0;}
   .lead-main.locked, .loc-table tbody tr.inert{cursor:default;}
   .filters select:disabled{opacity:.55;cursor:not-allowed;}
-
+ 
   section{margin-bottom:34px;}
   .section-head{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 12px;flex-wrap:wrap;gap:6px;}
   .section-head h2{font-size:17px;font-weight:700;margin:0;letter-spacing:-0.01em;}
   .section-head .hint{font-size:12.5px;color:var(--muted);}
-
+ 
   .panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px;}
-
+ 
   /* KPI */
   .kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;}
   .kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;}
@@ -73,7 +72,7 @@
   .kpi .sub{font-size:11.5px;color:var(--muted);margin-top:4px;}
   .kpi.accent-teal .val{color:var(--teal);} .kpi.accent-amber .val{color:var(--amber);}
   .kpi.accent-blue .val{color:var(--blue);} .kpi.accent-coral .val{color:var(--coral);}
-
+ 
   /* Action queue */
   .queue-list{display:flex;flex-direction:column;gap:0;}
   .queue-item{border-bottom:1px solid #EFEBE1;padding:12px 4px;}
@@ -82,6 +81,8 @@
   .queue-row .co{flex:1;min-width:0;}
   .queue-row .co .name{font-weight:600;}
   .queue-row .co .meta{font-size:11.5px;color:var(--muted);}
+  .acct-link{cursor:pointer;}
+  .acct-link:hover{color:var(--teal);text-decoration:underline;}
   .overdue-pill{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;}
   .overdue-pill.hot{background:var(--coral-soft);color:var(--coral);}
   .overdue-pill.warm{background:var(--amber-soft);color:var(--amber);}
@@ -94,7 +95,7 @@
   .btn.ghost:hover{color:var(--coral);}
   .btn.small{padding:4px 9px;font-size:11.5px;}
   .empty-state{color:var(--muted);font-size:13px;padding:20px 4px;text-align:center;}
-
+ 
   /* Log form */
   .log-form{background:#FBFAF6;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-top:10px;}
   .lf-heading{font-size:12.5px;color:var(--muted);margin-bottom:8px;}
@@ -120,7 +121,7 @@
   .activity-entry:last-child{border-bottom:none;}
   .activity-entry .when{color:var(--muted);}
   .activity-entry .who{font-weight:600;}
-
+ 
   /* Tasks */
   .task-form{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
   .task-form input[type=text]{flex:1;min-width:200px;font-family:inherit;font-size:13px;padding:8px 11px;border:1px solid var(--border);border-radius:7px;}
@@ -135,7 +136,7 @@
   .task-toggle{display:flex;gap:6px;margin-bottom:10px;}
   .task-toggle button{font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:#fff;cursor:pointer;color:var(--muted);}
   .task-toggle button.active{background:var(--ink);color:#fff;border-color:var(--ink);}
-
+ 
   /* leaderboard */
   .week-label{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:14px;}
   .range-controls{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);}
@@ -178,7 +179,7 @@
   .lb-status.ahead{color:var(--teal);}
   .lb-status.behind{color:var(--coral);}
   .lb-status.pending{color:var(--muted);}
-
+ 
   /* charts */
   .chart-row{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;}
   .panel canvas{max-height:300px;}
@@ -187,7 +188,7 @@
   .legend-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
   .chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);border:1px solid var(--border);border-radius:20px;padding:3px 10px 3px 8px;}
   .chip .sw{width:8px;height:8px;border-radius:50%;}
-
+ 
   /* locations table */
   table{width:100%;border-collapse:collapse;font-size:13px;}
   .loc-table th{text-align:left;font-size:11px;color:var(--muted);font-weight:600;padding:9px 10px;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;}
@@ -200,7 +201,7 @@
   .brand-tag{display:inline-block;font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:4px;}
   .table-scroll{overflow-x:auto;background:var(--card);border:1px solid var(--border);border-radius:10px;}
   .table-scroll table{min-width:1080px;}
-
+ 
   /* filters */
   .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
   .filters select, .filters input[type="text"]{font-family:inherit;font-size:13px;padding:8px 11px;border:1px solid var(--border);border-radius:7px;background:#fff;color:var(--text);}
@@ -211,7 +212,7 @@
   .filters .clear-btn:hover{color:var(--coral);border-color:var(--coral);}
   .count-line{font-size:12.5px;color:var(--muted);margin-bottom:10px;}
   .count-line strong{color:var(--text);}
-
+ 
   .lead-row{border-bottom:1px solid #EFEBE1;}
   .lead-row:hover{background:#FCFBF7;}
   .lead-main{display:grid;grid-template-columns:auto 2.2fr 1.4fr 1.4fr 1.5fr 1fr auto;gap:10px;align-items:center;padding:10px 12px;cursor:pointer;}
@@ -234,19 +235,19 @@
   .lead-row.open .caret{transform:rotate(90deg);}
   .lead-detail{display:none;padding:0 12px 16px;}
   .lead-row.open .lead-detail{display:block;}
-
+ 
   .pagination{display:flex;align-items:center;gap:10px;justify-content:flex-end;padding:12px 14px;font-size:12.5px;color:var(--muted);}
   .pagination button{border:1px solid var(--border);background:#fff;border-radius:6px;padding:5px 11px;cursor:pointer;font-size:12.5px;color:var(--text);}
   .pagination button:disabled{opacity:.4;cursor:default;}
   .pagination button:hover:not(:disabled){border-color:var(--teal);color:var(--teal);}
-
+ 
   .loading-overlay{position:fixed;inset:0;background:var(--paper);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;z-index:999;}
   .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg);}}
   .loading-overlay .msg{font-size:13px;color:var(--muted);}
-
+ 
   .shared-note{font-size:11.5px;color:var(--muted);background:var(--blue-soft);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:16px;}
-
+ 
   /* add prospect */
   .explorer-toolbar{display:flex;justify-content:flex-end;margin-bottom:12px;}
   .modal-overlay{position:fixed;inset:0;background:rgba(22,32,42,0.55);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;}
@@ -261,11 +262,41 @@
   }
   .modal-box textarea{resize:vertical;min-height:56px;}
   .modal-box .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+ 
+  /* account modal */
+  .account-modal-box{max-width:620px;}
+  .account-modal-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+  .account-section{border-top:1px solid var(--border);padding-top:14px;margin-top:14px;}
+  .account-section:first-child{border-top:none;margin-top:0;padding-top:0;}
+  .account-section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .account-section-head h4{font-size:12px;font-weight:700;color:var(--muted);margin:0;text-transform:uppercase;letter-spacing:.02em;}
+  .account-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
+  .apollo-badge{display:inline-block;font-size:10.5px;font-weight:700;color:#6A5A8C;background:var(--violet-soft);border-radius:4px;padding:2px 7px;margin-left:6px;}
+  .contact-card{border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;position:relative;}
+  .contact-card .cname{font-weight:700;font-size:13px;}
+  .contact-card .cmeta{font-size:12px;color:var(--muted);margin-top:2px;}
+  .contact-card .cmeta a{color:var(--teal);text-decoration:none;}
+  .contact-card .primary-tag{font-size:9.5px;font-weight:700;color:var(--teal);background:var(--teal-soft);border-radius:4px;padding:1px 5px;margin-left:6px;}
+  .contact-card .remove-contact{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;}
+  .contact-card .remove-contact:hover{color:var(--coral);}
+  .add-contact-form{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#FBFAF6;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:6px;}
+  .add-contact-form input{grid-column:span 1;font-family:inherit;font-size:12.5px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;}
+  .add-contact-form .actions{grid-column:span 2;display:flex;justify-content:flex-end;gap:8px;margin-top:2px;}
+  .edit-account-form label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin:8px 0 3px;}
+  .edit-account-form input, .edit-account-form textarea{width:100%;font-family:inherit;font-size:13px;padding:7px 9px;border:1px solid var(--border);border-radius:6px;}
+  .danger-zone{border:1px solid #F0C7BC;background:var(--coral-soft);border-radius:8px;padding:10px 12px;margin-top:6px;}
+  .danger-zone .label{font-size:11.5px;color:var(--coral);font-weight:600;margin-bottom:6px;}
+  .cadence-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1EEE4;}
+  .cadence-row:last-child{border-bottom:none;}
+  .cadence-row .clabel{font-size:13px;color:var(--text);}
+  .cadence-row .cinput-wrap{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+  .cadence-row input[type=number]{width:52px;font-family:inherit;font-size:13px;padding:6px 7px;border:1px solid var(--border);border-radius:6px;text-align:center;}
+  .cadence-row .cunit{font-size:12px;color:var(--muted);}
   .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;}
   .new-badge{display:inline-block;font-size:10px;font-weight:700;color:var(--teal);background:var(--teal-soft);border-radius:4px;padding:2px 6px;margin-left:6px;}
-
+ 
   footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 0 6px;}
-
+ 
   @media (max-width:980px){
     .kpi-row{grid-template-columns:repeat(3,1fr);}
     .chart-row{grid-template-columns:1fr;}
@@ -275,12 +306,12 @@
 </style>
 </head>
 <body>
-
+ 
 <div class="loading-overlay" id="loading-overlay" style="display:none;">
   <div class="spinner"></div>
   <div class="msg">Loading shared workspace data…</div>
 </div>
-
+ 
 <div class="modal-overlay" id="login-overlay" style="display:flex;">
   <div class="modal-box">
     <div class="modal-head">
@@ -297,7 +328,7 @@
     </div>
   </div>
 </div>
-
+ 
 <header class="top">
   <div class="wrap">
     <div>
@@ -317,24 +348,27 @@
           <div class="ms-list" id="loc-ms-list"></div>
         </div>
       </div>
+      <button type="button" class="btn small ghost" id="cadence-settings-btn" style="border-color:#3A4756;color:#B9C2CC;">My cadence</button>
       <button type="button" class="btn small ghost" id="logout-btn" style="border-color:#3A4756;color:#B9C2CC;">Log out</button>
     </div>
   </div>
 </header>
-
+ 
 <div class="wrap">
   <div class="tab-nav">
-    <button class="tab-btn active" id="tab-btn-work" data-tab="work">Work</button>
+    <button class="tab-btn active" id="tab-btn-tasks" data-tab="tasks">Tasks</button>
+    <button class="tab-btn" id="tab-btn-newprospects" data-tab="newprospects">New Prospects</button>
+    <button class="tab-btn" id="tab-btn-explorer" data-tab="explorer">Lead Explorer</button>
     <button class="tab-btn" id="tab-btn-analytics" data-tab="analytics">Analytics</button>
   </div>
 </div>
-
+ 
 <div class="wrap">
   <div class="shared-note">This is a live, shared workspace — everyone using this link sees the same leads, outcomes, and tasks in real time. The "Logged / Called / Emailed" baseline totals on the Analytics tab are a one-time snapshot from the original tracker export and won't update further; everything else here is fully live.</div>
   <div class="scope-banner" id="scope-banner" style="display:none;"></div>
-
-  <div id="tab-work">
-
+ 
+  <div id="tab-tasks">
+ 
   <section>
     <div class="section-head">
       <h2>Follow-up queue</h2>
@@ -344,24 +378,11 @@
       <div class="queue-list" id="queue-list"></div>
     </div>
   </section>
-
+ 
   <section>
     <div class="section-head">
-      <h2>New prospects</h2>
-      <span class="hint" id="new-prospects-hint">Recently added accounts — get the first call or email logged</span>
-    </div>
-    <div class="panel">
-      <div class="explorer-toolbar" style="margin-bottom:14px;">
-        <button class="btn primary" id="add-prospect-btn">+ Add new prospect</button>
-      </div>
-      <div id="new-prospects-list"></div>
-    </div>
-  </section>
-
-  <section>
-    <div class="section-head">
-      <h2>Tasks</h2>
-      <span class="hint">Manual reminders your team sets, separate from the automatic follow-up queue</span>
+      <h2>Reminders</h2>
+      <span class="hint">Manual reminders your team sets, separate from the automatic follow-up queue above</span>
     </div>
     <div class="panel">
       <div class="task-form">
@@ -379,11 +400,39 @@
       <div id="task-list"></div>
     </div>
   </section>
-
+ 
+  </div>
+ 
+  <div id="tab-newprospects" style="display:none;">
+ 
+  <section>
+    <div class="section-head">
+      <h2>New prospects</h2>
+      <span class="hint" id="new-prospects-hint">Recently added accounts — get the first call or email logged</span>
+    </div>
+    <div class="panel">
+      <div class="explorer-toolbar" style="justify-content:space-between;margin-bottom:14px;">
+        <div class="task-toggle" style="margin-bottom:0;">
+          <button class="active" data-np-range="today">Added today</button>
+          <button data-np-range="week">This week</button>
+        </div>
+        <button class="btn primary" id="add-prospect-btn">+ Add new prospect</button>
+      </div>
+      <div id="new-prospects-list"></div>
+    </div>
+  </section>
+ 
+  </div>
+ 
+  <div id="tab-explorer" style="display:none;">
+ 
   <section id="explorer">
     <div class="section-head">
       <h2>Lead explorer</h2>
-      <span class="hint">Click a lead to log an outcome, change status, or add a task</span>
+      <span class="hint">Click an account name to view its full history, outreach, and contacts</span>
+    </div>
+    <div class="explorer-toolbar">
+      <button class="btn primary" id="add-prospect-btn-2">+ Add new prospect</button>
     </div>
     <div class="filters">
       <input type="text" id="f-search" placeholder="Search company, contact, or notes…">
@@ -408,18 +457,18 @@
       <div class="pagination" id="pagination"></div>
     </div>
   </section>
-
+ 
   </div>
-
+ 
   <div id="tab-analytics" style="display:none;">
-
+ 
   <div class="explorer-toolbar" style="justify-content:space-between;align-items:center;">
     <span class="hint">Export a snapshot of every lead in view, with current status and activity history</span>
     <button class="btn" id="export-csv-btn">⬇ Export to CSV</button>
   </div>
-
+ 
   <section class="kpi-row" id="kpi-row"></section>
-
+ 
   <section>
     <div class="section-head">
       <h2>Leaderboards</h2>
@@ -458,7 +507,7 @@
       <div id="leaderboard-list"></div>
     </div>
   </section>
-
+ 
   <section>
     <div class="section-head">
       <h2>Portfolio overview</h2>
@@ -478,7 +527,7 @@
       </div>
     </div>
   </section>
-
+ 
   <section>
     <div class="section-head">
       <h2>Locations</h2>
@@ -504,9 +553,9 @@
       </table>
     </div>
   </section>
-
+ 
   </div>
-
+ 
   <div class="modal-overlay" id="add-prospect-overlay" style="display:none;">
     <div class="modal-box">
       <div class="modal-head">
@@ -525,6 +574,10 @@
       </div>
       <label>Email</label>
       <input type="text" id="np-email" placeholder="Direct email">
+      <div class="grid2">
+        <div><label>Status</label><select id="np-status"></select></div>
+        <div><label>Apollo lead?</label><select id="np-apollo"><option value="no">No</option><option value="yes">Yes — already on Apollo cadence</option></select></div>
+      </div>
       <label>Notes</label>
       <textarea id="np-notes" placeholder="Where this lead came from, anything worth knowing…"></textarea>
       <div class="modal-actions">
@@ -533,7 +586,7 @@
       </div>
     </div>
   </div>
-
+ 
   <div class="modal-overlay" id="bulk-log-overlay" style="display:none;">
     <div class="modal-box">
       <div class="modal-head">
@@ -543,20 +596,48 @@
       <div id="bulk-log-form-slot"></div>
     </div>
   </div>
-
+ 
+  <div class="modal-overlay" id="cadence-overlay" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>Your follow-up pacing</h3>
+        <button class="modal-close" id="cadence-close">✕</button>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);margin:0 0 10px;">The system suggests a next follow-up date based on how many days have passed since the last attempt. Adjust how many days it waits per status — this only changes suggestions <em>you</em> see; you can still always edit the date on any individual attempt.</p>
+      <div id="cadence-rows"></div>
+      <div class="modal-actions">
+        <button class="btn small ghost" id="cadence-reset">Reset to defaults</button>
+        <button class="btn primary" id="cadence-save">Save</button>
+      </div>
+    </div>
+  </div>
+ 
+  <div class="modal-overlay" id="account-overlay" style="display:none;">
+    <div class="modal-box account-modal-box">
+      <div class="modal-head">
+        <div id="account-modal-title-wrap">
+          <h3 id="account-modal-company">Company</h3>
+          <div class="account-modal-sub" id="account-modal-sub"></div>
+        </div>
+        <button class="modal-close" id="account-modal-close">✕</button>
+      </div>
+      <div id="account-modal-body"></div>
+    </div>
+  </div>
+ 
   <footer>Built from the Five Star Parks Prospecting Tracker · Volumes come from the Portfolio Summary tab; statuses, outcomes, and tasks update live and are shared with your team.</footer>
 </div>
-
+ 
 <script>
 /* ---------------- SUPABASE CONFIG ---------------- */
 const SUPABASE_URL = 'https://utiozccjdfsetpnmwtuo.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_ik4x5iUJymrt_fqNny-qFQ_4YSu58hc';
-
+ 
 /* ---------------- AUTH ---------------- */
 let authAccessToken = null;
 let authRefreshToken = null;
 let authUserEmail = null;
-
+ 
 function authHeaders(){
   return {
     'apikey': SUPABASE_KEY,
@@ -621,7 +702,7 @@ async function authFetch(url, opts={}, retried){
   }
   return res;
 }
-
+ 
 /* ---------------- SUPABASE DATA HELPERS ---------------- */
 async function supaSelect(table, query){
   let all = [];
@@ -658,12 +739,20 @@ async function supaDelete(table, matchQuery){
   const res = await authFetch(`${SUPABASE_URL}/rest/v1/${table}?${matchQuery}`, { method: 'DELETE' });
   if (!res.ok) throw new Error(`Supabase delete from ${table} failed: ${res.status}`);
 }
-
+async function supaUpdate(table, matchQuery, patch){
+  const res = await authFetch(`${SUPABASE_URL}/rest/v1/${table}?${matchQuery}`, {
+    method: 'PATCH',
+    headers: {'Prefer': 'return=minimal'},
+    body: JSON.stringify(patch)
+  });
+  if (!res.ok) throw new Error(`Supabase update on ${table} failed: ${res.status} ${await res.text()}`);
+}
+ 
 const LEADS = [];
 const LOCS = [{"brand":"Scene75","location":"Chicagoland","logged":426,"called":113,"emailed":375,"linkedin":152,"contacted":16,"booked":49,"in_conv":13,"tours":1},{"brand":"Scene75","location":"Columbus","logged":409,"called":192,"emailed":393,"linkedin":10,"contacted":8,"booked":1,"in_conv":6,"tours":0},{"brand":"Scene75","location":"Cleveland","logged":717,"called":73,"emailed":637,"linkedin":0,"contacted":1,"booked":1,"in_conv":17,"tours":0},{"brand":"Scene75","location":"Cincinnati","logged":178,"called":54,"emailed":95,"linkedin":0,"contacted":0,"booked":7,"in_conv":18,"tours":1},{"brand":"Scene75","location":"Dayton","logged":597,"called":593,"emailed":98,"linkedin":0,"contacted":22,"booked":22,"in_conv":49,"tours":0},{"brand":"Malibu Jacks","location":"N. Richland Hills","logged":314,"called":300,"emailed":307,"linkedin":167,"contacted":188,"booked":1,"in_conv":3,"tours":0},{"brand":"Malibu Jacks","location":"Lexington","logged":688,"called":688,"emailed":679,"linkedin":74,"contacted":2,"booked":0,"in_conv":7,"tours":0},{"brand":"Malibu Jacks","location":"Louisville","logged":233,"called":173,"emailed":101,"linkedin":89,"contacted":8,"booked":0,"in_conv":2,"tours":0},{"brand":"Malibu Jacks","location":"Ashland","logged":402,"called":255,"emailed":91,"linkedin":27,"contacted":35,"booked":0,"in_conv":0,"tours":0},{"brand":"Malibu Jacks","location":"Lafayette","logged":608,"called":173,"emailed":601,"linkedin":38,"contacted":157,"booked":5,"in_conv":5,"tours":0},{"brand":"Fun Land","location":"Fairfax (A)","logged":190,"called":74,"emailed":190,"linkedin":0,"contacted":0,"booked":0,"in_conv":1,"tours":0},{"brand":"Fun Land","location":"Fairfax (L)","logged":222,"called":93,"emailed":179,"linkedin":2,"contacted":22,"booked":0,"in_conv":18,"tours":2},{"brand":"Fun Land","location":"Fredericksburg (A)","logged":45,"called":20,"emailed":45,"linkedin":0,"contacted":1,"booked":0,"in_conv":1,"tours":0},{"brand":"Fun Land","location":"Fredericksburg (L)","logged":408,"called":217,"emailed":175,"linkedin":15,"contacted":64,"booked":0,"in_conv":94,"tours":5},{"brand":"Celebration Station","location":"OKC","logged":145,"called":130,"emailed":88,"linkedin":0,"contacted":6,"booked":0,"in_conv":0,"tours":0},{"brand":"Celebration Station","location":"Mesquite","logged":198,"called":161,"emailed":119,"linkedin":1,"contacted":10,"booked":0,"in_conv":0,"tours":0},{"brand":"Celebration Station","location":"Clearwater","logged":277,"called":202,"emailed":195,"linkedin":61,"contacted":78,"booked":0,"in_conv":6,"tours":1},{"brand":"Celebration Station","location":"Baton Rouge","logged":153,"called":118,"emailed":91,"linkedin":1,"contacted":18,"booked":0,"in_conv":0,"tours":0},{"brand":"Celebration Station","location":"Greensboro","logged":209,"called":122,"emailed":134,"linkedin":0,"contacted":4,"booked":1,"in_conv":6,"tours":0},{"brand":"Craig's Cruisers","location":"Grand Rapids","logged":661,"called":620,"emailed":529,"linkedin":87,"contacted":87,"booked":13,"in_conv":73,"tours":0},{"brand":"Branson Parks","location":"Branson Parks","logged":312,"called":211,"emailed":81,"linkedin":12,"contacted":6,"booked":0,"in_conv":7,"tours":2},{"brand":"Pigeon Forge","location":"Pigeon Forge Parks","logged":217,"called":117,"emailed":101,"linkedin":3,"contacted":5,"booked":5,"in_conv":7,"tours":1}];
 const TOTAL = {"logged":7609,"called":4699,"emailed":5304,"linkedin":739,"contacted":738,"booked":105,"in_conv":333,"tours":13};
 const LEAD_BY_ID = new Map();
-
+ 
 /* Pull the base lead list from Supabase and rebuild LEADS/LEAD_BY_ID in the same shape the rest of the app expects. */
 async function loadLeadsFromSupabase(){
   try{
@@ -673,7 +762,7 @@ async function loadLeadsFromSupabase(){
         id: row.id, b: row.brand, l: row.location, c: row.company, n: row.contact, t: row.title,
         p: row.phone, e: row.email, dc: row.date_called, de: row.date_emailed, li: row.linkedin,
         dt: row.date_contacted, s: row.base_status || 'No Status', note: row.notes,
-        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at
+        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo
       };
       LEADS.push(r);
       LEAD_BY_ID.set(r.id, r);
@@ -685,8 +774,72 @@ async function loadLeadsFromSupabase(){
     throw e;
   }
 }
-
-
+const leadContacts = {}; // leadId -> array of {id, name, title, phone, email}
+async function loadContactsFromSupabase(){
+  try{
+    const rows = await supaSelect('lead_contacts', 'select=*&order=created_at.asc');
+    rows.forEach(row=>{
+      if (!leadContacts[row.lead_id]) leadContacts[row.lead_id] = [];
+      leadContacts[row.lead_id].push({ id: row.id, name: row.name, title: row.title, phone: row.phone, email: row.email });
+    });
+  } catch(e){ console.error('contact load failed', e); }
+}
+let myCadence = {}; // this user's personal cadence-day overrides, status -> days
+async function loadMyCadence(){
+  if (!authUserEmail) return;
+  try{
+    const rows = await supaSelect('rep_cadence', `select=cadence_overrides&user_email=eq.${encodeURIComponent(authUserEmail)}`);
+    if (rows.length) myCadence = rows[0].cadence_overrides || {};
+  } catch(e){ console.error('cadence load failed', e); }
+}
+function cadenceDaysFor(status){
+  return (myCadence && myCadence[status] != null) ? myCadence[status] : (CADENCE_DAYS[status] ?? 3);
+}
+ 
+/* ---------------- CADENCE SETTINGS ---------------- */
+function renderCadenceRows(){
+  const wrap = document.getElementById('cadence-rows');
+  wrap.innerHTML = Object.keys(CADENCE_DAYS).map(status=>{
+    const val = (myCadence && myCadence[status] != null) ? myCadence[status] : CADENCE_DAYS[status];
+    return `<div class="cadence-row">
+      <div class="clabel">${esc(status)}</div>
+      <div class="cinput-wrap">
+        <input type="number" min="0" max="60" class="cadence-input" data-status="${esc(status)}" value="${val}">
+        <span class="cunit">days</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+document.getElementById('cadence-settings-btn').addEventListener('click', ()=>{
+  renderCadenceRows();
+  document.getElementById('cadence-overlay').style.display = 'flex';
+});
+document.getElementById('cadence-close').addEventListener('click', ()=>{ document.getElementById('cadence-overlay').style.display = 'none'; });
+document.getElementById('cadence-overlay').addEventListener('click', (e)=>{ if (e.target.id==='cadence-overlay') document.getElementById('cadence-overlay').style.display = 'none'; });
+document.getElementById('cadence-reset').addEventListener('click', ()=>{
+  myCadence = {};
+  renderCadenceRows();
+});
+document.getElementById('cadence-save').addEventListener('click', async ()=>{
+  if (!authUserEmail){ alert('You need to be logged in to save this.'); return; }
+  const next = {};
+  document.querySelectorAll('.cadence-input').forEach(inp=>{
+    const v = parseInt(inp.value, 10);
+    const status = inp.dataset.status;
+    if (!isNaN(v) && v !== CADENCE_DAYS[status]) next[status] = v;
+  });
+  myCadence = next;
+  const btn = document.getElementById('cadence-save');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await supaUpsert('rep_cadence', [{ user_email: authUserEmail, cadence_overrides: myCadence, updated_at: new Date().toISOString() }]);
+    document.getElementById('cadence-overlay').style.display = 'none';
+    renderAll();
+  } catch(e){ console.error(e); alert('Could not save your cadence settings — try again.'); }
+  finally { btn.disabled = false; btn.textContent = 'Save'; }
+});
+ 
+ 
 const BRAND_COLORS = {
   'Scene75':'#1F7A6C','Malibu Jacks':'#35638F','Fun Land':'#E0932E',
   'Celebration Station':'#D9583D',"Craig's Cruisers":'#6A5A8C',
@@ -707,14 +860,14 @@ const STATUS_COLORS = {
 };
 const ALL_STATUSES = ['No Status','Day 1 Sent','Called – No Answer','Day 3 Sent','Day 7 Sent','In Conversation',
   'Follow-up Sent','Tour Scheduled','Proposal Sent','Paused','Developing','In Person Visit','Booked','Not Interested'];
-
+ 
 const CADENCE_DAYS = {
   'Day 1 Sent':3, 'Called – No Answer':3, 'Day 3 Sent':4, 'Day 7 Sent':7,
   'In Conversation':3, 'Follow-up Sent':3, 'Follow-up/Assigned':3,
   'Paused':14, 'Developing':5, 'Proposal Sent':3, 'Tour Scheduled':2
 };
 const NO_FOLLOWUP = new Set(['Booked','Not Interested']);
-
+ 
 const CHANNELS = [
   {v:'call', label:'Called'},
   {v:'email', label:'Emailed'},
@@ -735,7 +888,7 @@ const OUTCOME_OPTIONS = [
   {v:'tour_scheduled', label:'Tour scheduled', status:'Tour Scheduled'},
   {v:'pause', label:'Pausing – try a new contact', status:'Paused'},
 ];
-
+ 
 /* Separate from pipeline status — a quick tag for whether this account books events at all. */
 const EVENTS_OPTIONS = [
   {v:'', label:'Events: —', color:'#8B95A1'},
@@ -752,22 +905,27 @@ async function saveEventsStatus(leadId, value){
   try { await persistLeadState(leadId, merged); }
   catch(e){ console.error('events status save failed', e); alert('Could not save — try again.'); }
 }
-
+ 
 function fmt(n){ return (n||0).toLocaleString('en-US'); }
+function ordinal(n){
+  const s = ['th','st','nd','rd'];
+  const v = n % 100;
+  return n + (s[(v-20)%10] || s[v] || s[0]);
+}
 function pct(a,b){ return b>0 ? Math.round((a/b)*100) : 0; }
 function todayISO(){ return new Date().toISOString().slice(0,10); }
 function daysBetween(a,b){ return Math.round((new Date(b+'T00:00:00') - new Date(a+'T00:00:00')) / 86400000); }
 function hexToSoft(hex){ const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return `rgba(${r},${g},${b},0.16)`; }
 function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
+ 
 /* ---------------- STATE ---------------- */
 let overrides = {};      // leadId(string) -> {status, lastContactDate, nextFollowUp, activity:[], updatedBy, updatedAt}
 let tasks = [];          // array of task objects
 let myName = '';
 let viewLocations = new Set(); // "brand|||location" keys currently in view; empty Set = all locations
-
+ 
 const LOCATION_OPTIONS = [...new Set(LOCS.map(l=>l.brand+'|||'+l.location))].sort();
-
+ 
 /* Sales rep assigned to each park. "2" is a secondary/backup rep where given. */
 const REP_ASSIGNMENTS = {
   'Scene75|||Chicagoland': {primary:'Sherry Kenny'},
@@ -828,7 +986,7 @@ function newLeadsCountFor(brand, location){
 function locsWithLiveCounts(){
   return LOCS.map(l=>({...l, logged: l.logged + newLeadsCountFor(l.brand, l.location)}));
 }
-
+ 
 function advanceSequence(current){
   if (!current || current==='No Status') return 'Day 1 Sent';
   if (current==='Day 1 Sent') return 'Day 3 Sent';
@@ -846,14 +1004,15 @@ function getEffective(r){
   const lastDate = (ov && ov.lastContactDate) || baseLastDate(r);
   let nextFollowUp = ov && ov.nextFollowUp !== undefined ? ov.nextFollowUp : undefined;
   if (nextFollowUp === undefined){
-    if (NO_FOLLOWUP.has(status) || !lastDate){ nextFollowUp = null; }
+    if (r.isApollo || NO_FOLLOWUP.has(status) || !lastDate){ nextFollowUp = null; }
     else {
-      const days = CADENCE_DAYS[status] ?? 5;
+      const days = cadenceDaysFor(status);
       const d = new Date(lastDate+'T00:00:00'); d.setDate(d.getDate()+days);
       nextFollowUp = d.toISOString().slice(0,10);
     }
   }
-  return { status, lastDate, nextFollowUp, activity: (ov && ov.activity) || [], eventsStatus: (ov && ov.eventsStatus) || '' };
+  const attemptCount = (ov && ov.activity) ? ov.activity.length : 0;
+  return { status, lastDate, nextFollowUp, activity: (ov && ov.activity) || [], eventsStatus: (ov && ov.eventsStatus) || '', attemptCount };
 }
 function hasCalledEver(r){
   if (r.dc) return true;
@@ -886,17 +1045,19 @@ function lastTouchedLabel(r){
 }
 function telHref(p){ return p ? 'tel:'+String(p).replace(/[^\d+]/g,'') : ''; }
 function mailtoHref(e){ return e ? 'mailto:'+e : ''; }
-
-
+ 
+ 
 async function loadAll(){
   await loadLeadsFromSupabase(); // note: new prospects are already rows in the leads table (is_new=true), so no separate step needed
-
+  await loadContactsFromSupabase();
+  await loadMyCadence();
+ 
   myName = localStorage.getItem('fsp_me') || '';
   if (myName){
     document.getElementById('me-input').value = myName;
     const ta = document.getElementById('task-assignee'); if (ta) ta.value = myName;
   }
-
+ 
   try {
     const rawLocs = localStorage.getItem('fsp_view_locations');
     if (rawLocs){
@@ -904,7 +1065,7 @@ async function loadAll(){
       if (Array.isArray(parsed)) viewLocations = new Set(parsed.filter(k=>LOCATION_OPTIONS.includes(k)));
     }
   } catch(e){}
-
+ 
   try {
     const stateRows = await supaSelect('lead_state', 'select=*');
     stateRows.forEach(row=>{
@@ -914,7 +1075,7 @@ async function loadAll(){
       };
     });
   } catch(e){ console.error('lead_state load failed', e); }
-
+ 
   try {
     const activityRows = await supaSelect('lead_activity', 'select=*&order=id.asc');
     activityRows.forEach(row=>{
@@ -929,7 +1090,7 @@ async function loadAll(){
       if (overrides[id].activity && overrides[id].activity.length > 50) overrides[id].activity = overrides[id].activity.slice(-50);
     });
   } catch(e){ console.error('lead_activity load failed', e); }
-
+ 
   try {
     const taskRows = await supaSelect('tasks', 'select=*');
     taskRows.forEach(row=>{
@@ -940,12 +1101,12 @@ async function loadAll(){
       });
     });
   } catch(e){ console.error('task load failed', e); }
-
+ 
   document.getElementById('loading-overlay').style.display = 'none';
   renderLocationPicker();
   renderAll();
 }
-
+ 
 async function persistLeadState(leadId, merged){
   await supaUpsert('lead_state', [{
     lead_id: String(leadId), status: merged.status || 'No Status',
@@ -953,7 +1114,7 @@ async function persistLeadState(leadId, merged){
     events_status: merged.eventsStatus || '', updated_at: new Date().toISOString()
   }]);
 }
-
+ 
 async function saveOverride(leadId, patch){
   const existing = overrides[leadId] || {activity:[]};
   const priorActivityLen = (existing.activity||[]).length;
@@ -973,7 +1134,7 @@ async function saveOverride(leadId, patch){
   } catch(e){ console.error('save failed', e); alert('Could not save — check your connection and try again.'); }
   renderAll();
 }
-
+ 
 async function saveTask(task){
   try {
     await supaUpsert('tasks', [{
@@ -983,19 +1144,19 @@ async function saveTask(task){
     }]);
   } catch(e){ console.error('task save failed', e); alert('Could not save the task — try again.'); }
 }
-
+ 
 document.getElementById('me-input').addEventListener('change', (e)=>{
   myName = e.target.value.trim();
   const ta = document.getElementById('task-assignee');
   if (ta && !ta.value.trim()) ta.value = myName;
   localStorage.setItem('fsp_me', myName);
 });
-
+ 
 /* ---------------- LOCATION PICKER (multi-select "Viewing" control) ---------------- */
 const msBtn = document.getElementById('loc-ms-btn');
 const msPanel = document.getElementById('loc-ms-panel');
 const msList = document.getElementById('loc-ms-list');
-
+ 
 // Build the checklist, grouped by brand
 const brandGroups = {};
 LOCATION_OPTIONS.forEach(opt=>{
@@ -1009,7 +1170,7 @@ msList.innerHTML = Object.keys(brandGroups).sort().map(brand=>`
     <label class="ms-item"><input type="checkbox" class="ms-check" value="${esc(item.opt)}"> ${esc(item.location)}</label>
   `).join('')}
 `).join('');
-
+ 
 function syncMsCheckboxes(){
   msList.querySelectorAll('.ms-check').forEach(cb=>{ cb.checked = viewLocations.has(cb.value); });
 }
@@ -1053,9 +1214,9 @@ msList.addEventListener('change', (e)=>{
 });
 document.getElementById('loc-ms-all').addEventListener('click', ()=> setViewLocations(new Set(LOCATION_OPTIONS)));
 document.getElementById('loc-ms-clear').addEventListener('click', ()=> setViewLocations(new Set()));
-
-
-
+ 
+ 
+ 
 /* ---------------- KPIs ---------------- */
 function scopedLeads(){
   return viewLocations.size===0 ? LEADS : LEADS.filter(r=>inScope(r.b, r.l));
@@ -1074,7 +1235,7 @@ function renderKPIs(){
   const liveBooked = leads.filter(r=>getEffective(r).status==='Booked').length;
   const liveInConv = leads.filter(r=>getEffective(r).status==='In Conversation').length;
   const openTasks = scopedTasks().filter(t=>!t.done).length;
-
+ 
   let totalLogged, totalCalled;
   if (viewLocations.size===0){
     totalLogged = TOTAL.logged + LEADS.filter(r=>r.isNew).length;
@@ -1087,7 +1248,7 @@ function renderKPIs(){
       totalCalled += row ? row.called : 0;
     });
   }
-
+ 
   const kpis = [
     {lbl:'Leads Logged', val:totalLogged, cls:''},
     {lbl:'Called (all-time)', val:totalCalled, cls:'accent-blue', sub:pct(totalCalled,totalLogged)+'% of logged'},
@@ -1100,7 +1261,7 @@ function renderKPIs(){
     <div class="kpi ${k.cls}"><div class="lbl">${k.lbl}</div><div class="val">${fmt(k.val)}</div>${k.sub?`<div class="sub">${k.sub}</div>`:''}</div>
   `).join('');
 }
-
+ 
 /* ---------------- FOLLOW-UP QUEUE ---------------- */
 function getQueueItems(){
   const today = todayISO();
@@ -1137,19 +1298,19 @@ function renderQueue(){
       <div class="queue-row" data-toggle="${r.id}">
         <span class="overdue-pill ${pillClass}">${overdueLabel}</span>
         <div class="co">
-          <div class="name">${esc(r.c)}</div>
+          <div class="name acct-link" data-view-account="${r.id}">${esc(r.c)}</div>
           <div class="meta">${esc(r.b)} · ${esc(r.l)}${rep?' · '+esc(rep):''} · <span class="status-badge" style="background:${hexToSoft(col)};color:${col}">${esc(it.eff.status)}</span>${it.flag?`<span class="coverage-badge">${esc(it.flag)}</span>`:''}</div>
           ${touched?`<div class="meta" style="color:var(--teal);">${esc(touched)}</div>`:''}
         </div>
         <div class="queue-actions">
-          <button class="btn small" data-log="${r.id}">Log attempt</button>
+          <button class="btn small" data-log="${r.id}">Log ${ordinal((it.eff.attemptCount||0)+1)} attempt</button>
           <button class="btn small ghost" data-snooze="${r.id}">Snooze 3d</button>
         </div>
       </div>
       <div class="qform-slot" id="qform-${r.id}"></div>
     </div>`;
   }).join('') + (items.length > 25 ? `<div class="empty-state">+${items.length-25} more — check "Due for follow-up only" in the Lead Explorer below to see the full list.</div>` : '');
-
+ 
   list.querySelectorAll('[data-toggle]').forEach(el=>{
     el.addEventListener('click', (e)=>{
       if (e.target.closest('button')) return;
@@ -1180,56 +1341,69 @@ function toggleQueueForm(id){
   queueExpandedId = id;
   renderLogForm(slot, id);
 }
-
+ 
 /* ---------------- NEW PROSPECTS ---------------- */
+let newProspectsRange = 'today';
 function renderNewProspects(){
   const el = document.getElementById('new-prospects-list');
   if (!el) return;
-  const list = LEADS.filter(r=> r.isNew && inScope(r.b, r.l))
-    .sort((a,b)=> (b.addedAt||'').localeCompare(a.addedAt||''));
+  const today = todayISO();
+  const wkStart = toISO(mondayOf(new Date()));
+  const wkEnd = toISO(weekEndOf(mondayOf(new Date())));
+  const list = LEADS.filter(r=>{
+    if (!r.isNew || !inScope(r.b, r.l)) return false;
+    const addedDate = r.addedAt ? r.addedAt.slice(0,10) : null;
+    if (!addedDate) return false;
+    return newProspectsRange==='today' ? addedDate===today : (addedDate>=wkStart && addedDate<=wkEnd);
+  }).sort((a,b)=> (b.addedAt||'').localeCompare(a.addedAt||''));
+  const rangeLabelText = newProspectsRange==='today' ? 'added today' : 'added this week';
   document.getElementById('new-prospects-hint').textContent = list.length
-    ? `${list.length} added so far${scopeSuffix()}`
-    : 'Recently added accounts — get the first call or email logged';
+    ? `${list.length} ${rangeLabelText}${scopeSuffix()}`
+    : `Nothing ${rangeLabelText} yet — use the button to add one`;
   if (!list.length){
-    el.innerHTML = `<div class="empty-state">No prospects added yet. Use the button above to add your first one.</div>`;
+    el.innerHTML = `<div class="empty-state">No prospects ${rangeLabelText}${scopeSuffix()}. Use the button above to add one.</div>`;
     return;
   }
   el.innerHTML = list.slice(0,8).map(r=>{
     const eff = getEffective(r);
     const when = r.addedAt ? new Date(r.addedAt).toLocaleDateString('en-US',{month:'short', day:'numeric'}) : '';
     return `<div class="queue-item">
-      <div class="queue-row" data-open="${r.id}">
+      <div class="queue-row">
         <span class="new-badge" style="margin-left:0;">New</span>
         <div class="co">
-          <div class="name">${esc(r.c)}</div>
+          <div class="name acct-link" data-view-account="${r.id}">${esc(r.c)}</div>
           <div class="meta">${esc(r.b)} · ${esc(r.l)}${r.addedBy?' · added by '+esc(r.addedBy):''}${when?' · '+when:''}</div>
         </div>
         <div class="queue-actions">
-          <button class="btn small" data-log-new="${r.id}">Log first attempt</button>
+          <button class="btn small" data-log-new="${r.id}">Log ${ordinal((eff.attemptCount||0)+1)} attempt</button>
         </div>
       </div>
     </div>`;
   }).join('') + (list.length>8 ? `<div class="empty-state">+${list.length-8} more — use "Due for follow-up only" off and search in the Lead Explorer to see all of them.</div>` : '');
-  el.querySelectorAll('[data-open]').forEach(row=>{
-    row.addEventListener('click', (e)=>{ if (e.target.closest('button')) return; openLeadInExplorer(row.dataset.open); });
-  });
   el.querySelectorAll('[data-log-new]').forEach(btn=>{
-    btn.addEventListener('click', ()=> openLeadInExplorer(btn.dataset.logNew));
+    btn.addEventListener('click', ()=> openAccountModal(btn.dataset.logNew));
   });
 }
-
-/* Jump to a lead in the Lead Explorer (same tab) with its log form open */
+document.querySelectorAll('[data-np-range]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-np-range]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    newProspectsRange = btn.dataset.npRange;
+    renderNewProspects();
+  });
+});
+ 
+/* Jump to a lead in the Lead Explorer (same tab) and open its account modal */
 function openLeadInExplorer(id){
   brandSel.value = ''; locSel.value = ''; statusSel.value = ''; dueCheckbox.checked = false; flagCheckbox.checked = false;
   updateLocationOptions();
   const lead = LEAD_BY_ID.get(Number(id)) || LEAD_BY_ID.get(id);
   searchInput.value = lead ? lead.c : '';
   applyFilters();
-  leadExpandedId = id;
-  renderLeadList();
-  document.getElementById('detail-'+id)?.scrollIntoView({behavior:'smooth', block:'center'});
+  openAccountModal(id);
+ 
 }
-
+ 
 /* ---------------- LOG FORM (shared by queue + explorer) ---------------- */
 function activitySummary(a){
   if (a.channels){
@@ -1249,19 +1423,19 @@ function renderLogForm(container, leadId){
     <div class="log-form">
       <div class="lf-heading">Logging an attempt for <strong>${todayLabel}</strong> — current status: <span class="status-badge" style="background:${hexToSoft(STATUS_COLORS[eff.status]||'#8B95A1')};color:${STATUS_COLORS[eff.status]||'#8B95A1'}">${esc(eff.status)}</span></div>
       ${flag ? `<div class="coverage-warning">⚠️ ${esc(flag)} — consider calling before another email.</div>` : ''}
-
+ 
       <label>How did you reach out today? <span class="lf-optional">(pick at least one)</span></label>
       <div class="channel-row">
         ${CHANNELS.map(c=>`<label class="chk channel-chk"><input type="checkbox" class="lf-channel" value="${c.v}"> ${c.label}</label>`).join('')}
       </div>
-
+ 
       <div class="lf-call-result" style="display:none;">
         <label>Result of the call</label>
         <select class="lf-callresult">
           ${CALL_RESULTS.map(cr=>`<option value="${cr.v}">${cr.label}</option>`).join('')}
         </select>
       </div>
-
+ 
       <div class="grid">
         <div>
           <label>Outcome</label>
@@ -1305,7 +1479,7 @@ function renderLogForm(container, leadId){
   const statusSel = container.querySelector('.lf-status');
   const nextInput = container.querySelector('.lf-next');
   const nextHint = container.querySelector('.lf-next-hint');
-
+ 
   function suggestStatus(){
     const o = OUTCOME_OPTIONS.find(x=>x.v===outcomeSel.value);
     if (o && o.status) return o.status;
@@ -1325,7 +1499,7 @@ function renderLogForm(container, leadId){
       nextHint.style.display = 'none';
     } else {
       nextInput.disabled = false;
-      const days = CADENCE_DAYS[newStatus] ?? 3;
+      const days = cadenceDaysFor(newStatus);
       const d = new Date(); d.setDate(d.getDate()+days);
       nextInput.value = d.toISOString().slice(0,10);
     }
@@ -1353,7 +1527,7 @@ function renderLogForm(container, leadId){
     else { nextInput.disabled=false; }
   });
   refreshNext();
-
+ 
   container.querySelector('.lf-cancel').addEventListener('click', ()=>{ container.innerHTML=''; queueExpandedId=null; leadExpandedId=null; });
   container.querySelector('.lf-save').addEventListener('click', async ()=>{
     const selectedChannels = channelChecks.filter(c=>c.checked).map(c=>c.value);
@@ -1382,7 +1556,7 @@ function renderLogForm(container, leadId){
     });
   });
 }
-
+ 
 /* ---------------- TASKS ---------------- */
 let taskFilter = 'open';
 function renderTasks(){
@@ -1399,9 +1573,10 @@ function renderTasks(){
     const overdue = t.dueDate && t.dueDate < today && !t.done;
     const tag = (viewLocations.size!==1 && t.location) ? ` <span style="color:var(--muted);font-size:11px;">[${esc(t.location)}]</span>` : '';
     const who = t.assignedTo ? ` <span style="color:var(--teal);font-size:11px;font-weight:600;">→ ${esc(t.assignedTo)}</span>` : '';
+    const companyBit = t.company ? (t.leadId ? ` <span class="acct-link" data-view-account="${t.leadId}" style="color:var(--muted);">— ${esc(t.company)}</span>` : ` <span style="color:var(--muted);">— ${esc(t.company)}</span>`) : '';
     return `<div class="task-row ${t.done?'done':''}" data-id="${t.id}">
       <input type="checkbox" ${t.done?'checked':''} data-toggle-task="${t.id}">
-      <span class="title">${esc(t.title)}${t.company?` <span style="color:var(--muted);">— ${esc(t.company)}</span>`:''}${who}${tag}</span>
+      <span class="title">${esc(t.title)}${companyBit}${who}${tag}</span>
       <span class="due ${overdue?'overdue':''}">${t.dueDate ? (overdue?'Overdue ':'')+t.dueDate : 'No date'}</span>
       ${!t.done?`<button class="btn small ghost" data-snooze-task="${t.id}">Snooze 3d</button>`:''}
       <button class="btn small ghost" data-del-task="${t.id}">Remove</button>
@@ -1449,26 +1624,31 @@ LOCATION_OPTIONS.forEach(opt=>{
   const [brand, location] = opt.split('|||');
   taskLocSel.insertAdjacentHTML('beforeend', `<option value="${esc(opt)}">${esc(brand)} — ${esc(location)}</option>`);
 });
-
+ 
 /* ---------------- ADD NEW PROSPECT ---------------- */
 const npLocSel = document.getElementById('np-location');
 LOCATION_OPTIONS.forEach(opt=>{
   const [brand, location] = opt.split('|||');
   npLocSel.insertAdjacentHTML('beforeend', `<option value="${esc(opt)}">${esc(brand)} — ${esc(location)}</option>`);
 });
+const npStatusSel = document.getElementById('np-status');
+ALL_STATUSES.forEach(s=> npStatusSel.insertAdjacentHTML('beforeend', `<option value="${esc(s)}">${esc(s)}</option>`));
 const npOverlay = document.getElementById('add-prospect-overlay');
 function openAddProspectModal(){
   ['np-company','np-contact','np-title','np-phone','np-email','np-notes'].forEach(id=>{ document.getElementById(id).value=''; });
+  npStatusSel.value = 'No Status';
+  document.getElementById('np-apollo').value = 'no';
   if (viewLocations.size===1){ const a = selectedLocsArray()[0]; npLocSel.value = locKey(a.brand, a.location); }
   npOverlay.style.display = 'flex';
   document.getElementById('np-company').focus();
 }
 function closeAddProspectModal(){ npOverlay.style.display = 'none'; }
 document.getElementById('add-prospect-btn').addEventListener('click', openAddProspectModal);
+document.getElementById('add-prospect-btn-2').addEventListener('click', openAddProspectModal);
 document.getElementById('add-prospect-close').addEventListener('click', closeAddProspectModal);
 document.getElementById('add-prospect-cancel').addEventListener('click', closeAddProspectModal);
 npOverlay.addEventListener('click', (e)=>{ if (e.target===npOverlay) closeAddProspectModal(); });
-
+ 
 document.getElementById('add-prospect-save').addEventListener('click', async ()=>{
   const company = document.getElementById('np-company').value.trim();
   if (!company){ alert('Company name is required.'); document.getElementById('np-company').focus(); return; }
@@ -1481,6 +1661,8 @@ document.getElementById('add-prospect-save').addEventListener('click', async ()=
     if (!ok) return;
   }
   const id = 'new_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+  const chosenStatus = npStatusSel.value || 'No Status';
+  const isApollo = document.getElementById('np-apollo').value === 'yes';
   const rec = {
     id, b: brand, l: location, c: company,
     n: document.getElementById('np-contact').value.trim(),
@@ -1488,24 +1670,23 @@ document.getElementById('add-prospect-save').addEventListener('click', async ()=
     p: document.getElementById('np-phone').value.trim(),
     e: document.getElementById('np-email').value.trim(),
     dc: null, de: null, li: null, dt: null,
-    s: 'No Status',
+    s: chosenStatus,
     note: document.getElementById('np-notes').value.trim(),
-    isNew: true, addedBy: myName || 'someone', addedAt: new Date().toISOString()
+    isNew: true, addedBy: myName || 'someone', addedAt: new Date().toISOString(), isApollo
   };
   try {
     await supaInsert('leads', [{
       id, brand, location, company,
       contact: rec.n, title: rec.t, phone: rec.p, email: rec.e,
       date_called: null, date_emailed: null, linkedin: null, date_contacted: null,
-      base_status: 'No Status', notes: rec.note, is_new: true, added_by: rec.addedBy
+      base_status: chosenStatus, notes: rec.note, is_new: true, added_by: rec.addedBy, is_apollo: isApollo
     }]);
   }
   catch(e){ console.error('save prospect failed', e); alert('Could not save — check your connection and try again.'); return; }
   LEADS.push(rec);
   LEAD_BY_ID.set(id, rec);
   closeAddProspectModal();
-  renderKPIs(); renderQueue(); renderNewProspects(); renderMetrics(); renderCharts(); renderLocTable();
-  openLeadInExplorer(id);
+  renderAll();
 });
 document.getElementById('task-add-btn').addEventListener('click', async ()=>{
   const title = document.getElementById('task-title').value.trim();
@@ -1543,7 +1724,7 @@ function addTaskForLead(r){
   renderMetrics();
   saveTask(task);
 }
-
+ 
 /* ---------------- CHARTS ---------------- */
 let loggedChart, statusChart;
 function renderCharts(){
@@ -1583,7 +1764,7 @@ function renderCharts(){
     const brandsShown = isSubset ? [...new Set(locsSorted.map(l=>l.brand))] : Object.keys(BRAND_COLORS);
     legendEl.innerHTML = brandsShown.map(b=>`<span class="chip"><span class="sw" style="background:${BRAND_COLORS[b]}"></span>${b}</span>`).join('');
   }
-
+ 
   document.getElementById('chart-status-sub').textContent = sel.length===1
     ? `Live status mix for ${sel[0].brand} — ${sel[0].location}`
     : sel.length>1
@@ -1602,7 +1783,7 @@ function renderCharts(){
       cutout:'60%' }
   });
 }
-
+ 
 /* ---------------- LOCATIONS TABLE ---------------- */
 let locSort = {key:'logged', dir:-1};
 function touchedCountFor(brand, location){
@@ -1659,7 +1840,7 @@ document.querySelectorAll('.loc-table th[data-key]').forEach(th=>{
     renderLocTable();
   });
 });
-
+ 
 /* ---------------- LEAD EXPLORER ---------------- */
 const brandSel = document.getElementById('f-brand');
 const locSel = document.getElementById('f-location');
@@ -1668,7 +1849,7 @@ const eventsSel = document.getElementById('f-events');
 const searchInput = document.getElementById('f-search');
 const dueCheckbox = document.getElementById('f-due');
 const flagCheckbox = document.getElementById('f-flag');
-
+ 
 Object.keys(BRAND_COLORS).sort().forEach(b=> brandSel.insertAdjacentHTML('beforeend', `<option value="${esc(b)}">${esc(b)}</option>`));
 ALL_STATUSES.forEach(s=> statusSel.insertAdjacentHTML('beforeend', `<option value="${esc(s)}">${esc(s)}</option>`));
 EVENTS_OPTIONS.filter(o=>o.v).forEach(o=> eventsSel.insertAdjacentHTML('beforeend', `<option value="${o.v}">${o.label}</option>`));
@@ -1686,13 +1867,13 @@ function refreshScopedViews(){
   renderCharts();
 }
 brandSel.addEventListener('change', ()=>{ updateLocationOptions(); applyFilters(); refreshScopedViews(); });
-
+ 
 let page = 1;
 const PAGE_SIZE = 40;
 let filtered = LEADS;
 let leadExpandedId = null;
 let selectedLeadIds = new Set();
-
+ 
 function applyFilters(){
   const b = brandSel.value;
   const l = locSel.value;
@@ -1720,7 +1901,7 @@ function applyFilters(){
   renderLeadList();
   renderBulkBar();
 }
-
+ 
 function renderLeadList(){
   const total = filtered.length;
   document.getElementById('count-line').innerHTML = `<strong>${fmt(total)}</strong> lead${total===1?'':'es'} match your filters`;
@@ -1741,7 +1922,7 @@ function renderLeadList(){
         <div class="lead-main" data-toggle="${r.id}">
           <input type="checkbox" class="lead-select-cb" data-lead-select="${r.id}" ${selectedLeadIds.has(String(r.id))?'checked':''}>
           <div>
-            <div class="company">${esc(r.c)}${r.isNew?'<span class="new-badge">New</span>':''}</div>
+            <div class="company acct-link" data-view-account="${r.id}">${esc(r.c)}${r.isNew?'<span class="new-badge">New</span>':''}${r.isApollo?'<span class="apollo-badge">Apollo</span>':''}</div>
             <div class="meta">${esc(r.b)} · ${esc(r.l)}${rep?` · <span title="Assigned rep">${esc(rep)}</span>`:''}</div>
             ${touched?`<div class="meta" style="color:var(--teal);">${esc(touched)}</div>`:''}
           </div>
@@ -1870,8 +2051,8 @@ function renderBulkLogForm(){
       const eff = getEffective(r);
       const newStatus = o.status || advanceSequence(eff.status);
       let nextFollowUp = null;
-      if (!NO_FOLLOWUP.has(newStatus)){
-        const days = CADENCE_DAYS[newStatus] ?? 3;
+      if (!NO_FOLLOWUP.has(newStatus) && !r.isApollo){
+        const days = cadenceDaysFor(newStatus);
         const d = new Date(); d.setDate(d.getDate()+days);
         nextFollowUp = d.toISOString().slice(0,10);
       }
@@ -1896,7 +2077,195 @@ function renderBulkLogForm(){
     renderAll();
   });
 }
-
+ 
+/* ---------------- ACCOUNT DETAIL MODAL ---------------- */
+let accountModalLeadId = null;
+function openAccountModal(leadId){
+  accountModalLeadId = leadId;
+  document.getElementById('account-overlay').style.display = 'flex';
+  renderAccountModal(leadId);
+}
+function closeAccountModal(){
+  document.getElementById('account-overlay').style.display = 'none';
+  accountModalLeadId = null;
+}
+document.getElementById('account-modal-close').addEventListener('click', closeAccountModal);
+document.getElementById('account-overlay').addEventListener('click', (e)=>{ if (e.target.id==='account-overlay') closeAccountModal(); });
+document.body.addEventListener('click', (e)=>{
+  const el = e.target.closest('[data-view-account]');
+  if (el){ e.stopPropagation(); openAccountModal(el.dataset.viewAccount); }
+});
+ 
+function renderAccountModal(leadId){
+  const r = LEAD_BY_ID.get(Number(leadId)) || LEAD_BY_ID.get(leadId);
+  if (!r) { closeAccountModal(); return; }
+  const rep = repLabel(r.b, r.l);
+  document.getElementById('account-modal-company').innerHTML = esc(r.c) + (r.isApollo ? '<span class="apollo-badge">Apollo lead</span>' : '');
+  document.getElementById('account-modal-sub').textContent = `${r.b} · ${r.l}${rep ? ' · '+rep : ''}`;
+ 
+  const body = document.getElementById('account-modal-body');
+  const contacts = leadContacts[leadId] || leadContacts[r.id] || [];
+  body.innerHTML = `
+    <div class="account-section">
+      <div class="account-toolbar">
+        <button class="btn small" id="acct-edit-btn">Edit account</button>
+        <button class="btn small ${r.isApollo?'primary':'ghost'}" id="acct-apollo-btn">${r.isApollo ? '✓ Apollo lead — cadence paused' : 'Mark as Apollo lead'}</button>
+        <button class="btn small ghost" id="acct-delete-btn" style="color:var(--coral);border-color:var(--coral);">Delete account</button>
+      </div>
+      ${r.isApollo ? `<div class="coverage-warning" style="margin-top:8px;">This account is on the Apollo email cadence already — it won't show up in the automated follow-up queue.</div>` : ''}
+      <div id="acct-edit-slot"></div>
+    </div>
+ 
+    <div class="account-section">
+      <div class="account-section-head"><h4>Contacts</h4><button class="btn small ghost" id="acct-add-contact-btn">+ Add contact</button></div>
+      <div class="contact-card">
+        <div class="cname">${r.n?esc(r.n):'<span style="color:var(--muted);">No name on file</span>'}<span class="primary-tag">Primary</span></div>
+        ${r.t?`<div class="cmeta">${esc(r.t)}</div>`:''}
+        <div class="cmeta">${r.p?`<a href="${telHref(r.p)}">${esc(r.p)}</a>`:''}${r.p&&r.e?' · ':''}${r.e?`<a href="${mailtoHref(r.e)}">${esc(r.e)}</a>`:''}</div>
+      </div>
+      ${contacts.map(c=>`
+        <div class="contact-card">
+          <button class="remove-contact" data-remove-contact="${c.id}">Remove</button>
+          <div class="cname">${esc(c.name)||'—'}</div>
+          ${c.title?`<div class="cmeta">${esc(c.title)}</div>`:''}
+          <div class="cmeta">${c.phone?`<a href="${telHref(c.phone)}">${esc(c.phone)}</a>`:''}${c.phone&&c.email?' · ':''}${c.email?`<a href="${mailtoHref(c.email)}">${esc(c.email)}</a>`:''}</div>
+        </div>
+      `).join('')}
+      <div id="acct-add-contact-slot"></div>
+    </div>
+ 
+    ${r.note ? `<div class="account-section"><div class="account-section-head"><h4>Notes</h4></div><div style="font-size:13px;color:var(--text);">${esc(r.note)}</div></div>` : ''}
+ 
+    <div class="account-section">
+      <div class="account-section-head"><h4>Log an attempt &amp; history</h4></div>
+      <div id="acct-log-form-slot"></div>
+    </div>
+  `;
+ 
+  document.getElementById('acct-edit-btn').addEventListener('click', ()=> toggleEditAccountForm(leadId));
+  document.getElementById('acct-apollo-btn').addEventListener('click', ()=> toggleApollo(leadId));
+  document.getElementById('acct-delete-btn').addEventListener('click', ()=> deleteAccount(leadId));
+  document.getElementById('acct-add-contact-btn').addEventListener('click', ()=> toggleAddContactForm(leadId));
+  body.querySelectorAll('[data-remove-contact]').forEach(btn=>{
+    btn.addEventListener('click', ()=> removeContact(leadId, btn.dataset.removeContact));
+  });
+ 
+  renderLogForm(document.getElementById('acct-log-form-slot'), String(leadId));
+}
+ 
+function toggleEditAccountForm(leadId){
+  const slot = document.getElementById('acct-edit-slot');
+  if (slot.innerHTML){ slot.innerHTML=''; return; }
+  const r = LEAD_BY_ID.get(Number(leadId)) || LEAD_BY_ID.get(leadId);
+  slot.innerHTML = `
+    <div class="edit-account-form">
+      <label>Company</label><input type="text" id="ea-company" value="${esc(r.c)}">
+      <div class="grid2">
+        <div><label>Contact name</label><input type="text" id="ea-contact" value="${esc(r.n||'')}"></div>
+        <div><label>Title</label><input type="text" id="ea-title" value="${esc(r.t||'')}"></div>
+      </div>
+      <div class="grid2">
+        <div><label>Phone</label><input type="text" id="ea-phone" value="${esc(r.p||'')}"></div>
+        <div><label>Email</label><input type="text" id="ea-email" value="${esc(r.e||'')}"></div>
+      </div>
+      <label>Notes</label><textarea id="ea-notes">${esc(r.note||'')}</textarea>
+      <div class="modal-actions">
+        <button class="btn small ghost" id="ea-cancel">Cancel</button>
+        <button class="btn primary" id="ea-save">Save changes</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('ea-cancel').addEventListener('click', ()=>{ slot.innerHTML=''; });
+  document.getElementById('ea-save').addEventListener('click', async ()=>{
+    const patch = {
+      company: document.getElementById('ea-company').value.trim(),
+      contact: document.getElementById('ea-contact').value.trim(),
+      title: document.getElementById('ea-title').value.trim(),
+      phone: document.getElementById('ea-phone').value.trim(),
+      email: document.getElementById('ea-email').value.trim(),
+      notes: document.getElementById('ea-notes').value.trim()
+    };
+    if (!patch.company){ alert('Company name is required.'); return; }
+    try {
+      await supaUpdate('leads', `id=eq.${encodeURIComponent(leadId)}`, patch);
+      r.c = patch.company; r.n = patch.contact; r.t = patch.title; r.p = patch.phone; r.e = patch.email; r.note = patch.notes;
+      slot.innerHTML = '';
+      renderAccountModal(leadId);
+      renderKPIs(); renderQueue(); renderNewProspects(); renderLocTable(); applyFilters();
+    } catch(e){ console.error(e); alert('Could not save changes — try again.'); }
+  });
+}
+ 
+async function toggleApollo(leadId){
+  const r = LEAD_BY_ID.get(Number(leadId)) || LEAD_BY_ID.get(leadId);
+  const next = !r.isApollo;
+  try {
+    await supaUpdate('leads', `id=eq.${encodeURIComponent(leadId)}`, { is_apollo: next });
+    r.isApollo = next;
+    renderAccountModal(leadId);
+    renderQueue();
+  } catch(e){ console.error(e); alert('Could not update — try again.'); }
+}
+ 
+async function deleteAccount(leadId){
+  const r = LEAD_BY_ID.get(Number(leadId)) || LEAD_BY_ID.get(leadId);
+  if (!r) return;
+  if (!confirm(`Delete "${r.c}" permanently? This removes the account, its contacts, and its full activity history. This cannot be undone.`)) return;
+  try {
+    await supaDelete('leads', `id=eq.${encodeURIComponent(leadId)}`);
+    const idx = LEADS.findIndex(x=>x.id===r.id);
+    if (idx>-1) LEADS.splice(idx,1);
+    LEAD_BY_ID.delete(r.id);
+    delete overrides[r.id];
+    delete leadContacts[r.id];
+    closeAccountModal();
+    renderAll();
+  } catch(e){ console.error(e); alert('Could not delete — try again.'); }
+}
+ 
+function toggleAddContactForm(leadId){
+  const slot = document.getElementById('acct-add-contact-slot');
+  if (slot.innerHTML){ slot.innerHTML=''; return; }
+  slot.innerHTML = `
+    <div class="add-contact-form">
+      <input type="text" id="ac-name" placeholder="Name">
+      <input type="text" id="ac-title" placeholder="Title">
+      <input type="text" id="ac-phone" placeholder="Phone">
+      <input type="text" id="ac-email" placeholder="Email">
+      <div class="actions">
+        <button class="btn small ghost" id="ac-cancel">Cancel</button>
+        <button class="btn primary" id="ac-save">Add contact</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('ac-cancel').addEventListener('click', ()=>{ slot.innerHTML=''; });
+  document.getElementById('ac-save').addEventListener('click', async ()=>{
+    const name = document.getElementById('ac-name').value.trim();
+    if (!name){ alert('Enter at least a name.'); return; }
+    const contact = {
+      id: 'c_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+      name, title: document.getElementById('ac-title').value.trim(),
+      phone: document.getElementById('ac-phone').value.trim(), email: document.getElementById('ac-email').value.trim()
+    };
+    try {
+      await supaInsert('lead_contacts', [{ id: contact.id, lead_id: String(leadId), name: contact.name, title: contact.title, phone: contact.phone, email: contact.email }]);
+      if (!leadContacts[leadId]) leadContacts[leadId] = [];
+      leadContacts[leadId].push(contact);
+      slot.innerHTML = '';
+      renderAccountModal(leadId);
+    } catch(e){ console.error(e); alert('Could not add contact — try again.'); }
+  });
+}
+ 
+async function removeContact(leadId, contactId){
+  if (!confirm('Remove this contact?')) return;
+  try {
+    await supaDelete('lead_contacts', `id=eq.${encodeURIComponent(contactId)}`);
+    leadContacts[leadId] = (leadContacts[leadId]||[]).filter(c=>c.id!==contactId);
+    renderAccountModal(leadId);
+  } catch(e){ console.error(e); alert('Could not remove contact — try again.'); }
+}
+ 
 function toggleLead(id){
   leadExpandedId = (String(leadExpandedId)===String(id)) ? null : id;
   renderLeadList();
@@ -1904,7 +2273,7 @@ function toggleLead(id){
     document.getElementById('detail-'+leadExpandedId)?.scrollIntoView({behavior:'smooth', block:'nearest'});
   }
 }
-
+ 
 let searchTimer;
 searchInput.addEventListener('input', ()=>{ clearTimeout(searchTimer); searchTimer = setTimeout(applyFilters, 180); });
 locSel.addEventListener('change', ()=>{ applyFilters(); refreshScopedViews(); });
@@ -1919,7 +2288,7 @@ document.getElementById('f-clear').addEventListener('click', ()=>{
   applyFilters();
   refreshScopedViews();
 });
-
+ 
 /* ---------------- THIS WEEK'S LEADERBOARD ---------------- */
 const GOAL_PER_WEEK = 50;
 function mondayOf(d){
@@ -1933,7 +2302,7 @@ function toISO(d){ const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,
 function weekEndOf(ws){ const e = new Date(ws); e.setDate(e.getDate()+6); return e; }
 function fmtShort(d){ return d.toLocaleDateString('en-US',{month:'short', day:'numeric'}); }
 function fmtShortISO(iso){ return fmtShort(new Date(iso+'T00:00:00')); }
-
+ 
 /* ---- reporting date range (drives all three leaderboards) ---- */
 let rangeStart = toISO(mondayOf(new Date()));
 let rangeEnd = toISO(weekEndOf(mondayOf(new Date())));
@@ -1941,7 +2310,7 @@ let rangePreset = 'week';
 const EARLIEST_DATE = '2015-01-01'; // sentinel floor for "All time"
 document.getElementById('range-start-input').value = rangeStart;
 document.getElementById('range-end-input').value = rangeEnd;
-
+ 
 function goalForRange(){
   const days = daysBetween(rangeStart, rangeEnd) + 1;
   return Math.max(1, Math.round(GOAL_PER_WEEK * days / 7));
@@ -1995,9 +2364,9 @@ document.getElementById('range-apply-btn').addEventListener('click', ()=>{
   document.querySelectorAll('.range-preset-btn').forEach(b=> b.classList.remove('active'));
   renderMetrics();
 });
-
+ 
 let leaderboardMode = 'person'; // 'person' | 'park' | 'accounts'
-
+ 
 function computeLeaderboard(){
   const scopedIds = new Set(scopedLeads().map(r=>r.id));
   const byPerson = {};
@@ -2025,7 +2394,7 @@ function computeLeaderboard(){
   });
   return byPerson;
 }
-
+ 
 function computeParkLeaderboard(){
   const scopedIds = new Set(scopedLeads().map(r=>r.id));
   const byPark = {};
@@ -2050,7 +2419,7 @@ function computeParkLeaderboard(){
   });
   return byPark;
 }
-
+ 
 function computeAccountsReachedLeaderboard(){
   // Distinct companies each person has logged activity against, within the selected range.
   const scopedIds = new Set(scopedLeads().map(r=>r.id));
@@ -2073,7 +2442,7 @@ function computeAccountsReachedLeaderboard(){
   Object.entries(byPerson).forEach(([p,set])=>{ out[p] = {total: set.size}; });
   return out;
 }
-
+ 
 document.querySelectorAll('.lb-mode-toggle button').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     document.querySelectorAll('.lb-mode-toggle button').forEach(b=>b.classList.remove('active'));
@@ -2082,7 +2451,7 @@ document.querySelectorAll('.lb-mode-toggle button').forEach(btn=>{
     renderMetrics();
   });
 });
-
+ 
 function renderMetrics(){
   const headerRow = document.getElementById('lb-header-row');
   const weekLabelEl = document.getElementById('week-label');
@@ -2090,7 +2459,7 @@ function renderMetrics(){
   const listEl = document.getElementById('leaderboard-list');
   const goal = goalForRange();
   const rangeSuffix = ` (${rangeLabel()})`;
-
+ 
   if (leaderboardMode === 'accounts'){
     document.getElementById('leaderboard-hint').textContent = `Distinct companies each person has logged activity against${rangeSuffix}` + scopeSuffix();
     weekLabelEl.textContent = rangeLabel();
@@ -2120,15 +2489,15 @@ function renderMetrics(){
     }).join('');
     return;
   }
-
+ 
   document.getElementById('leaderboard-hint').textContent = (leaderboardMode==='park'
     ? `Prospecting attempts by park${rangeSuffix}`
     : `Goal: ${fmt(goal)} prospecting attempts per person${rangeSuffix}`) + scopeSuffix();
   weekLabelEl.textContent = rangeLabel();
-
+ 
   const prog = rangeProgress();
   const expected = Math.round(goal * Math.min(prog.elapsed,prog.days)/prog.days);
-
+ 
   if (leaderboardMode === 'park'){
     headerRow.innerHTML = `<div class="lb-header-rank"></div><div class="lb-header-info">Park</div><div class="lb-header-tasks">Open tasks</div><div class="lb-header-bar">Attempts</div><div class="lb-header-status"></div>`;
     const board = computeParkLeaderboard();
@@ -2167,7 +2536,7 @@ function renderMetrics(){
     }).join('');
     return;
   }
-
+ 
   // person mode (default)
   headerRow.innerHTML = `<div class="lb-header-rank"></div><div class="lb-header-info">Rep</div><div class="lb-header-tasks">Open tasks</div><div class="lb-header-bar">Attempts</div><div class="lb-header-status">To hit ${goal}</div>`;
   const board = computeLeaderboard();
@@ -2175,13 +2544,13 @@ function renderMetrics(){
   const teamTotal = people.reduce((s,p)=>s+p[1].total,0);
   const teamAvg = people.length ? Math.round(teamTotal/people.length) : 0;
   const behindCount = people.filter(p=> p[1].total < expected).length;
-
+ 
   weekKpisEl.innerHTML = `
     <div class="week-kpi"><div class="lbl">Team attempts in range</div><div class="val">${fmt(teamTotal)}</div></div>
     <div class="week-kpi"><div class="lbl">Average per person</div><div class="val">${fmt(teamAvg)} <span style="font-size:12px;color:var(--muted);font-weight:500;">/ ${goal} goal</span></div></div>
     <div class="week-kpi"><div class="lbl">${prog.complete?'Missed goal':'Behind pace'}</div><div class="val" style="color:${behindCount?'var(--coral)':'var(--teal)'};">${behindCount} ${behindCount===1?'person':'people'}</div></div>
   `;
-
+ 
   if (!people.length){
     listEl.innerHTML = `<div class="empty-state">No attempts logged in this range${scopeSuffix()}. Log an outcome above to get on the board.</div>`;
     return;
@@ -2221,7 +2590,7 @@ function renderMetrics(){
     </div>`;
   }).join('');
 }
-
+ 
 /* ---------------- MASTER RENDER ---------------- */
 function renderAll(){
   renderKPIs();
@@ -2232,8 +2601,9 @@ function renderAll(){
   renderCharts();
   renderLocTable();
   applyFilters();
+  if (accountModalLeadId) renderAccountModal(accountModalLeadId);
 }
-
+ 
 /* ---------------- CSV EXPORT ---------------- */
 function csvCell(v){
   const s = (v==null?'':String(v));
@@ -2263,15 +2633,15 @@ document.getElementById('export-csv-btn').addEventListener('click', ()=>{
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
 });
-
+ 
 /* ---------------- TABS ---------------- */
+const TAB_IDS = ['tasks','newprospects','explorer','analytics'];
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     const tab = btn.dataset.tab;
-    document.getElementById('tab-work').style.display = tab==='work' ? 'block' : 'none';
-    document.getElementById('tab-analytics').style.display = tab==='analytics' ? 'block' : 'none';
+    TAB_IDS.forEach(id=>{ document.getElementById('tab-'+id).style.display = (id===tab) ? 'block' : 'none'; });
     if (tab==='analytics'){
       requestAnimationFrame(()=>{
         if (loggedChart) loggedChart.resize();
@@ -2280,7 +2650,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
     }
   });
 });
-
+ 
 /* ---------------- LOGIN GATE ---------------- */
 function showApp(){
   document.getElementById('login-overlay').style.display = 'none';
@@ -2309,10 +2679,11 @@ document.getElementById('login-submit-btn').addEventListener('click', attemptLog
 document.getElementById('login-password').addEventListener('keydown', (e)=>{ if (e.key==='Enter') attemptLogin(); });
 document.getElementById('login-email').addEventListener('keydown', (e)=>{ if (e.key==='Enter') document.getElementById('login-password').focus(); });
 document.getElementById('logout-btn').addEventListener('click', logout);
-
+ 
 if (restoreSession()){
   showApp();
 }
 </script>
 </body>
 </html>
+ 
