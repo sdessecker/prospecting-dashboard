@@ -26,16 +26,16 @@
   .wrap{max-width:1320px;margin:0 auto;padding:0 28px 64px;}
   h1,h2,h3,h4,.brandmark,.section-head h2{font-family:var(--font-display);}
  
-  header.top{background:linear-gradient(135deg,#141B24 0%,#1C2531 100%);color:#fff;padding:28px 0;margin-bottom:26px;box-shadow:0 1px 0 rgba(0,0,0,.25);border-bottom:3px solid var(--amber);}
+  header.top{background:linear-gradient(135deg,#141B24 0%,#1C2531 100%);color:#fff;padding:14px 0;margin-bottom:18px;box-shadow:0 1px 0 rgba(0,0,0,.25);border-bottom:3px solid var(--amber);}
   header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}
-  .brandmark{display:flex;align-items:center;gap:14px;}
-  .logo-badge{background:#fff;border-radius:9px;padding:7px 12px;display:flex;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.25);flex-shrink:0;}
-  .logo-img{height:30px;width:auto;display:block;}
-  h1{font-size:25px;font-weight:600;letter-spacing:-0.01em;margin:0;}
-  header.top p{margin:5px 0 0;color:#B9C2CC;font-size:13px;font-family:var(--font-body);}
-  .daily-quote{display:inline-block;margin-top:10px;padding:7px 15px;background:rgba(255,255,255,.07);border:1px solid rgba(216,205,168,.28);border-radius:20px;font-family:var(--font-display);font-style:italic;color:#E8DFC8;font-size:13px;max-width:640px;}
+  .brandmark{display:flex;align-items:center;gap:11px;}
+  .logo-badge{background:#fff;border-radius:8px;padding:5px 9px;display:flex;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.25);flex-shrink:0;}
+  .logo-img{height:22px;width:auto;display:block;}
+  h1{font-size:19px;font-weight:600;letter-spacing:-0.01em;margin:0;}
+  header.top p{margin:2px 0 0;color:#B9C2CC;font-size:11.5px;font-family:var(--font-body);}
+  .daily-quote{display:inline-block;margin-top:5px;padding:4px 12px;background:rgba(255,255,255,.07);border:1px solid rgba(216,205,168,.28);border-radius:16px;font-family:var(--font-display);font-style:italic;color:#E8DFC8;font-size:11.5px;max-width:640px;}
   .quote-tip-label{font-style:normal;font-weight:700;color:var(--amber);font-family:var(--font-body);}
-  .daily-quote .quote-author{font-style:normal;color:#9099A6;font-size:12px;font-family:var(--font-body);}
+  .daily-quote .quote-author{font-style:normal;color:#9099A6;font-size:11px;font-family:var(--font-body);}
  
   /* tabs */
   .tab-nav{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:26px;}
@@ -1886,6 +1886,9 @@ function renderLogForm(container, leadId){
       nextFollowUp: nextInput.value || null,
       activity
     });
+    if (accountModalLeadId != null && String(accountModalLeadId) === String(leadId)){
+      closeAccountModal();
+    }
   });
 }
  
