@@ -713,7 +713,7 @@
         <div><label>Apollo lead?</label><select id="np-apollo"><option value="no">No</option><option value="yes">Yes — already on Apollo cadence</option></select></div>
       </div>
       <label>Assigned to</label>
-      <select id="np-rep"></select>
+      <div class="logged-by-display" id="np-rep-display"></div>
       <label>Notes</label>
       <textarea id="np-notes" placeholder="Where this lead came from, anything worth knowing…"></textarea>
       <div class="modal-actions">
@@ -2004,16 +2004,13 @@ LOCATION_OPTIONS.forEach(opt=>{
 });
 const npStatusSel = document.getElementById('np-status');
 ALL_STATUSES.forEach(s=> npStatusSel.insertAdjacentHTML('beforeend', `<option value="${esc(s)}">${esc(s)}</option>`));
-const npRepSel = document.getElementById('np-rep');
-KNOWN_NAMES.forEach(n=> npRepSel.insertAdjacentHTML('beforeend', `<option value="${esc(n)}">${esc(n)}</option>`));
 const npOverlay = document.getElementById('add-prospect-overlay');
 function openAddProspectModal(){
   ['np-company','np-contact','np-title','np-phone','np-email','np-notes'].forEach(id=>{ document.getElementById(id).value=''; });
   npStatusSel.value = 'No Status';
   document.getElementById('np-apollo').value = 'no';
-  // default the owner to whoever's logged in (if they're a known rep), otherwise the park's primary rep
-  const meMatch = KNOWN_NAMES.find(n=>n.toLowerCase()===(myName||'').trim().toLowerCase());
-  npRepSel.value = meMatch || KNOWN_NAMES[0] || '';
+  // new prospects are automatically owned by whoever's logged in — no picking
+  document.getElementById('np-rep-display').textContent = myName || '—';
   if (viewLocations.size===1){ const a = selectedLocsArray()[0]; npLocSel.value = locKey(a.brand, a.location); }
   npOverlay.style.display = 'flex';
   document.getElementById('np-company').focus();
@@ -2048,14 +2045,14 @@ document.getElementById('add-prospect-save').addEventListener('click', async ()=
     dc: null, de: null, li: null, dt: null,
     s: chosenStatus,
     note: document.getElementById('np-notes').value.trim(),
-    isNew: true, addedBy: myName || 'someone', addedAt: new Date().toISOString(), isApollo, rep: npRepSel.value || null
+    isNew: true, addedBy: myName || 'someone', addedAt: new Date().toISOString(), isApollo, rep: myName || null
   };
   try {
     await supaInsert('leads', [{
       id, brand, location, company,
       contact: rec.n, title: rec.t, phone: rec.p, email: rec.e,
       date_called: null, date_emailed: null, linkedin: null, date_contacted: null,
-      base_status: chosenStatus, notes: rec.note, is_new: true, added_by: rec.addedBy, is_apollo: isApollo, assigned_rep: npRepSel.value || null
+      base_status: chosenStatus, notes: rec.note, is_new: true, added_by: rec.addedBy, is_apollo: isApollo, assigned_rep: myName || null
     }]);
   }
   catch(e){ console.error('save prospect failed', e); alert('Could not save — check your connection and try again.'); return; }
