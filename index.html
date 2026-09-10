@@ -428,6 +428,7 @@
           <div class="ms-list" id="loc-ms-list"></div>
         </div>
       </div>
+      <button type="button" class="btn small ghost mine-toggle" id="only-mine-btn" style="border-color:#3A4756;color:#B9C2CC;" title="Show only leads assigned to you">Only mine: off</button>
       <button type="button" class="btn small ghost" id="cadence-settings-btn" style="border-color:#3A4756;color:#B9C2CC;">My cadence</button>
       <button type="button" class="btn small ghost" id="logout-btn" style="border-color:#3A4756;color:#B9C2CC;">Log out</button>
     </div>
@@ -528,6 +529,7 @@
       <select id="f-location"><option value="">All locations</option></select>
       <select id="f-status"><option value="">All statuses</option></select>
       <select id="f-events"><option value="">All events statuses</option></select>
+      <select id="f-rep"><option value="">All reps</option></select>
       <label class="chk"><input type="checkbox" id="f-due"> Due for follow-up only</label>
       <label class="chk"><input type="checkbox" id="f-flag"> ⚠️ Email-only (never called)</label>
       <button class="clear-btn" id="f-clear">Clear filters</button>
@@ -710,6 +712,8 @@
         <div><label>Status</label><select id="np-status"></select></div>
         <div><label>Apollo lead?</label><select id="np-apollo"><option value="no">No</option><option value="yes">Yes — already on Apollo cadence</option></select></div>
       </div>
+      <label>Assigned to</label>
+      <select id="np-rep"></select>
       <label>Notes</label>
       <textarea id="np-notes" placeholder="Where this lead came from, anything worth knowing…"></textarea>
       <div class="modal-actions">
@@ -881,7 +885,7 @@ async function supaUpdate(table, matchQuery, patch){
 }
  
 const LEADS = [];
-const LOCS = [{"brand":"Scene75","location":"Chicagoland","logged":426,"called":113,"emailed":375,"linkedin":152,"contacted":16,"booked":49,"in_conv":13,"tours":1},{"brand":"Scene75","location":"Columbus","logged":409,"called":192,"emailed":393,"linkedin":10,"contacted":8,"booked":1,"in_conv":6,"tours":0},{"brand":"Scene75","location":"Cleveland","logged":717,"called":73,"emailed":637,"linkedin":0,"contacted":1,"booked":1,"in_conv":17,"tours":0},{"brand":"Scene75","location":"Cincinnati","logged":178,"called":54,"emailed":95,"linkedin":0,"contacted":0,"booked":7,"in_conv":18,"tours":1},{"brand":"Scene75","location":"Dayton","logged":597,"called":593,"emailed":98,"linkedin":0,"contacted":22,"booked":22,"in_conv":49,"tours":0},{"brand":"Malibu Jacks","location":"N. Richland Hills","logged":314,"called":300,"emailed":307,"linkedin":167,"contacted":188,"booked":1,"in_conv":3,"tours":0},{"brand":"Malibu Jacks","location":"Lexington","logged":688,"called":688,"emailed":679,"linkedin":74,"contacted":2,"booked":0,"in_conv":7,"tours":0},{"brand":"Malibu Jacks","location":"Louisville","logged":233,"called":173,"emailed":101,"linkedin":89,"contacted":8,"booked":0,"in_conv":2,"tours":0},{"brand":"Malibu Jacks","location":"Ashland","logged":402,"called":255,"emailed":91,"linkedin":27,"contacted":35,"booked":0,"in_conv":0,"tours":0},{"brand":"Malibu Jacks","location":"Lafayette","logged":608,"called":173,"emailed":601,"linkedin":38,"contacted":157,"booked":5,"in_conv":5,"tours":0},{"brand":"Fun Land","location":"Fairfax (A)","logged":190,"called":74,"emailed":190,"linkedin":0,"contacted":0,"booked":0,"in_conv":1,"tours":0},{"brand":"Fun Land","location":"Fairfax (L)","logged":222,"called":93,"emailed":179,"linkedin":2,"contacted":22,"booked":0,"in_conv":18,"tours":2},{"brand":"Fun Land","location":"Fredericksburg (A)","logged":45,"called":20,"emailed":45,"linkedin":0,"contacted":1,"booked":0,"in_conv":1,"tours":0},{"brand":"Fun Land","location":"Fredericksburg (L)","logged":408,"called":217,"emailed":175,"linkedin":15,"contacted":64,"booked":0,"in_conv":94,"tours":5},{"brand":"Celebration Station","location":"OKC","logged":145,"called":130,"emailed":88,"linkedin":0,"contacted":6,"booked":0,"in_conv":0,"tours":0},{"brand":"Celebration Station","location":"Mesquite","logged":198,"called":161,"emailed":119,"linkedin":1,"contacted":10,"booked":0,"in_conv":0,"tours":0},{"brand":"Celebration Station","location":"Clearwater","logged":277,"called":202,"emailed":195,"linkedin":61,"contacted":78,"booked":0,"in_conv":6,"tours":1},{"brand":"Celebration Station","location":"Baton Rouge","logged":153,"called":118,"emailed":91,"linkedin":1,"contacted":18,"booked":0,"in_conv":0,"tours":0},{"brand":"Celebration Station","location":"Greensboro","logged":209,"called":122,"emailed":134,"linkedin":0,"contacted":4,"booked":1,"in_conv":6,"tours":0},{"brand":"Craig's Cruisers","location":"Grand Rapids","logged":661,"called":620,"emailed":529,"linkedin":87,"contacted":87,"booked":13,"in_conv":73,"tours":0},{"brand":"Branson Parks","location":"Branson Parks","logged":312,"called":211,"emailed":81,"linkedin":12,"contacted":6,"booked":0,"in_conv":7,"tours":2},{"brand":"Pigeon Forge","location":"Pigeon Forge Parks","logged":217,"called":117,"emailed":101,"linkedin":3,"contacted":5,"booked":5,"in_conv":7,"tours":1}];
+const LOCS = [{"brand": "Scene75", "location": "Chicagoland", "logged": 426, "called": 113, "emailed": 375, "linkedin": 152, "contacted": 16, "booked": 49, "in_conv": 13, "tours": 1}, {"brand": "Scene75", "location": "Columbus", "logged": 409, "called": 192, "emailed": 393, "linkedin": 10, "contacted": 8, "booked": 1, "in_conv": 6, "tours": 0}, {"brand": "Scene75", "location": "Cleveland", "logged": 717, "called": 73, "emailed": 637, "linkedin": 0, "contacted": 1, "booked": 1, "in_conv": 17, "tours": 0}, {"brand": "Scene75", "location": "Cincinnati", "logged": 178, "called": 54, "emailed": 95, "linkedin": 0, "contacted": 0, "booked": 7, "in_conv": 18, "tours": 1}, {"brand": "Scene75", "location": "Dayton", "logged": 597, "called": 593, "emailed": 98, "linkedin": 0, "contacted": 22, "booked": 22, "in_conv": 49, "tours": 0}, {"brand": "Malibu Jacks", "location": "N. Richland Hills", "logged": 314, "called": 300, "emailed": 307, "linkedin": 167, "contacted": 188, "booked": 1, "in_conv": 3, "tours": 0}, {"brand": "Malibu Jacks", "location": "Lexington", "logged": 688, "called": 688, "emailed": 679, "linkedin": 74, "contacted": 2, "booked": 0, "in_conv": 7, "tours": 0}, {"brand": "Malibu Jacks", "location": "Louisville", "logged": 233, "called": 173, "emailed": 101, "linkedin": 89, "contacted": 8, "booked": 0, "in_conv": 2, "tours": 0}, {"brand": "Malibu Jacks", "location": "Ashland", "logged": 402, "called": 255, "emailed": 91, "linkedin": 27, "contacted": 35, "booked": 0, "in_conv": 0, "tours": 0}, {"brand": "Malibu Jacks", "location": "Lafayette", "logged": 608, "called": 173, "emailed": 601, "linkedin": 38, "contacted": 157, "booked": 5, "in_conv": 5, "tours": 0}, {"brand": "Fun Land", "location": "Fairfax", "logged": 412, "called": 167, "emailed": 369, "linkedin": 2, "contacted": 22, "booked": 0, "in_conv": 19, "tours": 2}, {"brand": "Fun Land", "location": "Fredericksburg", "logged": 453, "called": 237, "emailed": 220, "linkedin": 15, "contacted": 65, "booked": 0, "in_conv": 95, "tours": 5}, {"brand": "Celebration Station", "location": "OKC", "logged": 145, "called": 130, "emailed": 88, "linkedin": 0, "contacted": 6, "booked": 0, "in_conv": 0, "tours": 0}, {"brand": "Celebration Station", "location": "Mesquite", "logged": 198, "called": 161, "emailed": 119, "linkedin": 1, "contacted": 10, "booked": 0, "in_conv": 0, "tours": 0}, {"brand": "Celebration Station", "location": "Clearwater", "logged": 277, "called": 202, "emailed": 195, "linkedin": 61, "contacted": 78, "booked": 0, "in_conv": 6, "tours": 1}, {"brand": "Celebration Station", "location": "Baton Rouge", "logged": 153, "called": 118, "emailed": 91, "linkedin": 1, "contacted": 18, "booked": 0, "in_conv": 0, "tours": 0}, {"brand": "Celebration Station", "location": "Greensboro", "logged": 209, "called": 122, "emailed": 134, "linkedin": 0, "contacted": 4, "booked": 1, "in_conv": 6, "tours": 0}, {"brand": "Craig's Cruisers", "location": "Grand Rapids", "logged": 661, "called": 620, "emailed": 529, "linkedin": 87, "contacted": 87, "booked": 13, "in_conv": 73, "tours": 0}, {"brand": "Branson Parks", "location": "Branson Parks", "logged": 312, "called": 211, "emailed": 81, "linkedin": 12, "contacted": 6, "booked": 0, "in_conv": 7, "tours": 2}, {"brand": "Pigeon Forge", "location": "Pigeon Forge Parks", "logged": 217, "called": 117, "emailed": 101, "linkedin": 3, "contacted": 5, "booked": 5, "in_conv": 7, "tours": 1}];
 const TOTAL = {"logged":7609,"called":4699,"emailed":5304,"linkedin":739,"contacted":738,"booked":105,"in_conv":333,"tours":13};
 const LEAD_BY_ID = new Map();
  
@@ -894,7 +898,7 @@ async function loadLeadsFromSupabase(){
         id: row.id, b: row.brand, l: row.location, c: row.company, n: row.contact, t: row.title,
         p: row.phone, e: row.email, dc: row.date_called, de: row.date_emailed, li: row.linkedin,
         dt: row.date_contacted, s: row.base_status || 'No Status', note: row.notes,
-        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo
+        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo, rep: row.assigned_rep || null
       };
       LEADS.push(r);
       LEAD_BY_ID.set(r.id, r);
@@ -1244,10 +1248,8 @@ const REP_ASSIGNMENTS = {
   'Malibu Jacks|||Louisville': {primary:'Mckensie Johnson'},
   'Malibu Jacks|||Ashland': {primary:'Derrick Harshbarger'},
   'Malibu Jacks|||Lafayette': {primary:'Susan Dawson'},
-  'Fun Land|||Fairfax (A)': {primary:'Amanda Minniti', secondary:'Leah Merideth'},
-  'Fun Land|||Fairfax (L)': {primary:'Amanda Minniti', secondary:'Leah Merideth'},
-  'Fun Land|||Fredericksburg (A)': {primary:'Amanda Minniti', secondary:'Leah Merideth'},
-  'Fun Land|||Fredericksburg (L)': {primary:'Amanda Minniti', secondary:'Leah Merideth'},
+  'Fun Land|||Fairfax': {primary:'Amanda Minniti', secondary:'Leah Merideth'},
+  'Fun Land|||Fredericksburg': {primary:'Amanda Minniti', secondary:'Leah Merideth'},
   'Celebration Station|||OKC': {primary:'Vicki Bush'},
   'Celebration Station|||Mesquite': {primary:'Vicki Bush'},
   'Celebration Station|||Baton Rouge': {primary:'Vicki Bush'},
@@ -1383,6 +1385,8 @@ async function loadAll(){
       if (Array.isArray(parsed)) viewLocations = new Set(parsed.filter(k=>LOCATION_OPTIONS.includes(k)));
     }
   } catch(e){}
+  try { onlyMine = localStorage.getItem('fsp_only_mine') === '1'; } catch(e){}
+  renderOnlyMineBtn();
  
   try {
     const stateRows = await supaSelect('lead_state', 'select=*');
@@ -1525,6 +1529,24 @@ function setViewLocations(newSet){
   applyFilters();
   persistViewLocations();
 }
+function renderOnlyMineBtn(){
+  const b = document.getElementById('only-mine-btn');
+  if (!b) return;
+  b.textContent = onlyMine ? 'Only mine: on' : 'Only mine: off';
+  b.style.background = onlyMine ? 'var(--teal)' : 'transparent';
+  b.style.color = onlyMine ? '#fff' : '#B9C2CC';
+  b.style.borderColor = onlyMine ? 'var(--teal)' : '#3A4756';
+}
+function setOnlyMine(val){
+  onlyMine = !!val;
+  try { localStorage.setItem('fsp_only_mine', onlyMine ? '1' : '0'); } catch(e){}
+  renderOnlyMineBtn();
+  renderAll();
+}
+document.getElementById('only-mine-btn').addEventListener('click', ()=>{
+  if (!myName){ alert('Set your name first so I know which leads are yours.'); return; }
+  setOnlyMine(!onlyMine);
+});
 msBtn.addEventListener('click', (e)=>{ e.stopPropagation(); msPanel.style.display = msPanel.style.display==='none' ? 'block' : 'none'; });
 document.addEventListener('click', (e)=>{
   if (msPanel.style.display!=='none' && !e.target.closest('.ms-dropdown')) msPanel.style.display = 'none';
@@ -1541,8 +1563,24 @@ document.getElementById('loc-ms-clear').addEventListener('click', ()=> setViewLo
  
  
 /* ---------------- KPIs ---------------- */
+/* Per-lead ownership. Each lead has an explicit owner (assigned_rep) — this is what lets two
+   reps share one park (Fairfax, Fredericksburg, Grand Rapids) and still each see only their own
+   accounts. Falls back to the park's primary rep for any lead that hasn't been assigned yet. */
+function leadOwner(r){
+  if (r.rep) return r.rep;
+  const a = repFor(r.b, r.l);
+  return a ? a.primary : null;
+}
+function ownedByMe(r){
+  if (!myName) return false;
+  const o = leadOwner(r);
+  return !!o && o.trim().toLowerCase() === myName.trim().toLowerCase();
+}
+let onlyMine = false; // global toggle: narrow every view to leads assigned to the current user
 function scopedLeads(){
-  return viewLocations.size===0 ? LEADS : LEADS.filter(r=>inScope(r.b, r.l));
+  let base = viewLocations.size===0 ? LEADS : LEADS.filter(r=>inScope(r.b, r.l));
+  if (onlyMine) base = base.filter(ownedByMe);
+  return base;
 }
 function scopedTasks(){
   return viewLocations.size===0 ? tasks : tasks.filter(t=> !t.brand || inScope(t.brand, t.location));
@@ -1625,7 +1663,7 @@ function renderQueue(){
     const col = STATUS_COLORS[it.eff.status] || '#8B95A1';
     const pillClass = it.overdueDays >= 3 ? 'hot' : 'warm';
     const overdueLabel = it.overdueDays <= 0 ? 'Due today' : `${it.overdueDays}d overdue`;
-    const rep = repLabel(r.b, r.l);
+    const rep = leadOwner(r);
     const touched = lastTouchedLabel(r);
     return `<div class="queue-item" data-id="${r.id}">
       <div class="queue-row" data-toggle="${r.id}">
@@ -1966,11 +2004,16 @@ LOCATION_OPTIONS.forEach(opt=>{
 });
 const npStatusSel = document.getElementById('np-status');
 ALL_STATUSES.forEach(s=> npStatusSel.insertAdjacentHTML('beforeend', `<option value="${esc(s)}">${esc(s)}</option>`));
+const npRepSel = document.getElementById('np-rep');
+KNOWN_NAMES.forEach(n=> npRepSel.insertAdjacentHTML('beforeend', `<option value="${esc(n)}">${esc(n)}</option>`));
 const npOverlay = document.getElementById('add-prospect-overlay');
 function openAddProspectModal(){
   ['np-company','np-contact','np-title','np-phone','np-email','np-notes'].forEach(id=>{ document.getElementById(id).value=''; });
   npStatusSel.value = 'No Status';
   document.getElementById('np-apollo').value = 'no';
+  // default the owner to whoever's logged in (if they're a known rep), otherwise the park's primary rep
+  const meMatch = KNOWN_NAMES.find(n=>n.toLowerCase()===(myName||'').trim().toLowerCase());
+  npRepSel.value = meMatch || KNOWN_NAMES[0] || '';
   if (viewLocations.size===1){ const a = selectedLocsArray()[0]; npLocSel.value = locKey(a.brand, a.location); }
   npOverlay.style.display = 'flex';
   document.getElementById('np-company').focus();
@@ -2005,14 +2048,14 @@ document.getElementById('add-prospect-save').addEventListener('click', async ()=
     dc: null, de: null, li: null, dt: null,
     s: chosenStatus,
     note: document.getElementById('np-notes').value.trim(),
-    isNew: true, addedBy: myName || 'someone', addedAt: new Date().toISOString(), isApollo
+    isNew: true, addedBy: myName || 'someone', addedAt: new Date().toISOString(), isApollo, rep: npRepSel.value || null
   };
   try {
     await supaInsert('leads', [{
       id, brand, location, company,
       contact: rec.n, title: rec.t, phone: rec.p, email: rec.e,
       date_called: null, date_emailed: null, linkedin: null, date_contacted: null,
-      base_status: chosenStatus, notes: rec.note, is_new: true, added_by: rec.addedBy, is_apollo: isApollo
+      base_status: chosenStatus, notes: rec.note, is_new: true, added_by: rec.addedBy, is_apollo: isApollo, assigned_rep: npRepSel.value || null
     }]);
   }
   catch(e){ console.error('save prospect failed', e); alert('Could not save — check your connection and try again.'); return; }
@@ -2270,7 +2313,7 @@ function renderStaleAccounts(){
   }
   el.innerHTML = stale.slice(0,10).map(({lead:r, eff, daysStale})=>{
     const col = STATUS_COLORS[eff.status] || '#8B95A1';
-    const rep = repLabel(r.b, r.l);
+    const rep = leadOwner(r);
     return `<div class="task-row">
       <span class="title acct-link" data-view-account="${r.id}" style="flex:1;">${esc(r.c)}
         <span style="color:var(--muted);font-weight:400;font-size:11.5px;"> — ${esc(r.b)} · ${esc(r.l)}${rep?' · '+esc(rep):''}</span>
@@ -2454,6 +2497,7 @@ const brandSel = document.getElementById('f-brand');
 const locSel = document.getElementById('f-location');
 const statusSel = document.getElementById('f-status');
 const eventsSel = document.getElementById('f-events');
+const repSel = document.getElementById('f-rep');
 const searchInput = document.getElementById('f-search');
 const dueCheckbox = document.getElementById('f-due');
 const flagCheckbox = document.getElementById('f-flag');
@@ -2461,6 +2505,7 @@ const flagCheckbox = document.getElementById('f-flag');
 Object.keys(BRAND_COLORS).sort().forEach(b=> brandSel.insertAdjacentHTML('beforeend', `<option value="${esc(b)}">${esc(b)}</option>`));
 ALL_STATUSES.forEach(s=> statusSel.insertAdjacentHTML('beforeend', `<option value="${esc(s)}">${esc(s)}</option>`));
 EVENTS_OPTIONS.filter(o=>o.v).forEach(o=> eventsSel.insertAdjacentHTML('beforeend', `<option value="${o.v}">${o.label}</option>`));
+KNOWN_NAMES.forEach(n=> repSel.insertAdjacentHTML('beforeend', `<option value="${esc(n)}">${esc(n)}</option>`));
 function updateLocationOptions(){
   const b = brandSel.value;
   const opts = [...new Set(LEADS.filter(r=>!b || r.b===b).map(r=>r.l))].sort();
@@ -2487,13 +2532,14 @@ function applyFilters(){
   const l = locSel.value;
   const s = statusSel.value;
   const ev = eventsSel.value;
+  const rep = repSel.value;
   const q = searchInput.value.trim().toLowerCase();
   const dueOnly = dueCheckbox.checked;
   const today = todayISO();
-  filtered = LEADS.filter(r=>{
-    if (!inScope(r.b, r.l)) return false;
+  filtered = scopedLeads().filter(r=>{
     if (b && r.b!==b) return false;
     if (l && r.l!==l) return false;
+    if (rep && (leadOwner(r)||'').toLowerCase() !== rep.toLowerCase()) return false;
     const eff = getEffective(r);
     if (s && eff.status!==s) return false;
     if (ev && eff.eventsStatus!==ev) return false;
@@ -2525,7 +2571,7 @@ function renderLeadList(){
       const flag = coverageFlag(r);
       const isOpen = String(leadExpandedId)===String(r.id);
       const touched = lastTouchedLabel(r);
-      const rep = repLabel(r.b, r.l);
+      const rep = leadOwner(r);
       return `<div class="lead-row ${isOpen?'open':''}" data-id="${r.id}">
         <div class="lead-main" data-toggle="${r.id}">
           <input type="checkbox" class="lead-select-cb" data-lead-select="${r.id}" ${selectedLeadIds.has(String(r.id))?'checked':''}>
@@ -2708,7 +2754,7 @@ document.body.addEventListener('click', (e)=>{
 function renderAccountModal(leadId){
   const r = LEAD_BY_ID.get(Number(leadId)) || LEAD_BY_ID.get(leadId);
   if (!r) { closeAccountModal(); return; }
-  const rep = repLabel(r.b, r.l);
+  const rep = leadOwner(r);
   document.getElementById('account-modal-company').innerHTML = esc(r.c) + (r.isApollo ? '<span class="apollo-badge">Apollo lead</span>' : '');
   document.getElementById('account-modal-sub').textContent = `${r.b} · ${r.l}${rep ? ' · '+rep : ''}`;
  
@@ -2777,6 +2823,8 @@ function toggleEditAccountForm(leadId){
         <div><label>Phone</label><input type="text" id="ea-phone" value="${esc(r.p||'')}"></div>
         <div><label>Email</label><input type="text" id="ea-email" value="${esc(r.e||'')}"></div>
       </div>
+      <label>Assigned to</label>
+      <select id="ea-rep">${KNOWN_NAMES.map(n=>`<option value="${esc(n)}" ${(leadOwner(r)||'')===n?'selected':''}>${esc(n)}</option>`).join('')}</select>
       <label>Notes</label><textarea id="ea-notes">${esc(r.note||'')}</textarea>
       <div class="modal-actions">
         <button class="btn small ghost" id="ea-cancel">Cancel</button>
@@ -2792,12 +2840,13 @@ function toggleEditAccountForm(leadId){
       title: document.getElementById('ea-title').value.trim(),
       phone: document.getElementById('ea-phone').value.trim(),
       email: document.getElementById('ea-email').value.trim(),
-      notes: document.getElementById('ea-notes').value.trim()
+      notes: document.getElementById('ea-notes').value.trim(),
+      assigned_rep: document.getElementById('ea-rep').value || null
     };
     if (!patch.company){ alert('Company name is required.'); return; }
     try {
       await supaUpdate('leads', `id=eq.${encodeURIComponent(leadId)}`, patch);
-      r.c = patch.company; r.n = patch.contact; r.t = patch.title; r.p = patch.phone; r.e = patch.email; r.note = patch.notes;
+      r.c = patch.company; r.n = patch.contact; r.t = patch.title; r.p = patch.phone; r.e = patch.email; r.note = patch.notes; r.rep = patch.assigned_rep;
       slot.innerHTML = '';
       renderAccountModal(leadId);
       renderKPIs(); renderQueue(); renderNewProspects(); renderLocTable(); applyFilters();
@@ -2859,7 +2908,7 @@ async function restoreAccount(id, rows){
         id: row.id, b: row.brand, l: row.location, c: row.company, n: row.contact, t: row.title,
         p: row.phone, e: row.email, dc: row.date_called, de: row.date_emailed, li: row.linkedin,
         dt: row.date_contacted, s: row.base_status || 'No Status', note: row.notes,
-        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo
+        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo, rep: row.assigned_rep || null
       };
       LEADS.push(r);
       LEAD_BY_ID.set(r.id, r);
@@ -2928,10 +2977,11 @@ searchInput.addEventListener('input', ()=>{ clearTimeout(searchTimer); searchTim
 locSel.addEventListener('change', ()=>{ applyFilters(); refreshScopedViews(); });
 statusSel.addEventListener('change', applyFilters);
 eventsSel.addEventListener('change', applyFilters);
+repSel.addEventListener('change', applyFilters);
 dueCheckbox.addEventListener('change', applyFilters);
 flagCheckbox.addEventListener('change', applyFilters);
 document.getElementById('f-clear').addEventListener('click', ()=>{
-  brandSel.value=''; locSel.value=''; statusSel.value=''; eventsSel.value=''; searchInput.value=''; dueCheckbox.checked=false; flagCheckbox.checked=false;
+  brandSel.value=''; locSel.value=''; statusSel.value=''; eventsSel.value=''; repSel.value=''; searchInput.value=''; dueCheckbox.checked=false; flagCheckbox.checked=false;
   updateLocationOptions();
   document.querySelectorAll('#loc-tbody tr').forEach(r=>r.classList.remove('active-row'));
   applyFilters();
