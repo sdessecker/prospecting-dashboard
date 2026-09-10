@@ -4,34 +4,43 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Five Star Parks — Prospecting Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
 <style>
   :root{
-    --ink:#16202A; --paper:#FAF7F0; --card:#FFFFFF; --border:#E4DFD3;
-    --text:#16202A; --muted:#6B7280;
-    --teal:#1F7A6C; --teal-soft:#E4F1EE;
-    --amber:#E0932E; --amber-soft:#FBEDD8;
-    --coral:#D9583D; --coral-soft:#FBE7E1;
-    --blue:#35638F; --blue-soft:#E5EDF4;
+    --ink:#141B24; --paper:#F5EFE1; --card:#FFFFFF; --border:#E3DAC4;
+    --text:#1B2028; --muted:#736A5A;
+    --teal:#1C7A6C; --teal-soft:#E1F0EC;
+    --amber:#C8871E; --amber-soft:#F8E9CE;
+    --coral:#C24E36; --coral-soft:#F7E1DA;
+    --blue:#345C82; --blue-soft:#E2E9F0;
     --violet:#6A5A8C; --violet-soft:#ECE8F3;
+    --font-display:'Fraunces',Georgia,serif;
+    --font-body:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
-  body{background:var(--paper);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  body{background:var(--paper);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;}
   .wrap{max-width:1320px;margin:0 auto;padding:0 28px 64px;}
+  h1,h2,h3,h4,.brandmark,.section-head h2{font-family:var(--font-display);}
  
-  header.top{background:var(--ink);color:#fff;padding:26px 0;margin-bottom:26px;}
+  header.top{background:var(--ink);color:#fff;padding:26px 0;margin-bottom:26px;box-shadow:0 1px 0 rgba(0,0,0,.25);}
   header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}
   .brandmark{display:flex;align-items:baseline;gap:12px;}
-  .brandmark .dot{width:11px;height:11px;border-radius:50%;background:var(--amber);display:inline-block;transform:translateY(-2px);}
-  h1{font-size:24px;font-weight:700;letter-spacing:-0.02em;margin:0;}
-  header.top p{margin:5px 0 0;color:#B9C2CC;font-size:13px;}
+  .brandmark .dot{width:11px;height:11px;border-radius:50%;background:var(--amber);display:inline-block;transform:translateY(-2px);box-shadow:0 0 0 3px rgba(200,135,30,.25);}
+  h1{font-size:25px;font-weight:600;letter-spacing:-0.01em;margin:0;}
+  header.top p{margin:5px 0 0;color:#B9C2CC;font-size:13px;font-family:var(--font-body);}
  
   /* tabs */
   .tab-nav{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:26px;}
-  .tab-btn{font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);background:none;border:none;padding:12px 6px;margin-right:22px;cursor:pointer;position:relative;top:1px;}
+  .tab-btn{font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);background:none;border:none;padding:12px 6px;margin-right:22px;cursor:pointer;position:relative;top:1px;display:inline-flex;align-items:center;gap:7px;transition:color .12s;}
+  .tab-btn svg{width:15px;height:15px;opacity:.75;}
   .tab-btn.active{color:var(--ink);border-bottom:2px solid var(--teal);}
+  .tab-btn.active svg{opacity:1;}
   .tab-btn:hover:not(.active){color:var(--text);}
+  .tab-btn:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
   .me-box{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
   .me-field{display:flex;align-items:center;gap:8px;}
   .me-box label{font-size:12px;color:#B9C2CC;}
@@ -66,12 +75,17 @@
  
   /* KPI */
   .kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;}
-  .kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;}
+  .kpi{background:var(--card);border:1px solid var(--border);border-top:3px solid var(--border);border-radius:8px;padding:15px 16px;position:relative;}
   .kpi .lbl{font-size:11.5px;color:var(--muted);font-weight:600;margin-bottom:8px;}
-  .kpi .val{font-size:26px;font-weight:700;letter-spacing:-0.02em;}
+  .kpi .val{font-size:27px;font-weight:600;letter-spacing:-0.02em;font-family:var(--font-display);display:flex;align-items:baseline;gap:7px;}
   .kpi .sub{font-size:11.5px;color:var(--muted);margin-top:4px;}
-  .kpi.accent-teal .val{color:var(--teal);} .kpi.accent-amber .val{color:var(--amber);}
-  .kpi.accent-blue .val{color:var(--blue);} .kpi.accent-coral .val{color:var(--coral);}
+  .kpi .trend{font-size:11px;font-weight:700;padding:1px 6px;border-radius:10px;}
+  .kpi .trend.up{color:var(--teal);background:var(--teal-soft);}
+  .kpi .trend.down{color:var(--coral);background:var(--coral-soft);}
+  .kpi.accent-teal{border-top-color:var(--teal);} .kpi.accent-teal .val{color:var(--teal);}
+  .kpi.accent-amber{border-top-color:var(--amber);} .kpi.accent-amber .val{color:var(--amber);}
+  .kpi.accent-blue{border-top-color:var(--blue);} .kpi.accent-blue .val{color:var(--blue);}
+  .kpi.accent-coral{border-top-color:var(--coral);} .kpi.accent-coral .val{color:var(--coral);}
  
   /* Action queue */
   .queue-list{display:flex;flex-direction:column;gap:0;}
@@ -87,14 +101,27 @@
   .overdue-pill.hot{background:var(--coral-soft);color:var(--coral);}
   .overdue-pill.warm{background:var(--amber-soft);color:var(--amber);}
   .queue-actions{display:flex;gap:6px;}
-  .btn{font-size:12px;font-weight:600;border-radius:7px;padding:6px 11px;border:1px solid var(--border);background:#fff;color:var(--text);cursor:pointer;}
+  .btn{font-size:12px;font-weight:600;border-radius:7px;padding:6px 11px;border:1px solid var(--border);background:#fff;color:var(--text);cursor:pointer;transition:border-color .12s,color .12s,background .12s,transform .08s;}
   .btn:hover{border-color:var(--teal);color:var(--teal);}
+  .btn:active{transform:scale(.97);}
   .btn.primary{background:var(--teal);border-color:var(--teal);color:#fff;}
   .btn.primary:hover{background:#186154;color:#fff;}
   .btn.ghost{border-color:transparent;color:var(--muted);}
   .btn.ghost:hover{color:var(--coral);}
   .btn.small{padding:4px 9px;font-size:11.5px;}
-  .empty-state{color:var(--muted);font-size:13px;padding:20px 4px;text-align:center;}
+  .empty-state{color:var(--muted);font-size:13px;padding:24px 4px;text-align:center;}
+  .empty-state svg{display:block;margin:0 auto 8px;opacity:.35;width:28px;height:28px;}
+ 
+  .mystats-panel{background:var(--ink);border:none;position:relative;overflow:hidden;}
+  .mystats-panel::before{content:'';position:absolute;top:-40%;right:-8%;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(200,135,30,.18),transparent 70%);}
+  .mystats-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:22px;position:relative;}
+  .mystats-item .mystats-lbl{font-size:11.5px;color:#B9C2CC;font-weight:600;margin-bottom:6px;}
+  .mystats-item .mystats-val{font-size:28px;font-weight:600;color:#fff;font-family:var(--font-display);}
+  .mystats-item .mystats-val .of{font-size:15px;color:#8A94A0;font-weight:500;font-family:var(--font-body);}
+  .mystats-bar{height:8px;border-radius:4px;background:rgba(255,255,255,.14);margin-top:10px;overflow:hidden;max-width:260px;}
+  .mystats-bar i{display:block;height:100%;border-radius:4px;}
+  .mystats-sub{font-size:12px;color:#8A94A0;margin-top:6px;}
+  @media (max-width:780px){ .mystats-grid{grid-template-columns:1fr;gap:16px;} }
  
   /* Log form */
   .log-form{background:#FBFAF6;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-top:10px;}
@@ -250,11 +277,13 @@
  
   /* add prospect */
   .explorer-toolbar{display:flex;justify-content:flex-end;margin-bottom:12px;}
-  .modal-overlay{position:fixed;inset:0;background:rgba(22,32,42,0.55);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;}
-  .modal-box{background:#fff;border-radius:12px;padding:22px 24px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;}
+  .modal-overlay{position:fixed;inset:0;background:rgba(20,27,36,0.6);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;animation:overlayIn .15s ease-out;}
+  .modal-box{background:#fff;border-radius:12px;padding:22px 24px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 60px rgba(20,27,36,.35);animation:modalIn .18s cubic-bezier(.2,.8,.3,1.1);}
+  @keyframes overlayIn{from{opacity:0;}to{opacity:1;}}
+  @keyframes modalIn{from{opacity:0;transform:translateY(10px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
   .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
-  .modal-head h3{margin:0;font-size:17px;font-weight:700;}
-  .modal-close{background:none;border:none;font-size:16px;color:var(--muted);cursor:pointer;padding:2px 6px;}
+  .modal-head h3{margin:0;font-size:18px;font-weight:600;font-family:var(--font-display);}
+  .modal-close{background:none;border:none;font-size:16px;color:var(--muted);cursor:pointer;padding:2px 6px;transition:color .12s;}
   .modal-close:hover{color:var(--coral);}
   .modal-box label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin:10px 0 4px;}
   .modal-box select, .modal-box input[type=text], .modal-box input[type=email], .modal-box input[type=password], .modal-box textarea{
@@ -356,10 +385,10 @@
  
 <div class="wrap">
   <div class="tab-nav">
-    <button class="tab-btn active" id="tab-btn-tasks" data-tab="tasks">Tasks</button>
-    <button class="tab-btn" id="tab-btn-newprospects" data-tab="newprospects">New Prospects</button>
-    <button class="tab-btn" id="tab-btn-explorer" data-tab="explorer">Lead Explorer</button>
-    <button class="tab-btn" id="tab-btn-analytics" data-tab="analytics">Analytics</button>
+    <button class="tab-btn active" id="tab-btn-tasks" data-tab="tasks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tasks</button>
+    <button class="tab-btn" id="tab-btn-newprospects" data-tab="newprospects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>New Prospects</button>
+    <button class="tab-btn" id="tab-btn-explorer" data-tab="explorer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Lead Explorer</button>
+    <button class="tab-btn" id="tab-btn-analytics" data-tab="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg>Analytics</button>
   </div>
 </div>
  
@@ -368,6 +397,12 @@
   <div class="scope-banner" id="scope-banner" style="display:none;"></div>
  
   <div id="tab-tasks">
+ 
+  <section>
+    <div class="panel mystats-panel">
+      <div id="my-stats-card"></div>
+    </div>
+  </section>
  
   <section>
     <div class="section-head">
@@ -505,6 +540,21 @@
         <div class="lb-header-status">To hit 50</div>
       </div>
       <div id="leaderboard-list"></div>
+    </div>
+  </section>
+ 
+  <section>
+    <div class="chart-row">
+      <div class="panel">
+        <div class="panel-title">Pipeline funnel</div>
+        <div class="panel-sub">Where accounts drop off, stage by stage</div>
+        <canvas id="chart-funnel" height="220"></canvas>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Needs attention</div>
+        <div class="panel-sub" id="stale-sub">Promising deals with no activity in 14+ days</div>
+        <div id="stale-list"></div>
+      </div>
     </div>
   </section>
  
@@ -1726,6 +1776,81 @@ function addTaskForLead(r){
 }
  
 /* ---------------- CHARTS ---------------- */
+/* ---------------- PIPELINE FUNNEL ---------------- */
+let funnelChart;
+function computeFunnelData(){
+  let logged=0, called=0, contacted=0;
+  if (viewLocations.size===0){
+    logged = TOTAL.logged + LEADS.filter(r=>r.isNew).length;
+    called = TOTAL.called;
+    contacted = TOTAL.contacted || 0;
+  } else {
+    selectedLocsArray().forEach(sel=>{
+      const row = LOCS.find(l=>l.brand===sel.brand && l.location===sel.location);
+      logged += (row?row.logged:0) + newLeadsCountFor(sel.brand, sel.location);
+      called += row?row.called:0;
+      contacted += row?(row.contacted||0):0;
+    });
+  }
+  const scoped = scopedLeads();
+  const inConv = scoped.filter(r=>getEffective(r).status==='In Conversation').length;
+  const booked = scoped.filter(r=>getEffective(r).status==='Booked').length;
+  return [['Logged',logged],['Called',called],['Contacted',contacted],['In Conversation',inConv],['Booked',booked]];
+}
+function renderFunnelChart(){
+  const canvas = document.getElementById('chart-funnel');
+  if (!canvas) return;
+  const data = computeFunnelData();
+  const max = Math.max(...data.map(d=>d[1]), 1);
+  const shades = ['#1C7A6C','#2C8E7E','#3CA290','#5CB6A4','#8FCDBE'];
+  if (funnelChart) funnelChart.destroy();
+  funnelChart = new Chart(canvas, {
+    type:'bar',
+    data:{ labels: data.map(d=>d[0]), datasets:[{ data: data.map(d=>d[1]), backgroundColor: shades, borderRadius:4, barThickness:26 }] },
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:(c)=>{
+        const pctOfTop = data[0][1]>0 ? Math.round((c.parsed.x/data[0][1])*100) : 0;
+        return `${fmt(c.parsed.x)} (${pctOfTop}% of logged)`;
+      }}}},
+      scales:{ x:{beginAtZero:true, grid:{color:'#EFEBE1'}}, y:{grid:{display:false}, ticks:{font:{size:12,weight:600}}} } }
+  });
+}
+ 
+/* ---------------- NEEDS ATTENTION (stale, promising deals) ---------------- */
+const STALE_STATUSES = new Set(['In Conversation','Tour Scheduled','Proposal Sent','Follow-up Sent','Follow-up/Assigned']);
+function getStaleAccounts(){
+  const today = todayISO();
+  return scopedLeads()
+    .filter(r=>!r.isApollo)
+    .map(r=>({ lead:r, eff:getEffective(r) }))
+    .filter(({eff})=> STALE_STATUSES.has(eff.status) && eff.lastDate && daysBetween(eff.lastDate, today) >= 14)
+    .map(({lead,eff})=>({ lead, eff, daysStale: daysBetween(eff.lastDate, today) }))
+    .sort((a,b)=>b.daysStale-a.daysStale);
+}
+function renderStaleAccounts(){
+  const el = document.getElementById('stale-list');
+  if (!el) return;
+  const stale = getStaleAccounts();
+  document.getElementById('stale-sub').textContent = stale.length
+    ? `${stale.length} promising deal${stale.length===1?'':'s'} with no activity in 14+ days${scopeSuffix()}`
+    : `Nothing stale right now${scopeSuffix()}`;
+  if (!stale.length){
+    el.innerHTML = `<div class="empty-state">Nothing's gone quiet — every in-progress deal has recent activity.</div>`;
+    return;
+  }
+  el.innerHTML = stale.slice(0,10).map(({lead:r, eff, daysStale})=>{
+    const col = STATUS_COLORS[eff.status] || '#8B95A1';
+    const rep = repLabel(r.b, r.l);
+    return `<div class="task-row">
+      <span class="title acct-link" data-view-account="${r.id}" style="flex:1;">${esc(r.c)}
+        <span style="color:var(--muted);font-weight:400;font-size:11.5px;"> — ${esc(r.b)} · ${esc(r.l)}${rep?' · '+esc(rep):''}</span>
+      </span>
+      <span class="status-badge" style="background:${hexToSoft(col)};color:${col};margin-right:8px;">${esc(eff.status)}</span>
+      <span class="due overdue">${daysStale}d quiet</span>
+    </div>`;
+  }).join('') + (stale.length>10 ? `<div class="empty-state">+${stale.length-10} more going stale.</div>` : '');
+}
+ 
 let loggedChart, statusChart;
 function renderCharts(){
   if (loggedChart) loggedChart.destroy();
@@ -2328,6 +2453,35 @@ function rangeLabel(){
   if (rangePreset === 'all') return 'All time';
   return `${fmtShortISO(rangeStart)} – ${fmtShortISO(rangeEnd)}, ${rangeEnd.slice(0,4)}`;
 }
+function previousPeriodTeamTotal(){
+  if (rangePreset === 'all') return null; // no meaningful "previous" for all-time
+  const days = daysBetween(rangeStart, rangeEnd) + 1;
+  const prevEnd = new Date(rangeStart+'T00:00:00'); prevEnd.setDate(prevEnd.getDate()-1);
+  const prevStart = new Date(prevEnd); prevStart.setDate(prevStart.getDate()-(days-1));
+  const prevStartISO = toISO(prevStart), prevEndISO = toISO(prevEnd);
+  const scopedIds = new Set(scopedLeads().map(r=>r.id));
+  let total = 0;
+  LEADS.forEach(r=>{
+    if (!scopedIds.has(r.id)) return;
+    const ov = overrides[r.id];
+    if (!ov || !ov.activity) return;
+    ov.activity.forEach(a=>{
+      if (a.date < prevStartISO || a.date > prevEndISO) return;
+      const chans = (a.channels&&a.channels.length) ? a.channels : ['other'];
+      total += chans.length;
+    });
+  });
+  return total;
+}
+function trendBadge(current, previous){
+  if (previous == null) return '';
+  if (previous === 0) return current>0 ? `<span class="trend up">new activity</span>` : '';
+  const pct = Math.round(((current-previous)/previous)*100);
+  if (pct === 0) return `<span class="trend" style="color:var(--muted);background:#EEE9DC;">flat</span>`;
+  const dir = pct>0 ? 'up' : 'down';
+  const arrow = pct>0 ? '▲' : '▼';
+  return `<span class="trend ${dir}">${arrow} ${Math.abs(pct)}%</span>`;
+}
 function applyRangePreset(preset){
   const today = new Date();
   if (preset === 'week'){
@@ -2366,6 +2520,62 @@ document.getElementById('range-apply-btn').addEventListener('click', ()=>{
 });
  
 let leaderboardMode = 'person'; // 'person' | 'park' | 'accounts'
+ 
+/* ---------------- MY STATS (personal, always "this week" regardless of Analytics range picker) ---------------- */
+function computeThisWeekPersonTotals(){
+  const ws = toISO(mondayOf(new Date()));
+  const we = toISO(weekEndOf(mondayOf(new Date())));
+  const scopedIds = new Set(scopedLeads().map(r=>r.id));
+  const totals = {};
+  LEADS.forEach(r=>{
+    if (!scopedIds.has(r.id)) return;
+    const ov = overrides[r.id];
+    if (!ov || !ov.activity) return;
+    ov.activity.forEach(a=>{
+      if (a.date < ws || a.date > we) return;
+      const person = (a.by||'Unknown').trim() || 'Unknown';
+      const chans = (a.channels&&a.channels.length) ? a.channels : ['other'];
+      totals[person] = (totals[person]||0) + chans.length;
+    });
+  });
+  return totals;
+}
+function renderMyStats(){
+  const container = document.getElementById('my-stats-card');
+  if (!container) return;
+  if (!myName){
+    container.innerHTML = `<div class="empty-state" style="color:#B9C2CC;">Type your name in the box up top to see your personal stats here.</div>`;
+    return;
+  }
+  const totals = computeThisWeekPersonTotals();
+  const matchKey = Object.keys(totals).find(k=>k.toLowerCase()===myName.trim().toLowerCase());
+  const mine = matchKey ? totals[matchKey] : 0;
+  const ranked = Object.entries(totals).sort((a,b)=>b[1]-a[1]);
+  const myRankIdx = ranked.findIndex(([k])=>k.toLowerCase()===myName.trim().toLowerCase());
+  const rankLabel = myRankIdx>-1 ? `#${myRankIdx+1} of ${ranked.length}` : (ranked.length ? `Unranked yet` : '—');
+  const openTasksMine = tasks.filter(t=>!t.done && (t.assignedTo||'').trim().toLowerCase()===myName.trim().toLowerCase()).length;
+  const goal = GOAL_PER_WEEK;
+  const pctBar = Math.min(100, Math.round((mine/goal)*100));
+  const remaining = Math.max(0, goal-mine);
+  container.innerHTML = `
+    <div class="mystats-grid">
+      <div class="mystats-item">
+        <div class="mystats-lbl">Your attempts this week</div>
+        <div class="mystats-val">${fmt(mine)} <span class="of">/ ${goal} goal</span></div>
+        <div class="mystats-bar"><i style="width:${pctBar}%;background:${mine>=goal?'#2FA294':'#C8871E'};"></i></div>
+        <div class="mystats-sub">${mine>=goal ? 'Goal hit 🎉' : remaining+' more to go'}</div>
+      </div>
+      <div class="mystats-item">
+        <div class="mystats-lbl">Your rank this week</div>
+        <div class="mystats-val">${rankLabel}</div>
+      </div>
+      <div class="mystats-item">
+        <div class="mystats-lbl">Your open tasks</div>
+        <div class="mystats-val">${fmt(openTasksMine)}</div>
+      </div>
+    </div>
+  `;
+}
  
 function computeLeaderboard(){
   const scopedIds = new Set(scopedLeads().map(r=>r.id));
@@ -2544,9 +2754,10 @@ function renderMetrics(){
   const teamTotal = people.reduce((s,p)=>s+p[1].total,0);
   const teamAvg = people.length ? Math.round(teamTotal/people.length) : 0;
   const behindCount = people.filter(p=> p[1].total < expected).length;
+  const prevTotal = previousPeriodTeamTotal();
  
   weekKpisEl.innerHTML = `
-    <div class="week-kpi"><div class="lbl">Team attempts in range</div><div class="val">${fmt(teamTotal)}</div></div>
+    <div class="week-kpi"><div class="lbl">Team attempts in range</div><div class="val" style="display:flex;align-items:baseline;gap:8px;">${fmt(teamTotal)} ${trendBadge(teamTotal, prevTotal)}</div></div>
     <div class="week-kpi"><div class="lbl">Average per person</div><div class="val">${fmt(teamAvg)} <span style="font-size:12px;color:var(--muted);font-weight:500;">/ ${goal} goal</span></div></div>
     <div class="week-kpi"><div class="lbl">${prog.complete?'Missed goal':'Behind pace'}</div><div class="val" style="color:${behindCount?'var(--coral)':'var(--teal)'};">${behindCount} ${behindCount===1?'person':'people'}</div></div>
   `;
@@ -2594,11 +2805,14 @@ function renderMetrics(){
 /* ---------------- MASTER RENDER ---------------- */
 function renderAll(){
   renderKPIs();
+  renderMyStats();
   renderQueue();
   renderNewProspects();
   renderTasks();
   renderMetrics();
   renderCharts();
+  renderFunnelChart();
+  renderStaleAccounts();
   renderLocTable();
   applyFilters();
   if (accountModalLeadId) renderAccountModal(accountModalLeadId);
@@ -2646,6 +2860,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
       requestAnimationFrame(()=>{
         if (loggedChart) loggedChart.resize();
         if (statusChart) statusChart.resize();
+        if (funnelChart) funnelChart.resize();
       });
     }
   });
