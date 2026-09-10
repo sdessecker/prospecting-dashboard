@@ -2983,6 +2983,7 @@ function applyRangePreset(preset){
   renderKPIs();
   renderMetrics();
   renderTrendChart();
+  renderLocTable();
 }
 document.querySelectorAll('.range-preset-btn').forEach(btn=>{
   btn.addEventListener('click', ()=> applyRangePreset(btn.dataset.preset));
@@ -2997,6 +2998,7 @@ document.getElementById('range-apply-btn').addEventListener('click', ()=>{
   renderKPIs();
   renderMetrics();
   renderTrendChart();
+  renderLocTable();
 });
  
 let leaderboardMode = 'person'; // 'person' | 'park' | 'accounts'
