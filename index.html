@@ -27,7 +27,8 @@
   h1,h2,h3,h4,.brandmark,.section-head h2{font-family:var(--font-display);}
  
   header.top{background:linear-gradient(135deg,#141B24 0%,#1C2531 100%);color:#fff;padding:12px 0;margin-bottom:16px;box-shadow:0 1px 0 rgba(0,0,0,.25);border-bottom:3px solid var(--amber);}
-  header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}
+  header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;padding:0 28px;}
+  header.top .header-quote-row{justify-content:flex-start;margin-top:8px;}
   .brandmark{display:flex;align-items:center;gap:11px;flex-wrap:wrap;row-gap:4px;}
   .logo-badge{background:#fff;border-radius:8px;padding:5px 9px;display:flex;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.25);flex-shrink:0;}
   .logo-img{height:22px;width:auto;display:block;}
@@ -124,7 +125,6 @@
   .mystats-bar{height:5px;border-radius:3px;background:rgba(255,255,255,.14);margin-top:6px;overflow:hidden;max-width:220px;}
   .mystats-bar i{display:block;height:100%;border-radius:3px;}
   .mystats-sub{font-size:11px;color:#8A94A0;margin-top:3px;}
-  .mystats-panel .daily-quote{display:block;margin:10px 0 0;padding:6px 0 0;border-top:1px solid rgba(255,255,255,.1);background:none;border-radius:0;border-left:none;border-right:none;border-bottom:none;font-family:var(--font-display);font-style:italic;color:#D8CDA8;font-size:12px;max-width:none;position:relative;}
   @media (max-width:780px){ .mystats-grid{grid-template-columns:1fr;gap:12px;} }
  
   /* Log form */
@@ -432,6 +432,9 @@
       <button type="button" class="btn small ghost" id="logout-btn" style="border-color:#3A4756;color:#B9C2CC;">Log out</button>
     </div>
   </div>
+  <div class="wrap header-quote-row">
+    <p class="daily-quote" id="daily-quote"></p>
+  </div>
 </header>
  
 <div class="wrap">
@@ -449,7 +452,6 @@
   <section>
     <div class="panel mystats-panel">
       <div id="my-stats-card"></div>
-      <p class="daily-quote" id="daily-quote"></p>
     </div>
   </section>
  
