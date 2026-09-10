@@ -647,7 +647,7 @@
   <section>
     <div class="section-head">
       <h2>Portfolio overview</h2>
-      <span class="hint">Current pipeline snapshot — doesn't follow the date range above; volumes are from the original tracker export</span>
+      <span class="hint">Follows the date range above — pick a range up top and this updates for reporting</span>
     </div>
     <div class="chart-row">
       <div class="panel">
@@ -676,13 +676,13 @@
             <th data-key="brand">Brand</th>
             <th data-key="location">Location</th>
             <th data-key="rep">Rep</th>
-            <th class="num" data-key="logged">Logged</th>
-            <th class="num" data-key="called">Called</th>
+            <th class="num" data-key="logged" title="All-time, from the original tracker">Logged (all-time)</th>
+            <th class="num" data-key="attempts">Attempts</th>
+            <th class="num" data-key="calls">Calls</th>
+            <th class="num" data-key="emails">Emails</th>
             <th class="num" data-key="contacted">Contacted</th>
             <th class="num" data-key="booked">Booked</th>
             <th class="num" data-key="bookedRate">Booked rate</th>
-            <th class="num" data-key="in_conv">In Conv.</th>
-            <th class="num" data-key="touched">Activity in range</th>
           </tr>
         </thead>
         <tbody id="loc-tbody"></tbody>
@@ -2281,17 +2281,34 @@ function renderStaleAccounts(){
 }
  
 let loggedChart, statusChart;
+/* Outcome mix actually logged within the selected date range (not current live status) —
+   this is what a period report should show: what happened during this window. */
+const OUTCOME_LABELS = {continue:'Continued sequence', interested:'In Conversation', not_interested:'Not Interested', booked:'Booked', tour_scheduled:'Tour Scheduled', pause:'Paused'};
+function computeOutcomeMixInRange(){
+  const scopedIds = new Set(scopedLeads().map(r=>r.id));
+  const counts = {};
+  LEADS.forEach(r=>{
+    if (!scopedIds.has(r.id)) return;
+    const ov = overrides[r.id];
+    if (!ov || !ov.activity) return;
+    ov.activity.forEach(a=>{
+      if (a.date < rangeStart || a.date > rangeEnd) return;
+      const key = OUTCOME_LABELS[a.outcome] || 'Continued sequence';
+      counts[key] = (counts[key]||0)+1;
+    });
+  });
+  return counts;
+}
 function renderCharts(){
   if (loggedChart) loggedChart.destroy();
   const legendEl = document.getElementById('brand-legend');
   const sel = selectedLocsArray();
   if (sel.length===1){
     const f = sel[0];
-    const row = LOCS.find(l=>l.brand===f.brand && l.location===f.location) || {logged:0,called:0,emailed:0,linkedin:0,contacted:0,booked:0,in_conv:0,tours:0};
-    const liveLogged = row.logged + newLeadsCountFor(f.brand, f.location);
-    document.getElementById('chart-logged-title').textContent = f.brand+' — '+f.location+' funnel';
-    document.getElementById('chart-logged-sub').textContent = `${f.brand} — ${f.location}, all-time`;
-    const stages = [['Logged',liveLogged],['Called',row.called],['Emailed',row.emailed],['Contacted',row.contacted],['In Conv.',row.in_conv],['Booked',row.booked],['Tours',row.tours]];
+    const rs = computeLocRangeStats(f.brand, f.location);
+    document.getElementById('chart-logged-title').textContent = f.brand+' — '+f.location+' activity';
+    document.getElementById('chart-logged-sub').textContent = `${f.brand} — ${f.location}, ${rangeLabel()}`;
+    const stages = [['Attempts',rs.attempts],['Calls',rs.calls],['Emails',rs.emails],['Contacted',rs.contacted],['Booked',rs.booked]];
     loggedChart = new Chart(document.getElementById('chart-logged'), {
       type:'bar',
       data:{ labels: stages.map(s=>s[0]), datasets:[{ data: stages.map(s=>s[1]), backgroundColor: BRAND_COLORS[f.brand]||'#1F7A6C', borderRadius:4, barThickness:22 }] },
@@ -2302,40 +2319,45 @@ function renderCharts(){
     legendEl.innerHTML = '';
   } else {
     const isSubset = sel.length>1;
-    document.getElementById('chart-logged-title').textContent = isSubset ? 'Leads logged — selected locations' : 'Leads logged by location';
-    document.getElementById('chart-logged-sub').textContent = isSubset ? `${sel.length} locations you're viewing, colored by brand` : 'Sorted by volume, colored by brand';
-    let locsSorted = locsWithLiveCounts();
-    if (isSubset) locsSorted = locsSorted.filter(l=>viewLocations.has(locKey(l.brand,l.location)));
-    locsSorted = locsSorted.sort((a,b)=>b.logged-a.logged);
+    document.getElementById('chart-logged-title').textContent = isSubset ? 'Attempts — selected locations' : 'Attempts by location';
+    document.getElementById('chart-logged-sub').textContent = `${rangeLabel()}${isSubset ? ` · ${sel.length} locations you're viewing` : ''}, colored by brand`;
+    let locsRanged = locsWithLiveCounts().map(l=>({...l, rs: computeLocRangeStats(l.brand, l.location)}));
+    if (isSubset) locsRanged = locsRanged.filter(l=>viewLocations.has(locKey(l.brand,l.location)));
+    locsRanged = locsRanged.sort((a,b)=>b.rs.attempts-a.rs.attempts).filter(l=>isSubset || l.rs.attempts>0).slice(0, isSubset?locsRanged.length:20);
     loggedChart = new Chart(document.getElementById('chart-logged'), {
       type:'bar',
-      data:{ labels: locsSorted.map(l=>l.location),
-        datasets:[{ data: locsSorted.map(l=>l.logged), backgroundColor: locsSorted.map(l=>BRAND_COLORS[l.brand]||'#999'), borderRadius:4, barThickness: isSubset?22:14 }] },
+      data:{ labels: locsRanged.map(l=>l.location),
+        datasets:[{ data: locsRanged.map(l=>l.rs.attempts), backgroundColor: locsRanged.map(l=>BRAND_COLORS[l.brand]||'#999'), borderRadius:4, barThickness: isSubset?22:14 }] },
       options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
-        plugins:{legend:{display:false}, tooltip:{callbacks:{label:(c)=>`${fmt(c.parsed.x)} leads logged`}}},
+        plugins:{legend:{display:false}, tooltip:{callbacks:{label:(c)=>`${fmt(c.parsed.x)} attempts`}}},
         scales:{ x:{beginAtZero:true, grid:{color:'#EFEBE1'}}, y:{grid:{display:false}, ticks:{font:{size:11}}} } }
     });
-    const brandsShown = isSubset ? [...new Set(locsSorted.map(l=>l.brand))] : Object.keys(BRAND_COLORS);
+    const brandsShown = isSubset ? [...new Set(locsRanged.map(l=>l.brand))] : Object.keys(BRAND_COLORS);
     legendEl.innerHTML = brandsShown.map(b=>`<span class="chip"><span class="sw" style="background:${BRAND_COLORS[b]}"></span>${b}</span>`).join('');
   }
  
+  document.getElementById('chart-status-title').textContent = 'Outcomes this period';
   document.getElementById('chart-status-sub').textContent = sel.length===1
-    ? `Live status mix for ${sel[0].brand} — ${sel[0].location}`
+    ? `${sel[0].brand} — ${sel[0].location}, ${rangeLabel()}`
     : sel.length>1
-      ? `Live status mix across ${sel.length} selected locations`
-      : 'Live status mix, including outcomes your team has logged';
-  const statusCounts = {};
-  scopedLeads().forEach(r=>{ const s = getEffective(r).status; statusCounts[s] = (statusCounts[s]||0)+1; });
+      ? `${sel.length} selected locations, ${rangeLabel()}`
+      : `What your team logged, ${rangeLabel()}`;
+  const statusCounts = computeOutcomeMixInRange();
   const entries = Object.entries(statusCounts).sort((a,b)=>b[1]-a[1]);
   if (statusChart) statusChart.destroy();
-  statusChart = new Chart(document.getElementById('chart-status'), {
-    type:'doughnut',
-    data:{ labels: entries.map(e=>e[0]), datasets:[{ data: entries.map(e=>e[1]), backgroundColor: entries.map(e=>STATUS_COLORS[e[0]]||'#AAA'), borderColor:'#fff', borderWidth:2 }] },
-    options:{ responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{position:'right', labels:{boxWidth:10, font:{size:10.5}, padding:8}},
-        tooltip:{callbacks:{label:(c)=>{ const t=entries.reduce((s,e)=>s+e[1],0); return ` ${c.label}: ${fmt(c.parsed)} (${pct(c.parsed,t)}%)`; }}} },
-      cutout:'60%' }
-  });
+  if (!entries.length){
+    statusChart = null;
+    document.getElementById('chart-status').getContext('2d').clearRect(0,0,9999,9999);
+  } else {
+    statusChart = new Chart(document.getElementById('chart-status'), {
+      type:'doughnut',
+      data:{ labels: entries.map(e=>e[0]), datasets:[{ data: entries.map(e=>e[1]), backgroundColor: entries.map(e=>STATUS_COLORS[e[0]]||'#B7AF98'), borderColor:'#fff', borderWidth:2 }] },
+      options:{ responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{position:'right', labels:{boxWidth:10, font:{size:10.5}, padding:8}},
+          tooltip:{callbacks:{label:(c)=>{ const t=entries.reduce((s,e)=>s+e[1],0); return ` ${c.label}: ${fmt(c.parsed)} (${pct(c.parsed,t)}%)`; }}} },
+        cutout:'60%' }
+    });
+  }
 }
  
 /* ---------------- LOCATIONS TABLE ---------------- */
@@ -2356,31 +2378,56 @@ function liveBookedCountFor(brand, location){
   LEADS.forEach(r=>{ if (r.b===brand && r.l===location && getEffective(r).status==='Booked') n++; });
   return n;
 }
+/* Everything a rep/manager needs for a period report on one park — all scoped to the
+   currently selected date range, computed straight from the activity log. */
+function computeLocRangeStats(brand, location){
+  const s = {attempts:0, calls:0, emails:0, linkedin:0, in_person:0, booked:0, interested:0};
+  const contacted = new Set();
+  LEADS.forEach(r=>{
+    if (r.b!==brand || r.l!==location) return;
+    const ov = overrides[r.id];
+    if (!ov || !ov.activity) return;
+    ov.activity.forEach(a=>{
+      if (a.date < rangeStart || a.date > rangeEnd) return;
+      const chans = (a.channels && a.channels.length) ? a.channels : ['other'];
+      chans.forEach(c=>{ s.attempts++; if (s[c] !== undefined) s[c]++; });
+      contacted.add(r.id);
+      if (a.outcome === 'booked') s.booked++;
+      if (a.outcome === 'interested') s.interested++;
+    });
+  });
+  s.contacted = contacted.size;
+  s.bookedRate = s.contacted ? Math.round((s.booked/s.contacted)*100) : 0;
+  return s;
+}
 function renderLocTable(){
   const rows = locsWithLiveCounts().map(l=>{
-    const liveBooked = liveBookedCountFor(l.brand, l.location);
-    return {...l, touched: touchedCountFor(l.brand,l.location), liveBooked, bookedRate: pct(liveBooked, l.logged)};
+    const rs = computeLocRangeStats(l.brand, l.location);
+    return {...l, rs};
   });
   rows.sort((a,b)=>{
     const k = locSort.key;
-    if (typeof a[k]==='string') return a[k].localeCompare(b[k]) * locSort.dir;
-    return (a[k]-b[k]) * locSort.dir;
+    const av = k in (a.rs||{}) ? a.rs[k] : a[k];
+    const bv = k in (b.rs||{}) ? b.rs[k] : b[k];
+    if (typeof av==='string') return av.localeCompare(bv) * locSort.dir;
+    return (av-bv) * locSort.dir;
   });
-  document.getElementById('loc-table-hint').textContent = 'Logged/Called/Contacted/Booked are all-time totals; "Activity in range" follows the date range above · click a row to add or remove it from "Viewing"';
+  document.getElementById('loc-table-hint').textContent = `All columns except "Logged" follow the date range above (${rangeLabel()}) — pick a range up top, this table updates for reporting · click a row to add or remove it from "Viewing"`;
   document.getElementById('loc-tbody').innerHTML = rows.map(l=>{
     const selected = viewLocations.has(locKey(l.brand,l.location));
     const rep = repLabel(l.brand, l.location);
+    const rs = l.rs;
     return `<tr data-brand="${esc(l.brand)}" data-location="${esc(l.location)}" class="${selected?'active-row':''}">
       <td><span class="brand-tag" style="background:${BRAND_SOFT[l.brand]};color:${BRAND_COLORS[l.brand]}">${esc(l.brand)}</span></td>
       <td>${esc(l.location)}${selected?' <span style="color:var(--teal);font-size:11px;font-weight:700;">· viewing</span>':''}</td>
       <td>${rep ? esc(rep) : '<span style="color:var(--muted);">Unassigned</span>'}</td>
-      <td class="num">${fmt(l.logged)}</td>
-      <td class="num">${fmt(l.called)}</td>
-      <td class="num">${fmt(l.contacted)}</td>
-      <td class="num">${fmt(l.liveBooked)}</td>
-      <td class="num">${l.bookedRate}%</td>
-      <td class="num">${fmt(l.in_conv)}</td>
-      <td class="num">${l.touched ? fmt(l.touched) : '—'}</td>
+      <td class="num" title="All-time, from the original tracker">${fmt(l.logged)}</td>
+      <td class="num">${fmt(rs.attempts)}</td>
+      <td class="num">${fmt(rs.calls)}</td>
+      <td class="num">${fmt(rs.emails)}</td>
+      <td class="num">${fmt(rs.contacted)}</td>
+      <td class="num">${fmt(rs.booked)}</td>
+      <td class="num">${rs.bookedRate}%</td>
     </tr>`;
   }).join('');
   document.querySelectorAll('#loc-tbody tr').forEach(tr=>{
@@ -2984,6 +3031,7 @@ function applyRangePreset(preset){
   renderMetrics();
   renderTrendChart();
   renderLocTable();
+  renderCharts();
 }
 document.querySelectorAll('.range-preset-btn').forEach(btn=>{
   btn.addEventListener('click', ()=> applyRangePreset(btn.dataset.preset));
@@ -2999,6 +3047,7 @@ document.getElementById('range-apply-btn').addEventListener('click', ()=>{
   renderMetrics();
   renderTrendChart();
   renderLocTable();
+  renderCharts();
 });
  
 let leaderboardMode = 'person'; // 'person' | 'park' | 'accounts'
