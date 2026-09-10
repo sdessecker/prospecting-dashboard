@@ -26,7 +26,7 @@
   .wrap{max-width:1320px;margin:0 auto;padding:0 28px 64px;}
   h1,h2,h3,h4,.brandmark,.section-head h2{font-family:var(--font-display);}
  
-  header.top{background:var(--ink);color:#fff;padding:26px 0;margin-bottom:26px;box-shadow:0 1px 0 rgba(0,0,0,.25);}
+  header.top{background:linear-gradient(135deg,#141B24 0%,#1C2531 100%);color:#fff;padding:28px 0;margin-bottom:26px;box-shadow:0 1px 0 rgba(0,0,0,.25);border-bottom:3px solid var(--amber);}
   header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}
   .brandmark{display:flex;align-items:baseline;gap:12px;}
   .brandmark .dot{width:11px;height:11px;border-radius:50%;background:var(--amber);display:inline-block;transform:translateY(-2px);box-shadow:0 0 0 3px rgba(200,135,30,.25);}
@@ -66,9 +66,9 @@
   .lead-main.locked, .loc-table tbody tr.inert{cursor:default;}
   .filters select:disabled{opacity:.55;cursor:not-allowed;}
  
-  section{margin-bottom:34px;}
-  .section-head{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 12px;flex-wrap:wrap;gap:6px;}
-  .section-head h2{font-size:17px;font-weight:700;margin:0;letter-spacing:-0.01em;}
+  section{margin-bottom:38px;}
+  .section-head{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 14px;flex-wrap:wrap;gap:6px;padding-left:13px;border-left:3px solid var(--amber);}
+  .section-head h2{font-size:21px;font-weight:600;margin:0;letter-spacing:-0.01em;line-height:1.15;}
   .section-head .hint{font-size:12.5px;color:var(--muted);}
  
   .panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px;}
@@ -137,6 +137,7 @@
   .coverage-badge{font-size:10px;font-weight:700;color:var(--coral);background:var(--coral-soft);border-radius:4px;padding:2px 6px;margin-left:6px;white-space:nowrap;}
   .log-form .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
   .log-form label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px;}
+  .logged-by-display{font-size:13px;padding:7px 9px;color:var(--text);font-weight:600;}
   .log-form select, .log-form input[type=date], .log-form textarea, .log-form input[type=text]{
     width:100%;font-family:inherit;font-size:13px;padding:7px 9px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--text);
   }
@@ -167,6 +168,7 @@
   /* leaderboard */
   .week-label{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:14px;}
   .range-controls{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+  .analytics-range-panel{margin-bottom:20px;border-top:3px solid var(--ink);}
   .range-presets{display:flex;gap:6px;flex-wrap:wrap;}
   .range-preset-btn{font-size:12px;padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:#fff;cursor:pointer;color:var(--muted);}
   .range-preset-btn.active{background:var(--teal);color:#fff;border-color:var(--teal);}
@@ -215,6 +217,28 @@
   .legend-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
   .chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);border:1px solid var(--border);border-radius:20px;padding:3px 10px 3px 8px;}
   .chip .sw{width:8px;height:8px;border-radius:50%;}
+ 
+  .funnel-conversions{display:flex;justify-content:space-between;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;}
+  .funnel-conversions .fc-item{text-align:center;flex:1;min-width:70px;}
+  .funnel-conversions .fc-pct{font-size:15px;font-weight:700;color:var(--teal);font-family:var(--font-display);}
+  .funnel-conversions .fc-pct.weak{color:var(--coral);}
+  .funnel-conversions .fc-lbl{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.3;}
+ 
+  .channel-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #F1EEE4;}
+  .channel-row:last-child{border-bottom:none;}
+  .channel-row .ch-name{font-size:13px;font-weight:600;width:80px;flex-shrink:0;}
+  .channel-row .ch-bar-wrap{flex:1;}
+  .channel-row .ch-bar{height:8px;border-radius:4px;background:#EEE9DC;overflow:hidden;}
+  .channel-row .ch-bar i{display:block;height:100%;border-radius:4px;background:var(--teal);}
+  .channel-row .ch-meta{font-size:11px;color:var(--muted);margin-top:3px;}
+  .channel-row .ch-pct{font-size:16px;font-weight:700;color:var(--text);font-family:var(--font-display);width:52px;text-align:right;flex-shrink:0;}
+ 
+  .avg-cycle-big{display:flex;align-items:baseline;gap:10px;}
+  .avg-cycle-big .num{font-size:48px;font-weight:600;font-family:var(--font-display);color:var(--ink);}
+  .avg-cycle-big .unit{font-size:15px;color:var(--muted);}
+  .avg-cycle-sample{font-size:12px;color:var(--muted);margin-top:8px;}
+ 
+  .lb-booked-badge{display:inline-block;font-size:10px;font-weight:700;color:var(--teal);background:var(--teal-soft);border-radius:10px;padding:1px 7px;margin-left:6px;}
  
   /* locations table */
   table{width:100%;border-collapse:collapse;font-size:13px;}
@@ -358,6 +382,32 @@
   </div>
 </div>
  
+<div class="modal-overlay" id="welcome-name-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Welcome — what's your name?</h3>
+    </div>
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 12px;">This is shown as "Logged by" everywhere you log an outcome or a task. It's set once and stays consistent — you can always fix a typo later from the box in the header.</p>
+    <label>Your name</label>
+    <input type="text" id="welcome-name-input" placeholder="e.g. Jordan Smith">
+    <div id="welcome-name-error" style="color:#D9583D;font-size:12.5px;margin-top:8px;display:none;">Enter your name to continue.</div>
+    <div class="modal-actions">
+      <button class="btn primary" id="welcome-name-save" style="width:100%;">Continue</button>
+    </div>
+  </div>
+</div>
+ 
+<div class="modal-overlay" id="trash-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Recently deleted accounts</h3>
+      <button class="modal-close" id="trash-close">✕</button>
+    </div>
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 10px;">Deleted accounts land here instead of disappearing outright — restore one if it was a mistake.</p>
+    <div id="trash-list"></div>
+  </div>
+</div>
+ 
 <header class="top">
   <div class="wrap">
     <div>
@@ -423,10 +473,11 @@
       <div class="task-form">
         <input type="text" id="task-title" placeholder="Task, e.g. Call back about pricing">
         <input type="text" id="task-company" placeholder="Company (optional)">
-        <input type="text" id="task-assignee" placeholder="Assigned to">
+        <input type="text" id="task-assignee" placeholder="Assigned to" list="known-names-list">
         <select id="task-location"><option value="">General (visible to everyone)</option></select>
         <input type="date" id="task-due">
         <button class="btn primary" id="task-add-btn">Add task</button>
+        <datalist id="known-names-list"></datalist>
       </div>
       <div class="task-toggle">
         <button class="active" data-f="open">Open</button>
@@ -466,7 +517,8 @@
       <h2>Lead explorer</h2>
       <span class="hint">Click an account name to view its full history, outreach, and contacts</span>
     </div>
-    <div class="explorer-toolbar">
+    <div class="explorer-toolbar" style="justify-content:space-between;">
+      <button class="btn ghost" id="view-trash-btn">🗑 View deleted accounts</button>
       <button class="btn primary" id="add-prospect-btn-2">+ Add new prospect</button>
     </div>
     <div class="filters">
@@ -497,8 +549,27 @@
  
   <div id="tab-analytics" style="display:none;">
  
+  <div class="panel analytics-range-panel">
+    <div class="range-controls" style="border:none;margin:0;padding:0;">
+      <div class="range-presets">
+        <button class="range-preset-btn active" data-preset="week">This Week</button>
+        <button class="range-preset-btn" data-preset="lastweek">Last Week</button>
+        <button class="range-preset-btn" data-preset="month">This Month</button>
+        <button class="range-preset-btn" data-preset="30d">Last 30 Days</button>
+        <button class="range-preset-btn" data-preset="all">All Time</button>
+      </div>
+      <div class="range-custom">
+        <input type="date" id="range-start-input">
+        <span>to</span>
+        <input type="date" id="range-end-input">
+        <button class="btn small" id="range-apply-btn">Apply</button>
+      </div>
+    </div>
+    <div class="week-label" id="week-label" style="margin:10px 0 0;">Week of —</div>
+  </div>
+ 
   <div class="explorer-toolbar" style="justify-content:space-between;align-items:center;">
-    <span class="hint">Export a snapshot of every lead in view, with current status and activity history</span>
+    <span class="hint">Everything below reflects the date range selected above</span>
     <button class="btn" id="export-csv-btn">⬇ Export to CSV</button>
   </div>
  
@@ -515,22 +586,6 @@
         <button data-mode="park">By Park</button>
         <button data-mode="accounts">Accounts Reached</button>
       </div>
-      <div class="range-controls">
-        <div class="range-presets">
-          <button class="range-preset-btn active" data-preset="week">This Week</button>
-          <button class="range-preset-btn" data-preset="lastweek">Last Week</button>
-          <button class="range-preset-btn" data-preset="month">This Month</button>
-          <button class="range-preset-btn" data-preset="30d">Last 30 Days</button>
-          <button class="range-preset-btn" data-preset="all">All Time</button>
-        </div>
-        <div class="range-custom">
-          <input type="date" id="range-start-input">
-          <span>to</span>
-          <input type="date" id="range-end-input">
-          <button class="btn small" id="range-apply-btn">Apply</button>
-        </div>
-      </div>
-      <div class="week-label" id="week-label">Week of —</div>
       <div class="week-kpis" id="week-kpis"></div>
       <div class="lb-header-row" id="lb-header-row">
         <div class="lb-header-rank"></div>
@@ -544,16 +599,42 @@
   </section>
  
   <section>
+    <div class="section-head">
+      <h2>Activity trend</h2>
+      <span class="hint">Attempts and bookings by week, last 10 weeks — is momentum building or fading?</span>
+    </div>
+    <div class="panel">
+      <canvas id="chart-trend" height="90"></canvas>
+    </div>
+  </section>
+ 
+  <section>
     <div class="chart-row">
       <div class="panel">
         <div class="panel-title">Pipeline funnel</div>
-        <div class="panel-sub">Where accounts drop off, stage by stage</div>
+        <div class="panel-sub" id="funnel-sub">Where accounts drop off, stage by stage</div>
         <canvas id="chart-funnel" height="220"></canvas>
+        <div id="funnel-conversions" class="funnel-conversions"></div>
       </div>
+      <div class="panel">
+        <div class="panel-title">Which channels actually work</div>
+        <div class="panel-sub">Share of touched accounts that reached In Conversation or Booked, by channel</div>
+        <div id="channel-effectiveness"></div>
+      </div>
+    </div>
+  </section>
+ 
+  <section>
+    <div class="chart-row">
       <div class="panel">
         <div class="panel-title">Needs attention</div>
         <div class="panel-sub" id="stale-sub">Promising deals with no activity in 14+ days</div>
         <div id="stale-list"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Average sales cycle</div>
+        <div class="panel-sub">From first attempt to Booked, across every booked account in view</div>
+        <div id="avg-cycle-display"></div>
       </div>
     </div>
   </section>
@@ -806,7 +887,7 @@ const LEAD_BY_ID = new Map();
 /* Pull the base lead list from Supabase and rebuild LEADS/LEAD_BY_ID in the same shape the rest of the app expects. */
 async function loadLeadsFromSupabase(){
   try{
-    const rows = await supaSelect('leads', 'select=*');
+    const rows = await supaSelect('leads', 'select=*&deleted_at=is.null');
     rows.forEach(row=>{
       const r = {
         id: row.id, b: row.brand, l: row.location, c: row.company, n: row.contact, t: row.title,
@@ -842,6 +923,56 @@ async function loadMyCadence(){
     if (rows.length) myCadence = rows[0].cadence_overrides || {};
   } catch(e){ console.error('cadence load failed', e); }
 }
+ 
+/* ---------------- IDENTITY (canonical, tied to login — not re-typed per attempt) ---------------- */
+function promptForNameModal(){
+  return new Promise((resolve)=>{
+    const overlay = document.getElementById('welcome-name-overlay');
+    const input = document.getElementById('welcome-name-input');
+    const err = document.getElementById('welcome-name-error');
+    const btn = document.getElementById('welcome-name-save');
+    input.value = '';
+    err.style.display = 'none';
+    overlay.style.display = 'flex';
+    function submit(){
+      const val = input.value.trim();
+      if (!val){ err.style.display = 'block'; input.focus(); return; }
+      overlay.style.display = 'none';
+      btn.removeEventListener('click', submit);
+      input.removeEventListener('keydown', onKey);
+      resolve(val);
+    }
+    function onKey(e){ if (e.key==='Enter') submit(); }
+    btn.addEventListener('click', submit);
+    input.addEventListener('keydown', onKey);
+    setTimeout(()=>input.focus(), 60);
+  });
+}
+async function loadOrPromptMyProfile(){
+  if (!authUserEmail) return;
+  try{
+    const rows = await supaSelect('rep_profile', `select=display_name&user_email=eq.${encodeURIComponent(authUserEmail)}`);
+    if (rows.length && rows[0].display_name){
+      myName = rows[0].display_name;
+      document.getElementById('me-input').value = myName;
+      const ta = document.getElementById('task-assignee'); if (ta) ta.value = myName;
+      return;
+    }
+  } catch(e){ console.error('profile load failed', e); }
+  // No profile yet — ask once, then it's fixed going forward (editable via the name box, which now saves back here too).
+  const name = await promptForNameModal();
+  myName = name;
+  document.getElementById('me-input').value = myName;
+  const ta = document.getElementById('task-assignee'); if (ta) ta.value = myName;
+  await saveMyProfile(myName);
+}
+async function saveMyProfile(name){
+  if (!authUserEmail || !name) return;
+  try {
+    await supaUpsert('rep_profile', [{ user_email: authUserEmail, display_name: name, updated_at: new Date().toISOString() }]);
+  } catch(e){ console.error('profile save failed', e); }
+}
+ 
 function cadenceDaysFor(status){
   return (myCadence && myCadence[status] != null) ? myCadence[status] : (CADENCE_DAYS[status] ?? 3);
 }
@@ -904,17 +1035,14 @@ const STATUS_COLORS = {
   'Day 1 Sent':'#35638F','Called – No Answer':'#8B95A1','No Status':'#B7AF98',
   'Day 3 Sent':'#5C87AD','Day 7 Sent':'#7FA3C2','In Conversation':'#E0932E',
   'Not Interested':'#D9583D','Booked':'#1F7A6C','Paused':'#B98A55',
-  'Follow-up Sent':'#C7A25E','In Person Visit':'#6A5A8C','Tour Scheduled':'#2FA294',
-  'Follow-up/Assigned':'#A8916B','Developing':'#9C6B3E','Proposal Sent':'#3F8F8F',
-  'Sent over intro email with corp deck':'#B0A98F'
+  'Tour Scheduled':'#2FA294','Proposal Sent':'#3F8F8F'
 };
 const ALL_STATUSES = ['No Status','Day 1 Sent','Called – No Answer','Day 3 Sent','Day 7 Sent','In Conversation',
-  'Follow-up Sent','Tour Scheduled','Proposal Sent','Paused','Developing','In Person Visit','Booked','Not Interested'];
+  'Tour Scheduled','Proposal Sent','Paused','Booked','Not Interested'];
  
 const CADENCE_DAYS = {
   'Day 1 Sent':3, 'Called – No Answer':3, 'Day 3 Sent':4, 'Day 7 Sent':7,
-  'In Conversation':3, 'Follow-up Sent':3, 'Follow-up/Assigned':3,
-  'Paused':14, 'Developing':5, 'Proposal Sent':3, 'Tour Scheduled':2
+  'In Conversation':3, 'Paused':14, 'Proposal Sent':3, 'Tour Scheduled':2
 };
 const NO_FOLLOWUP = new Set(['Booked','Not Interested']);
  
@@ -1007,6 +1135,9 @@ function repLabel(brand, location){
   if (!r) return null;
   return r.secondary ? `${r.primary} (+ ${r.secondary})` : r.primary;
 }
+const KNOWN_NAMES = [...new Set(Object.values(REP_ASSIGNMENTS).flatMap(r=> r.secondary ? [r.primary, r.secondary] : [r.primary]))].sort();
+const knownNamesList = document.getElementById('known-names-list');
+if (knownNamesList){ KNOWN_NAMES.forEach(n=> knownNamesList.insertAdjacentHTML('beforeend', `<option value="${esc(n)}">`)); }
 function locKey(brand, location){ return brand+'|||'+location; }
 function inScope(brand, location){
   return viewLocations.size===0 || viewLocations.has(locKey(brand, location));
@@ -1101,13 +1232,7 @@ async function loadAll(){
   await loadLeadsFromSupabase(); // note: new prospects are already rows in the leads table (is_new=true), so no separate step needed
   await loadContactsFromSupabase();
   await loadMyCadence();
- 
-  myName = localStorage.getItem('fsp_me') || '';
-  if (myName){
-    document.getElementById('me-input').value = myName;
-    const ta = document.getElementById('task-assignee'); if (ta) ta.value = myName;
-  }
- 
+  await loadOrPromptMyProfile();
   try {
     const rawLocs = localStorage.getItem('fsp_view_locations');
     if (rawLocs){
@@ -1195,11 +1320,14 @@ async function saveTask(task){
   } catch(e){ console.error('task save failed', e); alert('Could not save the task — try again.'); }
 }
  
-document.getElementById('me-input').addEventListener('change', (e)=>{
-  myName = e.target.value.trim();
+document.getElementById('me-input').addEventListener('change', async (e)=>{
+  const val = e.target.value.trim();
+  if (!val){ e.target.value = myName; return; } // don't allow clearing your identity to blank
+  myName = val;
   const ta = document.getElementById('task-assignee');
   if (ta && !ta.value.trim()) ta.value = myName;
-  localStorage.setItem('fsp_me', myName);
+  await saveMyProfile(myName);
+  renderAll();
 });
  
 /* ---------------- LOCATION PICKER (multi-select "Viewing" control) ---------------- */
@@ -1276,39 +1404,49 @@ function scopedTasks(){
 }
 function renderKPIs(){
   const leads = scopedLeads();
-  let loggedToday = 0;
-  const todayStr = todayISO();
+  const scopedIds = new Set(leads.map(r=>r.id));
+ 
+  let attemptsInRange = 0, bookedInRange = 0;
   leads.forEach(r=>{
     const ov = overrides[r.id];
-    if (ov) (ov.activity||[]).forEach(a=>{ if (a.date === todayStr) loggedToday++; });
+    if (!ov || !ov.activity) return;
+    ov.activity.forEach(a=>{
+      if (a.date < rangeStart || a.date > rangeEnd) return;
+      const chans = (a.channels&&a.channels.length) ? a.channels : ['other'];
+      attemptsInRange += chans.length;
+      if (a.outcome === 'booked') bookedInRange++;
+    });
   });
-  const liveBooked = leads.filter(r=>getEffective(r).status==='Booked').length;
+  const newInRange = leads.filter(r=>{
+    if (!r.isNew || !r.addedAt) return false;
+    const d = r.addedAt.slice(0,10);
+    return d >= rangeStart && d <= rangeEnd;
+  }).length;
   const liveInConv = leads.filter(r=>getEffective(r).status==='In Conversation').length;
   const openTasks = scopedTasks().filter(t=>!t.done).length;
  
-  let totalLogged, totalCalled;
+  let totalLogged;
   if (viewLocations.size===0){
     totalLogged = TOTAL.logged + LEADS.filter(r=>r.isNew).length;
-    totalCalled = TOTAL.called;
   } else {
-    totalLogged = 0; totalCalled = 0;
+    totalLogged = 0;
     selectedLocsArray().forEach(sel=>{
       const row = LOCS.find(l=>l.brand===sel.brand && l.location===sel.location);
       totalLogged += (row ? row.logged : 0) + newLeadsCountFor(sel.brand, sel.location);
-      totalCalled += row ? row.called : 0;
     });
   }
+  const prevAttempts = previousPeriodTeamTotal();
  
   const kpis = [
-    {lbl:'Leads Logged', val:totalLogged, cls:''},
-    {lbl:'Called (all-time)', val:totalCalled, cls:'accent-blue', sub:pct(totalCalled,totalLogged)+'% of logged'},
-    {lbl:'Booked (live)', val:liveBooked, cls:'accent-teal', sub:pct(liveBooked,totalLogged)+'% conversion'},
-    {lbl:'In Conversation (live)', val:liveInConv, cls:'accent-amber'},
-    {lbl:'Open Tasks', val:openTasks, cls:'accent-coral'},
-    {lbl:'Logged Today', val:loggedToday, cls:'accent-teal', sub:'activity entries logged'}
+    {lbl:'Attempts in range', val:attemptsInRange, cls:'accent-teal', trend:trendBadge(attemptsInRange, prevAttempts)},
+    {lbl:'New prospects in range', val:newInRange, cls:'accent-blue'},
+    {lbl:'Booked in range', val:bookedInRange, cls:'accent-teal'},
+    {lbl:'In Conversation (live)', val:liveInConv, cls:'accent-amber', sub:'current pipeline, not range-based'},
+    {lbl:'Open Tasks', val:openTasks, cls:'accent-coral', sub:'current, not range-based'},
+    {lbl:'Leads Logged (all-time)', val:totalLogged, cls:'', sub:'from the original import'}
   ];
   document.getElementById('kpi-row').innerHTML = kpis.map(k=>`
-    <div class="kpi ${k.cls}"><div class="lbl">${k.lbl}</div><div class="val">${fmt(k.val)}</div>${k.sub?`<div class="sub">${k.sub}</div>`:''}</div>
+    <div class="kpi ${k.cls}"><div class="lbl">${k.lbl}</div><div class="val">${fmt(k.val)} ${k.trend||''}</div>${k.sub?`<div class="sub">${k.sub}</div>`:''}</div>
   `).join('');
 }
  
@@ -1507,7 +1645,7 @@ function renderLogForm(container, leadId){
         </div>
         <div>
           <label>Logged by</label>
-          <input type="text" class="lf-by" value="${esc(myName)}" placeholder="Your name">
+          <div class="logged-by-display">${esc(myName)}</div>
         </div>
       </div>
       <div class="lf-next-hint" style="display:none;"></div>
@@ -1582,12 +1720,8 @@ function renderLogForm(container, leadId){
   container.querySelector('.lf-save').addEventListener('click', async ()=>{
     const selectedChannels = channelChecks.filter(c=>c.checked).map(c=>c.value);
     if (!selectedChannels.length){ alert('Pick at least one way you reached out today (call, email, LinkedIn, or in person).'); return; }
-    const by = container.querySelector('.lf-by').value.trim() || 'someone';
-    if (container.querySelector('.lf-by').value.trim()){
-      myName = container.querySelector('.lf-by').value.trim();
-      document.getElementById('me-input').value = myName;
-      localStorage.setItem('fsp_me', myName);
-    }
+    if (!myName){ alert('Set your name up top before logging an attempt.'); return; }
+    const by = myName;
     const note = container.querySelector('.lf-note').value.trim();
     const today = todayISO();
     const callChecked = selectedChannels.includes('call');
@@ -1777,7 +1911,59 @@ function addTaskForLead(r){
  
 /* ---------------- CHARTS ---------------- */
 /* ---------------- PIPELINE FUNNEL ---------------- */
+/* ---------------- ACTIVITY TREND (last 10 weeks) ---------------- */
+let trendChart;
+function computeWeeklyTrend(weeksBack){
+  const scopedIds = new Set(scopedLeads().map(r=>r.id));
+  const buckets = [];
+  let cursor = mondayOf(new Date());
+  for (let i=0;i<weeksBack;i++){
+    const start = new Date(cursor);
+    const end = weekEndOf(start);
+    buckets.unshift({ startISO: toISO(start), endISO: toISO(end), label: fmtShort(start), attempts:0, booked:0 });
+    cursor.setDate(cursor.getDate()-7);
+  }
+  LEADS.forEach(r=>{
+    if (!scopedIds.has(r.id)) return;
+    const ov = overrides[r.id];
+    if (!ov || !ov.activity) return;
+    ov.activity.forEach(a=>{
+      const b = buckets.find(bk=> a.date>=bk.startISO && a.date<=bk.endISO);
+      if (!b) return;
+      const chans = (a.channels&&a.channels.length) ? a.channels : ['other'];
+      b.attempts += chans.length;
+      if (a.outcome==='booked') b.booked += 1;
+    });
+  });
+  return buckets;
+}
+function renderTrendChart(){
+  const canvas = document.getElementById('chart-trend');
+  if (!canvas) return;
+  const buckets = computeWeeklyTrend(10);
+  if (trendChart) trendChart.destroy();
+  trendChart = new Chart(canvas, {
+    data:{
+      labels: buckets.map(b=>b.label),
+      datasets:[
+        { type:'bar', label:'Attempts', data: buckets.map(b=>b.attempts), backgroundColor:'#D8CDA8', borderRadius:4, order:2, yAxisID:'y' },
+        { type:'line', label:'Booked', data: buckets.map(b=>b.booked), borderColor:'#1C7A6C', backgroundColor:'#1C7A6C', tension:.35, pointRadius:4, pointBackgroundColor:'#1C7A6C', borderWidth:2.5, order:1, yAxisID:'y1' }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'top', align:'end', labels:{boxWidth:10,font:{size:11.5}}} },
+      scales:{
+        x:{ grid:{display:false}, ticks:{font:{size:11}} },
+        y:{ position:'left', beginAtZero:true, grid:{color:'#EFEBE1'}, title:{display:true,text:'Attempts',font:{size:11}} },
+        y1:{ position:'right', beginAtZero:true, grid:{display:false}, ticks:{precision:0}, title:{display:true,text:'Booked',font:{size:11}} }
+      }
+    }
+  });
+}
+ 
 let funnelChart;
+ 
 function computeFunnelData(){
   let logged=0, called=0, contacted=0;
   if (viewLocations.size===0){
@@ -1814,10 +2000,105 @@ function renderFunnelChart(){
       }}}},
       scales:{ x:{beginAtZero:true, grid:{color:'#EFEBE1'}}, y:{grid:{display:false}, ticks:{font:{size:12,weight:600}}} } }
   });
+  const overallSub = document.getElementById('funnel-sub');
+  if (overallSub){
+    const overall = data[0][1]>0 ? Math.round((data[data.length-1][1]/data[0][1])*100) : 0;
+    overallSub.textContent = `Where accounts drop off, stage by stage — ${overall}% overall logged-to-booked`;
+  }
+  const convEl = document.getElementById('funnel-conversions');
+  if (convEl){
+    const items = [];
+    for (let i=1;i<data.length;i++){
+      const from = data[i-1][1], to = data[i][1];
+      const pct = from>0 ? Math.round((to/from)*100) : 0;
+      items.push(`<div class="fc-item"><div class="fc-pct ${pct<25?'weak':''}">${pct}%</div><div class="fc-lbl">${esc(data[i-1][0])} →<br>${esc(data[i][0])}</div></div>`);
+    }
+    convEl.innerHTML = items.join('');
+  }
+}
+ 
+/* ---------------- CHANNEL EFFECTIVENESS ---------------- */
+function computeChannelEffectiveness(){
+  const scopedIds = new Set(scopedLeads().map(r=>r.id));
+  const stats = {};
+  CHANNELS.forEach(c=> stats[c.v] = {label:c.label, touches:0, leads:new Set(), successLeads:new Set()});
+  LEADS.forEach(r=>{
+    if (!scopedIds.has(r.id)) return;
+    const ov = overrides[r.id];
+    if (!ov || !ov.activity || !ov.activity.length) return;
+    const eff = getEffective(r);
+    const isSuccess = eff.status==='Booked' || eff.status==='In Conversation';
+    ov.activity.forEach(a=>{
+      const chans = (a.channels&&a.channels.length) ? a.channels : [];
+      chans.forEach(c=>{
+        if (!stats[c]) stats[c] = {label:c, touches:0, leads:new Set(), successLeads:new Set()};
+        stats[c].touches++;
+        stats[c].leads.add(r.id);
+        if (isSuccess) stats[c].successLeads.add(r.id);
+      });
+    });
+  });
+  return Object.values(stats)
+    .filter(s=>s.touches>0)
+    .map(s=>({ label:s.label, touches:s.touches, leadCount:s.leads.size, successRate: s.leads.size ? Math.round((s.successLeads.size/s.leads.size)*100) : 0 }))
+    .sort((a,b)=>b.successRate-a.successRate);
+}
+function renderChannelEffectiveness(){
+  const el = document.getElementById('channel-effectiveness');
+  if (!el) return;
+  const rows = computeChannelEffectiveness();
+  if (!rows.length){
+    el.innerHTML = `<div class="empty-state">No channel activity logged yet${scopeSuffix()}.</div>`;
+    return;
+  }
+  const maxRate = Math.max(...rows.map(r=>r.successRate), 1);
+  el.innerHTML = rows.map(r=>`
+    <div class="channel-row">
+      <div class="ch-name">${esc(r.label)}</div>
+      <div class="ch-bar-wrap">
+        <div class="ch-bar"><i style="width:${Math.round((r.successRate/Math.max(maxRate,25))*100)}%;"></i></div>
+        <div class="ch-meta">${fmt(r.touches)} touches · ${fmt(r.leadCount)} accounts</div>
+      </div>
+      <div class="ch-pct">${r.successRate}%</div>
+    </div>
+  `).join('');
+}
+ 
+/* ---------------- AVERAGE SALES CYCLE ---------------- */
+function computeAvgDaysToBook(){
+  const scopedIds = new Set(scopedLeads().map(r=>r.id));
+  const diffs = [];
+  LEADS.forEach(r=>{
+    if (!scopedIds.has(r.id)) return;
+    const ov = overrides[r.id];
+    if (!ov || !ov.activity || !ov.activity.length) return;
+    if (getEffective(r).status !== 'Booked') return;
+    const bookedEntry = ov.activity.find(a=>a.outcome==='booked');
+    const firstDate = ov.activity[0].date;
+    if (bookedEntry && firstDate){
+      const d = daysBetween(firstDate, bookedEntry.date);
+      if (d>=0) diffs.push(d);
+    }
+  });
+  if (!diffs.length) return null;
+  return { avg: Math.round(diffs.reduce((s,d)=>s+d,0)/diffs.length), count: diffs.length };
+}
+function renderAvgCycle(){
+  const el = document.getElementById('avg-cycle-display');
+  if (!el) return;
+  const result = computeAvgDaysToBook();
+  if (!result){
+    el.innerHTML = `<div class="empty-state">No bookings with a logged first-attempt date yet${scopeSuffix()}.</div>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="avg-cycle-big"><span class="num">${result.avg}</span><span class="unit">days, on average</span></div>
+    <div class="avg-cycle-sample">Based on ${result.count} booked account${result.count===1?'':'s'} with logged activity${scopeSuffix()}</div>
+  `;
 }
  
 /* ---------------- NEEDS ATTENTION (stale, promising deals) ---------------- */
-const STALE_STATUSES = new Set(['In Conversation','Tour Scheduled','Proposal Sent','Follow-up Sent','Follow-up/Assigned']);
+const STALE_STATUSES = new Set(['In Conversation','Tour Scheduled','Proposal Sent']);
 function getStaleAccounts(){
   const today = todayISO();
   return scopedLeads()
@@ -2145,7 +2426,7 @@ function renderBulkLogForm(){
         </div>
         <div>
           <label>Logged by</label>
-          <input type="text" class="blf-by" value="${esc(myName)}" placeholder="Your name">
+          <div class="logged-by-display">${esc(myName)}</div>
         </div>
       </div>
       <label>Note</label>
@@ -2162,9 +2443,10 @@ function renderBulkLogForm(){
   document.getElementById('blf-save').addEventListener('click', async ()=>{
     const channels = [...slot.querySelectorAll('.blf-channel')].filter(c=>c.checked).map(c=>c.value);
     if (!channels.length){ alert('Pick at least one way you reached out (call, email, LinkedIn, or in person).'); return; }
+    if (!myName){ alert('Set your name up top before logging an attempt.'); return; }
     const outcomeVal = slot.querySelector('.blf-outcome').value;
     const o = OUTCOME_OPTIONS.find(x=>x.v===outcomeVal);
-    const by = slot.querySelector('.blf-by').value.trim() || myName || 'someone';
+    const by = myName;
     const note = slot.querySelector('.blf-note').value.trim();
     const today = todayISO();
     const saveBtn = document.getElementById('blf-save');
@@ -2235,7 +2517,7 @@ function renderAccountModal(leadId){
       <div class="account-toolbar">
         <button class="btn small" id="acct-edit-btn">Edit account</button>
         <button class="btn small ${r.isApollo?'primary':'ghost'}" id="acct-apollo-btn">${r.isApollo ? '✓ Apollo lead — cadence paused' : 'Mark as Apollo lead'}</button>
-        <button class="btn small ghost" id="acct-delete-btn" style="color:var(--coral);border-color:var(--coral);">Delete account</button>
+        <button class="btn small ghost" id="acct-delete-btn" style="color:var(--coral);border-color:var(--coral);">Move to trash</button>
       </div>
       ${r.isApollo ? `<div class="coverage-warning" style="margin-top:8px;">This account is on the Apollo email cadence already — it won't show up in the automated follow-up queue.</div>` : ''}
       <div id="acct-edit-slot"></div>
@@ -2335,18 +2617,58 @@ async function toggleApollo(leadId){
 async function deleteAccount(leadId){
   const r = LEAD_BY_ID.get(Number(leadId)) || LEAD_BY_ID.get(leadId);
   if (!r) return;
-  if (!confirm(`Delete "${r.c}" permanently? This removes the account, its contacts, and its full activity history. This cannot be undone.`)) return;
+  if (!confirm(`Move "${r.c}" to trash? Its activity history and contacts stay intact — you can restore it later from "View deleted accounts" in the Lead Explorer.`)) return;
   try {
-    await supaDelete('leads', `id=eq.${encodeURIComponent(leadId)}`);
+    await supaUpdate('leads', `id=eq.${encodeURIComponent(leadId)}`, { deleted_at: new Date().toISOString() });
     const idx = LEADS.findIndex(x=>x.id===r.id);
     if (idx>-1) LEADS.splice(idx,1);
     LEAD_BY_ID.delete(r.id);
-    delete overrides[r.id];
-    delete leadContacts[r.id];
     closeAccountModal();
     renderAll();
   } catch(e){ console.error(e); alert('Could not delete — try again.'); }
 }
+ 
+/* ---------------- TRASH / RESTORE ---------------- */
+async function openTrash(){
+  document.getElementById('trash-overlay').style.display = 'flex';
+  const listEl = document.getElementById('trash-list');
+  listEl.innerHTML = `<div class="empty-state">Loading…</div>`;
+  try{
+    const rows = await supaSelect('leads', 'select=*&deleted_at=not.is.null&order=deleted_at.desc');
+    if (!rows.length){ listEl.innerHTML = `<div class="empty-state">Nothing in the trash right now.</div>`; return; }
+    listEl.innerHTML = rows.map(row=>{
+      const delDate = row.deleted_at ? new Date(row.deleted_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+      return `<div class="task-row">
+        <span class="title" style="flex:1;">${esc(row.company)} <span style="color:var(--muted);font-weight:400;font-size:11.5px;">— ${esc(row.brand)} · ${esc(row.location)} · deleted ${delDate}</span></span>
+        <button class="btn small primary" data-restore="${esc(row.id)}">Restore</button>
+      </div>`;
+    }).join('');
+    listEl.querySelectorAll('[data-restore]').forEach(btn=>{
+      btn.addEventListener('click', ()=> restoreAccount(btn.dataset.restore, rows));
+    });
+  } catch(e){ console.error(e); listEl.innerHTML = `<div class="empty-state">Could not load the trash — try again.</div>`; }
+}
+async function restoreAccount(id, rows){
+  try{
+    await supaUpdate('leads', `id=eq.${encodeURIComponent(id)}`, { deleted_at: null });
+    const row = rows.find(x=>x.id===id);
+    if (row && !LEAD_BY_ID.has(row.id)){
+      const r = {
+        id: row.id, b: row.brand, l: row.location, c: row.company, n: row.contact, t: row.title,
+        p: row.phone, e: row.email, dc: row.date_called, de: row.date_emailed, li: row.linkedin,
+        dt: row.date_contacted, s: row.base_status || 'No Status', note: row.notes,
+        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo
+      };
+      LEADS.push(r);
+      LEAD_BY_ID.set(r.id, r);
+    }
+    renderAll();
+    openTrash();
+  } catch(e){ console.error(e); alert('Could not restore — try again.'); }
+}
+document.getElementById('view-trash-btn').addEventListener('click', openTrash);
+document.getElementById('trash-close').addEventListener('click', ()=>{ document.getElementById('trash-overlay').style.display = 'none'; });
+document.getElementById('trash-overlay').addEventListener('click', (e)=>{ if (e.target.id==='trash-overlay') document.getElementById('trash-overlay').style.display = 'none'; });
  
 function toggleAddContactForm(leadId){
   const slot = document.getElementById('acct-add-contact-slot');
@@ -2504,7 +2826,9 @@ function applyRangePreset(preset){
   document.getElementById('range-start-input').value = rangeStart;
   document.getElementById('range-end-input').value = rangeEnd;
   document.querySelectorAll('.range-preset-btn').forEach(b=> b.classList.toggle('active', b.dataset.preset===preset));
+  renderKPIs();
   renderMetrics();
+  renderTrendChart();
 }
 document.querySelectorAll('.range-preset-btn').forEach(btn=>{
   btn.addEventListener('click', ()=> applyRangePreset(btn.dataset.preset));
@@ -2516,7 +2840,9 @@ document.getElementById('range-apply-btn').addEventListener('click', ()=>{
   if (s > e){ alert('Start date must be before end date.'); return; }
   rangeStart = s; rangeEnd = e; rangePreset = 'custom';
   document.querySelectorAll('.range-preset-btn').forEach(b=> b.classList.remove('active'));
+  renderKPIs();
   renderMetrics();
+  renderTrendChart();
 });
  
 let leaderboardMode = 'person'; // 'person' | 'park' | 'accounts'
@@ -2581,7 +2907,7 @@ function computeLeaderboard(){
   const scopedIds = new Set(scopedLeads().map(r=>r.id));
   const byPerson = {};
   function ensure(person){
-    if (!byPerson[person]) byPerson[person] = {total:0, call:0, email:0, linkedin:0, in_person:0, other:0, openTasks:0};
+    if (!byPerson[person]) byPerson[person] = {total:0, call:0, email:0, linkedin:0, in_person:0, other:0, openTasks:0, booked:0};
     return byPerson[person];
   }
   LEADS.forEach(r=>{
@@ -2594,6 +2920,7 @@ function computeLeaderboard(){
       const rec = ensure(person);
       const chans = (a.channels && a.channels.length) ? a.channels : ['other'];
       chans.forEach(c=>{ rec.total++; if (rec[c] !== undefined) rec[c]++; else rec.other++; });
+      if (a.outcome === 'booked') rec.booked++;
     });
   });
   scopedTasks().forEach(t=>{
@@ -2789,7 +3116,7 @@ function renderMetrics(){
     return `<div class="lb-row rank-${rank<=3?rank:''}">
       <div class="lb-rank">${rank<=3 ? ['🥇','🥈','🥉'][rank-1] : rank}</div>
       <div class="lb-info">
-        <div class="lb-name ${isMe?'me':''}">${esc(name)}${isMe?' (you)':''}</div>
+        <div class="lb-name ${isMe?'me':''}">${esc(name)}${isMe?' (you)':''}${d.booked?`<span class="lb-booked-badge">🏆 ${d.booked} booked</span>`:''}</div>
         <div class="lb-breakdown">${breakdown||'—'}</div>
       </div>
       <div class="lb-tasks">${d.openTasks ? `<span class="task-count-badge">${d.openTasks}</span>` : '<span class="task-count-zero">0</span>'}</div>
@@ -2812,6 +3139,9 @@ function renderAll(){
   renderMetrics();
   renderCharts();
   renderFunnelChart();
+  renderTrendChart();
+  renderChannelEffectiveness();
+  renderAvgCycle();
   renderStaleAccounts();
   renderLocTable();
   applyFilters();
@@ -2861,6 +3191,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
         if (loggedChart) loggedChart.resize();
         if (statusChart) statusChart.resize();
         if (funnelChart) funnelChart.resize();
+        if (trendChart) trendChart.resize();
       });
     }
   });
