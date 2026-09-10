@@ -817,7 +817,7 @@ async function loginWithPassword(email, password){
   if (!res.ok) throw new Error(data.error_description || data.msg || 'Login failed — check your email and password.');
   authAccessToken = data.access_token;
   authRefreshToken = data.refresh_token;
-  authUserEmail = data.user && data.user.email;
+  authUserEmail = (data.user && data.user.email || '').trim().toLowerCase();
   saveSession();
 }
 function logout(){
@@ -934,13 +934,23 @@ function promptForNameModal(){
     input.value = '';
     err.style.display = 'none';
     overlay.style.display = 'flex';
-    function submit(){
+    async function submit(){
       const val = input.value.trim();
-      if (!val){ err.style.display = 'block'; input.focus(); return; }
-      overlay.style.display = 'none';
-      btn.removeEventListener('click', submit);
-      input.removeEventListener('keydown', onKey);
-      resolve(val);
+      if (!val){ err.textContent = 'Enter your name to continue.'; err.style.display = 'block'; input.focus(); return; }
+      err.style.display = 'none';
+      btn.disabled = true; btn.textContent = 'Saving…';
+      try {
+        await supaUpsert('rep_profile', [{ user_email: authUserEmail, display_name: val, updated_at: new Date().toISOString() }]);
+        overlay.style.display = 'none';
+        btn.removeEventListener('click', submit);
+        input.removeEventListener('keydown', onKey);
+        resolve(val);
+      } catch(e){
+        console.error('profile save failed', e);
+        err.textContent = 'Could not save — check your connection and try again.';
+        err.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Continue';
+      }
     }
     function onKey(e){ if (e.key==='Enter') submit(); }
     btn.addEventListener('click', submit);
@@ -964,7 +974,7 @@ async function loadOrPromptMyProfile(){
   myName = name;
   document.getElementById('me-input').value = myName;
   const ta = document.getElementById('task-assignee'); if (ta) ta.value = myName;
-  await saveMyProfile(myName);
+  // (the modal already saved this to rep_profile before resolving — no extra save needed here)
 }
 async function saveMyProfile(name){
   if (!authUserEmail || !name) return;
