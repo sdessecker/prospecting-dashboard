@@ -647,7 +647,7 @@
   <section>
     <div class="section-head">
       <h2>Portfolio overview</h2>
-      <span class="hint">Status mix reflects live team activity; volumes are from the original tracker export</span>
+      <span class="hint">Current pipeline snapshot — doesn't follow the date range above; volumes are from the original tracker export</span>
     </div>
     <div class="chart-row">
       <div class="panel">
@@ -682,7 +682,7 @@
             <th class="num" data-key="booked">Booked</th>
             <th class="num" data-key="bookedRate">Booked rate</th>
             <th class="num" data-key="in_conv">In Conv.</th>
-            <th class="num" data-key="touched">Team activity</th>
+            <th class="num" data-key="touched">Activity in range</th>
           </tr>
         </thead>
         <tbody id="loc-tbody"></tbody>
@@ -2342,7 +2342,13 @@ function renderCharts(){
 let locSort = {key:'logged', dir:-1};
 function touchedCountFor(brand, location){
   let n = 0;
-  LEADS.forEach(r=>{ if (r.b===brand && r.l===location && overrides[r.id]) n++; });
+  LEADS.forEach(r=>{
+    if (r.b!==brand || r.l!==location) return;
+    const ov = overrides[r.id];
+    if (!ov || !ov.activity || !ov.activity.length) return;
+    const inRange = ov.activity.some(a => a.date >= rangeStart && a.date <= rangeEnd);
+    if (inRange) n++;
+  });
   return n;
 }
 function liveBookedCountFor(brand, location){
@@ -2360,7 +2366,7 @@ function renderLocTable(){
     if (typeof a[k]==='string') return a[k].localeCompare(b[k]) * locSort.dir;
     return (a[k]-b[k]) * locSort.dir;
   });
-  document.getElementById('loc-table-hint').textContent = 'Click a row to add or remove it from "Viewing" above';
+  document.getElementById('loc-table-hint').textContent = 'Logged/Called/Contacted/Booked are all-time totals; "Activity in range" follows the date range above · click a row to add or remove it from "Viewing"';
   document.getElementById('loc-tbody').innerHTML = rows.map(l=>{
     const selected = viewLocations.has(locKey(l.brand,l.location));
     const rep = repLabel(l.brand, l.location);
