@@ -1500,9 +1500,11 @@ function syncMsCheckboxes(){
 function renderLocationPicker(){
   syncMsCheckboxes();
   const n = viewLocations.size;
-  msBtn.textContent = (n===0 ? 'All locations' : n===1 ? selectedLocsArray()[0].location : `${n} locations selected`) + ' ▾';
+  const allSelected = n===0 || n===LOCATION_OPTIONS.length;
+  msBtn.textContent = (allSelected ? 'All locations' : n===1 ? selectedLocsArray()[0].location : `${n} locations selected`) + ' ▾';
   const banner = document.getElementById('scope-banner');
-  if (n>0){
+  const isGenuineSubset = n>0 && n<LOCATION_OPTIONS.length;
+  if (isGenuineSubset){
     const names = selectedLocsArray().map(a=>a.location).join(', ');
     banner.style.display='flex';
     banner.innerHTML = `<span>Viewing <strong>${n} location${n===1?'':'s'}</strong>: ${esc(names)}. Everything below — queue, tasks, leaderboard, charts — is scoped to just these.</span><button id="banner-clear">Show all locations</button>`;
