@@ -898,7 +898,7 @@ async function loadLeadsFromSupabase(){
         id: row.id, b: row.brand, l: row.location, c: row.company, n: row.contact, t: row.title,
         p: row.phone, e: row.email, dc: row.date_called, de: row.date_emailed, li: row.linkedin,
         dt: row.date_contacted, s: row.base_status || 'No Status', note: row.notes,
-        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo, rep: row.assigned_rep || null
+        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo, rep: row.assigned_rep || null, repEmail: row.assigned_rep_email || null
       };
       LEADS.push(r);
       LEAD_BY_ID.set(r.id, r);
@@ -963,6 +963,47 @@ function promptForNameModal(){
     setTimeout(()=>input.focus(), 60);
   });
 }
+/* ---------------- ROSTER (identity = login email; name is just the label) ---------------- */
+let REP_ROSTER = []; // [{email, name}] — every account that has set a display name
+async function loadRoster(){
+  try{
+    const rows = await supaSelect('rep_profile', 'select=user_email,display_name');
+    REP_ROSTER = rows
+      .filter(r=>r.user_email && r.display_name)
+      .map(r=>({ email: r.user_email.trim().toLowerCase(), name: r.display_name.trim() }));
+  } catch(e){ console.error('roster load failed', e); }
+}
+function rosterNameForEmail(email){
+  if (!email) return null;
+  const hit = REP_ROSTER.find(p=>p.email===email.trim().toLowerCase());
+  return hit ? hit.name : null;
+}
+function rosterEmailForName(name){
+  if (!name) return null;
+  const n = name.trim().toLowerCase();
+  const hit = REP_ROSTER.find(p=>p.name.toLowerCase()===n);
+  return hit ? hit.email : null;
+}
+/* Stable identity key for grouping: email when we have it, otherwise the (canonical) name.
+   Old activity logged before emails were recorded still groups correctly if the name matches a
+   roster entry — we resolve it to that person's email. */
+function identityKey(byEmail, byName){
+  if (byEmail) return byEmail.trim().toLowerCase();
+  const viaName = rosterEmailForName(byName);
+  if (viaName) return viaName;
+  return canonicalRepName(byName);
+}
+function identityLabel(key){
+  return rosterNameForEmail(key) || key;
+}
+/* Names to offer wherever a person is picked (filters, reassign). Roster first, then any hardcoded
+   park reps who haven't created an account yet. */
+function allRepNames(){
+  const names = new Set(REP_ROSTER.map(p=>p.name));
+  KNOWN_NAMES.forEach(n=>{ if (![...names].some(x=>x.toLowerCase()===n.toLowerCase())) names.add(n); });
+  return [...names].sort((a,b)=>a.localeCompare(b));
+}
+ 
 async function loadOrPromptMyProfile(){
   if (!authUserEmail) return;
   try{
@@ -985,6 +1026,9 @@ async function saveMyProfile(name){
   if (!authUserEmail || !name) return;
   try {
     await supaUpsert('rep_profile', [{ user_email: authUserEmail, display_name: name, updated_at: new Date().toISOString() }]);
+    // keep the in-memory roster in sync so the leaderboard relabels immediately
+    const me = REP_ROSTER.find(p=>p.email===authUserEmail);
+    if (me) me.name = name; else REP_ROSTER.push({ email: authUserEmail, name });
   } catch(e){ console.error('profile save failed', e); }
 }
  
@@ -1378,6 +1422,8 @@ async function loadAll(){
   await loadContactsFromSupabase();
   await loadMyCadence();
   await loadOrPromptMyProfile();
+  await loadRoster(); // after the profile prompt, so a first-time user is on the roster immediately
+  refreshRepPickers();
   try {
     const rawLocs = localStorage.getItem('fsp_view_locations');
     if (rawLocs){
@@ -1405,7 +1451,7 @@ async function loadAll(){
       if (!overrides[row.lead_id].activity) overrides[row.lead_id].activity = [];
       overrides[row.lead_id].activity.push({
         date: row.activity_date, channels: row.channels || [], callResult: row.call_result,
-        outcome: row.outcome, note: row.note, by: row.logged_by
+        outcome: row.outcome, note: row.note, by: row.logged_by, byEmail: row.logged_by_email || null
       });
     });
     Object.keys(overrides).forEach(id=>{
@@ -1450,7 +1496,7 @@ async function saveOverride(leadId, patch){
       await supaInsert('lead_activity', [{
         lead_id: String(leadId), activity_date: newEntry.date, channels: newEntry.channels || [],
         call_result: newEntry.callResult || null, outcome: newEntry.outcome || null,
-        note: newEntry.note || null, logged_by: newEntry.by || null
+        note: newEntry.note || null, logged_by: newEntry.by || null, logged_by_email: newEntry.byEmail || null
       }]);
     }
   } catch(e){ console.error('save failed', e); alert('Could not save — check your connection and try again.'); }
@@ -1571,7 +1617,13 @@ function leadOwner(r){
   const a = repFor(r.b, r.l);
   return a ? a.primary : null;
 }
+function leadOwnerEmail(r){
+  if (r.repEmail) return r.repEmail.trim().toLowerCase();
+  return rosterEmailForName(leadOwner(r));
+}
 function ownedByMe(r){
+  const oe = leadOwnerEmail(r);
+  if (oe && authUserEmail) return oe === authUserEmail;
   if (!myName) return false;
   const o = leadOwner(r);
   return !!o && o.trim().toLowerCase() === myName.trim().toLowerCase();
@@ -1912,7 +1964,7 @@ function renderLogForm(container, leadId){
     const entry = {
       date: today, channels: selectedChannels,
       callResult: callChecked ? callResultSel.value : null,
-      outcome: outcomeSel.value, note, by
+      outcome: outcomeSel.value, note, by, byEmail: authUserEmail || null
     };
     const existing = overrides[leadId] || {activity:[]};
     const activity = [...(existing.activity||[]), entry];
@@ -2045,14 +2097,14 @@ document.getElementById('add-prospect-save').addEventListener('click', async ()=
     dc: null, de: null, li: null, dt: null,
     s: chosenStatus,
     note: document.getElementById('np-notes').value.trim(),
-    isNew: true, addedBy: myName || 'someone', addedAt: new Date().toISOString(), isApollo, rep: myName || null
+    isNew: true, addedBy: myName || 'someone', addedAt: new Date().toISOString(), isApollo, rep: myName || null, repEmail: authUserEmail || null
   };
   try {
     await supaInsert('leads', [{
       id, brand, location, company,
       contact: rec.n, title: rec.t, phone: rec.p, email: rec.e,
       date_called: null, date_emailed: null, linkedin: null, date_contacted: null,
-      base_status: chosenStatus, notes: rec.note, is_new: true, added_by: rec.addedBy, is_apollo: isApollo, assigned_rep: myName || null
+      base_status: chosenStatus, notes: rec.note, is_new: true, added_by: rec.addedBy, is_apollo: isApollo, assigned_rep: myName || null, assigned_rep_email: authUserEmail || null
     }]);
   }
   catch(e){ console.error('save prospect failed', e); alert('Could not save — check your connection and try again.'); return; }
@@ -2502,7 +2554,14 @@ const flagCheckbox = document.getElementById('f-flag');
 Object.keys(BRAND_COLORS).sort().forEach(b=> brandSel.insertAdjacentHTML('beforeend', `<option value="${esc(b)}">${esc(b)}</option>`));
 ALL_STATUSES.forEach(s=> statusSel.insertAdjacentHTML('beforeend', `<option value="${esc(s)}">${esc(s)}</option>`));
 EVENTS_OPTIONS.filter(o=>o.v).forEach(o=> eventsSel.insertAdjacentHTML('beforeend', `<option value="${o.v}">${o.label}</option>`));
-KNOWN_NAMES.forEach(n=> repSel.insertAdjacentHTML('beforeend', `<option value="${esc(n)}">${esc(n)}</option>`));
+function refreshRepPickers(){
+  const keep = repSel.value;
+  repSel.innerHTML = '<option value="">All reps</option>' + allRepNames().map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  if ([...repSel.options].some(o=>o.value===keep)) repSel.value = keep;
+  const dl = document.getElementById('known-names-list');
+  if (dl) dl.innerHTML = allRepNames().map(n=>`<option value="${esc(n)}">`).join('');
+}
+refreshRepPickers();
 function updateLocationOptions(){
   const b = brandSel.value;
   const opts = [...new Set(LEADS.filter(r=>!b || r.b===b).map(r=>r.l))].sort();
@@ -2709,7 +2768,7 @@ function renderBulkLogForm(){
         nextFollowUp = d.toISOString().slice(0,10);
       }
       const existing = overrides[id] || {activity:[]};
-      const newEntry = { date: today, channels, callResult: null, outcome: outcomeVal, note, by };
+      const newEntry = { date: today, channels, callResult: null, outcome: outcomeVal, note, by, byEmail: authUserEmail || null };
       const activity = [...(existing.activity||[]), newEntry];
       const merged = {...existing, status: newStatus, lastContactDate: today, nextFollowUp, activity: activity.length>50?activity.slice(-50):activity};
       overrides[id] = merged;
@@ -2718,7 +2777,7 @@ function renderBulkLogForm(){
         await supaInsert('lead_activity', [{
           lead_id: String(id), activity_date: newEntry.date, channels: newEntry.channels || [],
           call_result: newEntry.callResult || null, outcome: newEntry.outcome || null,
-          note: newEntry.note || null, logged_by: newEntry.by || null
+          note: newEntry.note || null, logged_by: newEntry.by || null, logged_by_email: newEntry.byEmail || null
         }]);
       } catch(e){ console.error('bulk save failed for', id, e); }
     }));
@@ -2821,7 +2880,7 @@ function toggleEditAccountForm(leadId){
         <div><label>Email</label><input type="text" id="ea-email" value="${esc(r.e||'')}"></div>
       </div>
       <label>Assigned to</label>
-      <select id="ea-rep">${KNOWN_NAMES.map(n=>`<option value="${esc(n)}" ${(leadOwner(r)||'')===n?'selected':''}>${esc(n)}</option>`).join('')}</select>
+      <select id="ea-rep">${allRepNames().map(n=>`<option value="${esc(n)}" ${(leadOwner(r)||'').toLowerCase()===n.toLowerCase()?'selected':''}>${esc(n)}</option>`).join('')}</select>
       <label>Notes</label><textarea id="ea-notes">${esc(r.note||'')}</textarea>
       <div class="modal-actions">
         <button class="btn small ghost" id="ea-cancel">Cancel</button>
@@ -2838,12 +2897,13 @@ function toggleEditAccountForm(leadId){
       phone: document.getElementById('ea-phone').value.trim(),
       email: document.getElementById('ea-email').value.trim(),
       notes: document.getElementById('ea-notes').value.trim(),
-      assigned_rep: document.getElementById('ea-rep').value || null
+      assigned_rep: document.getElementById('ea-rep').value || null,
+      assigned_rep_email: rosterEmailForName(document.getElementById('ea-rep').value) || null
     };
     if (!patch.company){ alert('Company name is required.'); return; }
     try {
       await supaUpdate('leads', `id=eq.${encodeURIComponent(leadId)}`, patch);
-      r.c = patch.company; r.n = patch.contact; r.t = patch.title; r.p = patch.phone; r.e = patch.email; r.note = patch.notes; r.rep = patch.assigned_rep;
+      r.c = patch.company; r.n = patch.contact; r.t = patch.title; r.p = patch.phone; r.e = patch.email; r.note = patch.notes; r.rep = patch.assigned_rep; r.repEmail = patch.assigned_rep_email;
       slot.innerHTML = '';
       renderAccountModal(leadId);
       renderKPIs(); renderQueue(); renderNewProspects(); renderLocTable(); applyFilters();
@@ -2905,7 +2965,7 @@ async function restoreAccount(id, rows){
         id: row.id, b: row.brand, l: row.location, c: row.company, n: row.contact, t: row.title,
         p: row.phone, e: row.email, dc: row.date_called, de: row.date_emailed, li: row.linkedin,
         dt: row.date_contacted, s: row.base_status || 'No Status', note: row.notes,
-        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo, rep: row.assigned_rep || null
+        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo, rep: row.assigned_rep || null, repEmail: row.assigned_rep_email || null
       };
       LEADS.push(r);
       LEAD_BY_ID.set(r.id, r);
@@ -3106,15 +3166,19 @@ function computeThisWeekPersonTotals(){
   const we = toISO(weekEndOf(mondayOf(new Date())));
   const scopedIds = new Set(scopedLeads().map(r=>r.id));
   const totals = {};
+  // seed the whole roster so rank reads "#N of <team size>", not "of people who've logged something"
+  const rosterKeys = new Set(REP_ROSTER.map(p=>p.email));
+  KNOWN_NAMES.forEach(n=> rosterKeys.add(rosterEmailForName(n) || n));
+  rosterKeys.forEach(k=>{ totals[k] = 0; });
   LEADS.forEach(r=>{
     if (!scopedIds.has(r.id)) return;
     const ov = overrides[r.id];
     if (!ov || !ov.activity) return;
     ov.activity.forEach(a=>{
       if (a.date < ws || a.date > we) return;
-      const person = (a.by||'Unknown').trim() || 'Unknown';
+      const key = identityKey(a.byEmail, a.by);
       const chans = (a.channels&&a.channels.length) ? a.channels : ['other'];
-      totals[person] = (totals[person]||0) + chans.length;
+      totals[key] = (totals[key]||0) + chans.length;
     });
   });
   return totals;
@@ -3127,10 +3191,10 @@ function renderMyStats(){
     return;
   }
   const totals = computeThisWeekPersonTotals();
-  const matchKey = Object.keys(totals).find(k=>k.toLowerCase()===myName.trim().toLowerCase());
-  const mine = matchKey ? totals[matchKey] : 0;
+  const myKey = authUserEmail || identityKey(null, myName);
+  const mine = totals[myKey] || 0;
   const ranked = Object.entries(totals).sort((a,b)=>b[1]-a[1]);
-  const myRankIdx = ranked.findIndex(([k])=>k.toLowerCase()===myName.trim().toLowerCase());
+  const myRankIdx = ranked.findIndex(([k])=>k===myKey);
   const rankLabel = myRankIdx>-1 ? `#${myRankIdx+1} of ${ranked.length}` : (ranked.length ? `Unranked yet` : '—');
   const openTasksMine = tasks.filter(t=>!t.done && (t.assignedTo||'').trim().toLowerCase()===myName.trim().toLowerCase()).length;
   const goal = GOAL_PER_WEEK;
@@ -3156,21 +3220,48 @@ function renderMyStats(){
   `;
 }
  
+/* The identities that should appear on person-based leaderboards even with zero activity — so the
+   whole team is visible from day one and each person's needle moves as they log outreach.
+   Roster = everyone with an account (keyed by login email). Respects the location scope (only reps
+   covering the selected parks) and the "Only mine" toggle. */
+function scopedRepIdentities(){
+  if (onlyMine && authUserEmail) return [authUserEmail];
+  if (viewLocations.size===0){
+    const keys = new Set(REP_ROSTER.map(p=>p.email));
+    KNOWN_NAMES.forEach(n=> keys.add(rosterEmailForName(n) || n)); // park reps with no account yet, by name
+    return [...keys];
+  }
+  const keys = new Set();
+  selectedLocsArray().forEach(sel=>{
+    const a = repFor(sel.brand, sel.location);
+    if (!a) return;
+    [a.primary, a.secondary].filter(Boolean).forEach(n=> keys.add(rosterEmailForName(n) || n));
+  });
+  return [...keys];
+}
+/* Map a logged name onto the roster spelling when it matches case-insensitively, so "aman mahmood"
+   and "Aman Mahmood" land in the same row instead of fragmenting. */
+function canonicalRepName(name){
+  const n = (name||'').trim();
+  if (!n) return 'Unknown';
+  const hit = KNOWN_NAMES.find(k=>k.toLowerCase()===n.toLowerCase());
+  return hit || n;
+}
 function computeLeaderboard(){
   const scopedIds = new Set(scopedLeads().map(r=>r.id));
-  const byPerson = {};
-  function ensure(person){
-    if (!byPerson[person]) byPerson[person] = {total:0, call:0, email:0, linkedin:0, in_person:0, other:0, openTasks:0, booked:0};
-    return byPerson[person];
+  const byPerson = {}; // identity key (email, or name if no account) -> stats
+  function ensure(key){
+    if (!byPerson[key]) byPerson[key] = {total:0, call:0, email:0, linkedin:0, in_person:0, other:0, openTasks:0, booked:0};
+    return byPerson[key];
   }
+  scopedRepIdentities().forEach(ensure); // everyone on the roster shows, even at zero
   LEADS.forEach(r=>{
     if (!scopedIds.has(r.id)) return;
     const ov = overrides[r.id];
     if (!ov || !ov.activity) return;
     ov.activity.forEach(a=>{
       if (a.date < rangeStart || a.date > rangeEnd) return;
-      const person = (a.by||'Unknown').trim() || 'Unknown';
-      const rec = ensure(person);
+      const rec = ensure(identityKey(a.byEmail, a.by));
       const chans = (a.channels && a.channels.length) ? a.channels : ['other'];
       chans.forEach(c=>{ rec.total++; if (rec[c] !== undefined) rec[c]++; else rec.other++; });
       if (a.outcome === 'booked') rec.booked++;
@@ -3178,9 +3269,9 @@ function computeLeaderboard(){
   });
   scopedTasks().forEach(t=>{
     if (t.done) return;
-    const person = (t.assignedTo || t.createdBy || '').trim();
-    if (!person) return;
-    ensure(person).openTasks++;
+    const who = (t.assignedTo || t.createdBy || '').trim();
+    if (!who) return;
+    ensure(identityKey(null, who)).openTasks++;
   });
   return byPerson;
 }
@@ -3213,7 +3304,8 @@ function computeParkLeaderboard(){
 function computeAccountsReachedLeaderboard(){
   // Distinct companies each person has logged activity against, within the selected range.
   const scopedIds = new Set(scopedLeads().map(r=>r.id));
-  const byPerson = {}; // person -> Set of lead ids
+  const byPerson = {}; // identity key -> Set of lead ids
+  scopedRepIdentities().forEach(k=>{ byPerson[k] = new Set(); }); // roster shows even at zero
   LEADS.forEach(r=>{
     if (!scopedIds.has(r.id)) return;
     const ov = overrides[r.id];
@@ -3221,7 +3313,7 @@ function computeAccountsReachedLeaderboard(){
     const people = new Set();
     ov.activity.forEach(a=>{
       if (a.date < rangeStart || a.date > rangeEnd) return;
-      people.add((a.by||'Unknown').trim() || 'Unknown');
+      people.add(identityKey(a.byEmail, a.by));
     });
     people.forEach(p=>{
       if (!byPerson[p]) byPerson[p] = new Set();
@@ -3263,9 +3355,10 @@ function renderMetrics(){
     }
     const max = Math.max(...people.map(p=>p[1].total), 1);
     listEl.innerHTML = people.map((p,i)=>{
-      const [name, d] = p;
+      const [key, d] = p;
+      const name = identityLabel(key);
       const rank = i+1;
-      const isMe = myName && name.toLowerCase()===myName.toLowerCase();
+      const isMe = (authUserEmail && key===authUserEmail) || (myName && name.toLowerCase()===myName.toLowerCase());
       const pctBar = Math.round((d.total/max)*100);
       return `<div class="lb-row rank-${rank<=3?rank:''}">
         <div class="lb-rank">${rank<=3 ? ['🥇','🥈','🥉'][rank-1] : rank}</div>
@@ -3347,7 +3440,8 @@ function renderMetrics(){
     return;
   }
   listEl.innerHTML = people.map((p,i)=>{
-    const [name, d] = p;
+    const [key, d] = p;
+    const name = identityLabel(key);
     const rank = i+1;
     const remaining = Math.max(0, goal - d.total);
     const pctOfGoal = Math.min(100, Math.round((d.total/goal)*100));
@@ -3364,7 +3458,7 @@ function renderMetrics(){
     } else {
       statusHtml = `<span class="lb-status behind">${remaining} more — behind pace</span>`;
     }
-    const isMe = myName && name.toLowerCase()===myName.toLowerCase();
+    const isMe = (authUserEmail && key===authUserEmail) || (myName && name.toLowerCase()===myName.toLowerCase());
     const breakdown = [d.call?`${d.call} calls`:null, d.email?`${d.email} emails`:null, d.linkedin?`${d.linkedin} LinkedIn`:null, d.in_person?`${d.in_person} in-person`:null, d.other?`${d.other} other`:null].filter(Boolean).join(' · ');
     return `<div class="lb-row rank-${rank<=3?rank:''}">
       <div class="lb-rank">${rank<=3 ? ['🥇','🥈','🥉'][rank-1] : rank}</div>
