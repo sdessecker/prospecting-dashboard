@@ -119,6 +119,9 @@
   .date-range-chk{gap:6px;}
   .date-range-chk input[type=date]{font-family:inherit;font-size:12px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;}
  
+  .segment-badge{display:inline-block;font-size:10px;font-weight:700;color:var(--blue);background:var(--blue-soft);border-radius:4px;padding:2px 6px;margin-left:6px;vertical-align:middle;}
+  .segment-badge.subtle{font-weight:600;opacity:.85;}
+ 
   /* budget pacing */
   .budget-topline{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;color:var(--text);margin-bottom:12px;}
   .budget-topline strong{color:var(--ink);}
@@ -603,7 +606,10 @@
     </div>
     <div class="explorer-toolbar" style="justify-content:space-between;">
       <button class="btn ghost" id="view-trash-btn">🗑 View deleted accounts</button>
-      <button class="btn primary" id="add-prospect-btn-2">+ Add new prospect</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn" id="export-filtered-btn" title="Download exactly what's listed below as a CSV">⬇ Export this list</button>
+        <button class="btn primary" id="add-prospect-btn-2">+ Add new prospect</button>
+      </div>
     </div>
     <div class="filters">
       <input type="text" id="f-search" placeholder="Search company, contact, or notes…">
@@ -612,6 +618,7 @@
       <select id="f-status"><option value="">All statuses</option></select>
       <select id="f-events"><option value="">All events statuses</option></select>
       <select id="f-rep"><option value="">All reps</option></select>
+      <select id="f-segment"><option value="">All segments</option></select>
       <label class="chk date-range-chk" title="Show accounts with an attempt in this date window">Activity from <input type="date" id="f-act-from"> to <input type="date" id="f-act-to"></label>
       <label class="chk"><input type="checkbox" id="f-due"> Due for follow-up only</label>
       <label class="chk"><input type="checkbox" id="f-flag"> ⚠️ Email-only (never called)</label>
@@ -1004,7 +1011,7 @@ async function loadLeadsFromSupabase(){
         id: row.id, b: row.brand, l: row.location, c: row.company, n: row.contact, t: row.title,
         p: row.phone, e: row.email, dc: row.date_called, de: row.date_emailed, li: row.linkedin,
         dt: row.date_contacted, s: row.base_status || 'No Status', note: row.notes,
-        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo, rep: row.assigned_rep || null, repEmail: row.assigned_rep_email || null
+        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo, rep: row.assigned_rep || null, repEmail: row.assigned_rep_email || null, segment: row.segment || null
       };
       LEADS.push(r);
       LEAD_BY_ID.set(r.id, r);
@@ -1741,6 +1748,19 @@ document.getElementById('loc-ms-clear').addEventListener('click', ()=> setViewLo
  
  
 /* ---------------- KPIs ---------------- */
+/* ---------------- SEGMENT (School / Church / Corporate / Community & sports) ----------------
+   Inferred from the company name so the whole book is filterable on day one; any account can be
+   overridden from Edit account, and the override is what's saved. */
+const SEGMENTS = ['School','Church','Corporate','Community & sports'];
+function inferSegment(name){
+  const n = (name||'').toLowerCase();
+  if (/\b(park district|parks? (and|&) rec|rec center|recreation|ymca|ywca|boys (&|and) girls|scouts?|4-h|little league|league|athletic|soccer|baseball|softball|football|basketball|hockey|lacrosse|volleyball|cheer|gymnastics|dance|swim|karate|martial arts|youth (group|ministry|football|sports)|club)\b/.test(n)) return 'Community & sports';
+  if (/\b(school|schools|academy|elementary|middle|high school|hs|jr\.? high|junior high|prep|montessori|preschool|pre-k|daycare|day care|learning center|college|university|isd|district|charter|k-?8|k-?12|head start|homeschool|home school|pta|ptsa|ffa|fca)\b/.test(n)) return 'School';
+  if (/\b(church|baptist|ministr(y|ies)|parish|chapel|temple|synagogue|cathedral|lutheran|methodist|presbyterian|assembly of god|fellowship|congregation|worship|catholic|christian center|calvary|tabernacle|mosque|episcopal|nazarene|pentecostal|apostolic|bible|gospel|grace community|life ?church|crossroads|awana|vbs)\b/.test(n)) return 'Church';
+  return 'Corporate';
+}
+function segmentOf(r){ return r.segment || inferSegment(r.c); }
+ 
 /* Per-lead ownership. Each lead has an explicit owner (assigned_rep) — this is what lets two
    reps share one park (Fairfax, Fredericksburg, Grand Rapids) and still each see only their own
    accounts. Falls back to the park's primary rep for any lead that hasn't been assigned yet. */
@@ -2709,6 +2729,8 @@ const locSel = document.getElementById('f-location');
 const statusSel = document.getElementById('f-status');
 const eventsSel = document.getElementById('f-events');
 const repSel = document.getElementById('f-rep');
+const segmentSel = document.getElementById('f-segment');
+SEGMENTS.forEach(sg=> segmentSel.insertAdjacentHTML('beforeend', `<option value="${esc(sg)}">${esc(sg)}</option>`));
 const actFromInput = document.getElementById('f-act-from');
 const actToInput = document.getElementById('f-act-to');
 const searchInput = document.getElementById('f-search');
@@ -2755,6 +2777,7 @@ function applyFilters(resetPage){
   const s = statusSel.value;
   const ev = eventsSel.value;
   const rep = repSel.value;
+  const segment = segmentSel.value;
   const q = searchInput.value.trim().toLowerCase();
   const dueOnly = dueCheckbox.checked;
   const actFrom = actFromInput.value || '';
@@ -2764,6 +2787,7 @@ function applyFilters(resetPage){
     if (b && r.b!==b) return false;
     if (l && r.l!==l) return false;
     if (rep && (leadOwner(r)||'').toLowerCase() !== rep.toLowerCase()) return false;
+    if (segment && segmentOf(r) !== segment) return false;
     const eff = getEffective(r);
     if (s && eff.status!==s) return false;
     if (ev && eff.eventsStatus!==ev) return false;
@@ -2809,7 +2833,7 @@ function renderLeadList(){
         <div class="lead-main" data-toggle="${r.id}">
           <input type="checkbox" class="lead-select-cb" data-lead-select="${r.id}" ${selectedLeadIds.has(String(r.id))?'checked':''}>
           <div>
-            <div class="company acct-link" data-view-account="${r.id}">${esc(r.c)}${r.isNew?'<span class="new-badge">New</span>':''}${r.isApollo?'<span class="apollo-badge">Apollo</span>':''}</div>
+            <div class="company acct-link" data-view-account="${r.id}">${esc(r.c)}<span class="segment-badge subtle">${esc(segmentOf(r))}</span>${r.isNew?'<span class="new-badge">New</span>':''}${r.isApollo?'<span class="apollo-badge">Apollo</span>':''}</div>
             <div class="meta">${esc(r.b)} · ${esc(r.l)}${rep?` · <span title="Assigned rep">${esc(rep)}</span>`:''}</div>
             ${touched?`<div class="meta" style="color:var(--teal);">${esc(touched)}</div>`:''}
           </div>
@@ -3042,7 +3066,7 @@ function renderAccountModal(leadId){
   if (!r) { closeAccountModal(); return; }
   const rep = leadOwner(r);
   const eff = getEffective(r);
-  document.getElementById('account-modal-company').innerHTML = esc(r.c) + (r.isApollo ? '<span class="apollo-badge">Apollo lead</span>' : '');
+  document.getElementById('account-modal-company').innerHTML = esc(r.c) + `<span class="segment-badge" title="${r.segment?'Set manually':'Guessed from the name — change it under Edit account'}">${esc(segmentOf(r))}${r.segment?'':' ?'}</span>` + (r.isApollo ? '<span class="apollo-badge">Apollo lead</span>' : '');
   document.getElementById('account-modal-sub').textContent = `${r.b} · ${r.l}${rep ? ' · '+rep : ''}`;
  
   const body = document.getElementById('account-modal-body');
@@ -3138,6 +3162,8 @@ function toggleEditAccountForm(leadId){
         <div><label>Phone</label><input type="text" id="ea-phone" value="${esc(r.p||'')}"></div>
         <div><label>Email</label><input type="text" id="ea-email" value="${esc(r.e||'')}"></div>
       </div>
+      <label>Segment</label>
+      <select id="ea-segment">${SEGMENTS.map(sg=>`<option value="${esc(sg)}" ${segmentOf(r)===sg?'selected':''}>${esc(sg)}</option>`).join('')}</select>
       <label>Assigned to</label>
       <select id="ea-rep">${allRepNames().map(n=>`<option value="${esc(n)}" ${(leadOwner(r)||'').toLowerCase()===n.toLowerCase()?'selected':''}>${esc(n)}</option>`).join('')}</select>
       <label>Notes</label><textarea id="ea-notes">${esc(r.note||'')}</textarea>
@@ -3157,12 +3183,13 @@ function toggleEditAccountForm(leadId){
       email: document.getElementById('ea-email').value.trim(),
       notes: document.getElementById('ea-notes').value.trim(),
       assigned_rep: document.getElementById('ea-rep').value || null,
-      assigned_rep_email: rosterEmailForName(document.getElementById('ea-rep').value) || null
+      assigned_rep_email: rosterEmailForName(document.getElementById('ea-rep').value) || null,
+      segment: document.getElementById('ea-segment').value || null
     };
     if (!patch.company){ alert('Company name is required.'); return; }
     try {
       await supaUpdate('leads', `id=eq.${encodeURIComponent(leadId)}`, patch);
-      r.c = patch.company; r.n = patch.contact; r.t = patch.title; r.p = patch.phone; r.e = patch.email; r.note = patch.notes; r.rep = patch.assigned_rep; r.repEmail = patch.assigned_rep_email;
+      r.c = patch.company; r.n = patch.contact; r.t = patch.title; r.p = patch.phone; r.e = patch.email; r.note = patch.notes; r.rep = patch.assigned_rep; r.repEmail = patch.assigned_rep_email; r.segment = patch.segment;
       slot.innerHTML = '';
       renderAccountModal(leadId);
       renderKPIs(); renderQueue(); renderNewProspects(); renderLocTable(); applyFilters();
@@ -3311,7 +3338,7 @@ async function restoreAccount(id, rows){
         id: row.id, b: row.brand, l: row.location, c: row.company, n: row.contact, t: row.title,
         p: row.phone, e: row.email, dc: row.date_called, de: row.date_emailed, li: row.linkedin,
         dt: row.date_contacted, s: row.base_status || 'No Status', note: row.notes,
-        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo, rep: row.assigned_rep || null, repEmail: row.assigned_rep_email || null
+        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo, rep: row.assigned_rep || null, repEmail: row.assigned_rep_email || null, segment: row.segment || null
       };
       LEADS.push(r);
       LEAD_BY_ID.set(r.id, r);
@@ -3381,12 +3408,13 @@ locSel.addEventListener('change', ()=>{ applyFilters(true); refreshScopedViews()
 statusSel.addEventListener('change', ()=>applyFilters(true));
 eventsSel.addEventListener('change', ()=>applyFilters(true));
 repSel.addEventListener('change', ()=>applyFilters(true));
+segmentSel.addEventListener('change', ()=>applyFilters(true));
 actFromInput.addEventListener('change', ()=>applyFilters(true));
 actToInput.addEventListener('change', ()=>applyFilters(true));
 dueCheckbox.addEventListener('change', ()=>applyFilters(true));
 flagCheckbox.addEventListener('change', ()=>applyFilters(true));
 document.getElementById('f-clear').addEventListener('click', ()=>{
-  brandSel.value=''; locSel.value=''; statusSel.value=''; eventsSel.value=''; repSel.value=''; searchInput.value=''; dueCheckbox.checked=false; flagCheckbox.checked=false; actFromInput.value=''; actToInput.value='';
+  brandSel.value=''; locSel.value=''; statusSel.value=''; eventsSel.value=''; repSel.value=''; segmentSel.value=''; searchInput.value=''; dueCheckbox.checked=false; flagCheckbox.checked=false; actFromInput.value=''; actToInput.value='';
   updateLocationOptions();
   document.querySelectorAll('#loc-tbody tr').forEach(r=>r.classList.remove('active-row'));
   applyFilters(true);
@@ -3966,6 +3994,38 @@ function csvCell(v){
   const s = (v==null?'':String(v));
   return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
 }
+function buildLeadsCsv(rows){
+  const header = ['Brand','Location','Segment','Assigned Rep','Company','Contact','Title','Phone','Email','Status','Events Status','Last Contact Date','Next Follow-up','Coverage Flag','Notes','Activity Log'];
+  const lines = [header.map(csvCell).join(',')];
+  rows.forEach(r=>{
+    const eff = getEffective(r);
+    const flag = coverageFlag(r) || '';
+    const activityStr = (eff.activity||[]).map(a=>`${a.date} ${a.by||''}: ${activitySummary(a)}${a.note?' - '+a.note:''}`).join(' | ');
+    lines.push([
+      r.b, r.l, segmentOf(r), leadOwner(r)||'', r.c, r.n||'', r.t||'', r.p||'', r.e||'',
+      eff.status, eventsLabel(eff.eventsStatus), eff.lastDate||'', eff.nextFollowUp||'', flag, r.note||'', activityStr
+    ].map(csvCell).join(','));
+  });
+  return lines.join('\n');
+}
+function downloadCsv(csv, filename){
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+document.getElementById('export-filtered-btn').addEventListener('click', ()=>{
+  if (!filtered.length){ alert('Nothing to export — the current filters match no accounts.'); return; }
+  const parts = [];
+  if (segmentSel.value) parts.push(segmentSel.value.replace(/[^a-z0-9]+/gi,'_').toLowerCase());
+  if (viewLocations.size===1) parts.push(selectedLocsArray()[0].location.replace(/[^a-z0-9]+/gi,'_'));
+  else if (viewLocations.size>1) parts.push(`${viewLocations.size}_locations`);
+  if (repSel.value) parts.push(repSel.value.replace(/[^a-z0-9]+/gi,'_'));
+  const name = `leads_${parts.length?parts.join('_')+'_':''}${todayISO()}.csv`;
+  downloadCsv(buildLeadsCsv(filtered), name);
+});
 document.getElementById('export-csv-btn').addEventListener('click', ()=>{
   const rows = scopedLeads();
   const header = ['Brand','Location','Assigned Rep','Company','Contact','Title','Phone','Email','Status','Events Status','Last Contact Date','Next Follow-up','Coverage Flag','Notes','Activity Log'];
