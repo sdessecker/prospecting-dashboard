@@ -3508,10 +3508,40 @@ document.getElementById('range-apply-btn').addEventListener('click', ()=>{
  
 let leaderboardMode = 'person'; // 'person' | 'park' | 'accounts'
  
-/* ---------------- BUDGET PACING (team-wide, per calendar month) ---------------- */
+/* ---------------- BUDGET PACING (team-wide, per FISCAL period) ----------------
+   Five Star runs a 4-4-5 fiscal calendar: periods are whole Mon–Sun weeks, not calendar months.
+   Boundaries below come from the company's Fiscal_Calendar.xlsx (FY2019–FY2026). Each entry is
+   [fiscalYear, periodNumber, quarter, startDate, endDate]. Past Jan 3 2027 the app falls back to
+   the calendar month and says so — drop in an updated calendar and re-embed to extend it. */
+const FISCAL_PERIODS = [[2019,1,1,"2018-12-31","2019-01-27"],[2019,2,1,"2019-01-28","2019-02-24"],[2019,3,1,"2019-02-25","2019-03-31"],[2019,4,2,"2019-04-01","2019-04-28"],[2019,5,2,"2019-04-29","2019-05-26"],[2019,6,2,"2019-05-27","2019-06-30"],[2019,7,3,"2019-07-01","2019-07-28"],[2019,8,3,"2019-07-29","2019-08-25"],[2019,9,3,"2019-08-26","2019-09-29"],[2019,10,4,"2019-09-30","2019-10-27"],[2019,11,4,"2019-10-28","2019-11-24"],[2019,12,4,"2019-11-25","2019-12-29"],[2020,1,1,"2019-12-30","2020-01-26"],[2020,2,1,"2020-01-27","2020-02-23"],[2020,3,1,"2020-02-24","2020-03-29"],[2020,4,2,"2020-03-30","2020-04-26"],[2020,5,2,"2020-04-27","2020-05-24"],[2020,6,2,"2020-05-25","2020-06-28"],[2020,7,3,"2020-06-29","2020-07-26"],[2020,8,3,"2020-07-27","2020-08-23"],[2020,9,3,"2020-08-24","2020-09-27"],[2020,10,4,"2020-09-28","2020-10-25"],[2020,11,4,"2020-10-26","2020-11-22"],[2020,12,4,"2020-11-23","2021-01-03"],[2021,1,1,"2021-01-04","2021-01-31"],[2021,2,1,"2021-02-01","2021-02-28"],[2021,3,1,"2021-03-01","2021-04-04"],[2021,4,2,"2021-04-05","2021-05-02"],[2021,5,2,"2021-05-03","2021-05-30"],[2021,6,2,"2021-05-31","2021-07-04"],[2021,7,3,"2021-07-05","2021-08-01"],[2021,8,3,"2021-08-02","2021-08-29"],[2021,9,3,"2021-08-30","2021-10-03"],[2021,10,4,"2021-10-04","2021-10-31"],[2021,11,4,"2021-11-01","2021-11-28"],[2021,12,4,"2021-11-29","2022-01-02"],[2022,1,1,"2022-01-03","2022-01-30"],[2022,2,1,"2022-01-31","2022-02-27"],[2022,3,1,"2022-02-28","2022-04-03"],[2022,4,2,"2022-04-04","2022-05-01"],[2022,5,2,"2022-05-02","2022-05-29"],[2022,6,2,"2022-05-30","2022-07-03"],[2022,7,3,"2022-07-04","2022-07-31"],[2022,8,3,"2022-08-01","2022-08-28"],[2022,9,3,"2022-08-29","2022-10-02"],[2022,10,4,"2022-10-03","2022-10-30"],[2022,11,4,"2022-10-31","2022-11-27"],[2022,12,4,"2022-11-28","2023-01-01"],[2023,1,1,"2023-01-02","2023-01-29"],[2023,2,1,"2023-01-30","2023-02-26"],[2023,3,1,"2023-02-27","2023-04-02"],[2023,4,2,"2023-04-03","2023-04-30"],[2023,5,2,"2023-05-01","2023-05-28"],[2023,6,2,"2023-05-29","2023-07-02"],[2023,7,3,"2023-07-03","2023-07-30"],[2023,8,3,"2023-07-31","2023-08-27"],[2023,9,3,"2023-08-28","2023-10-01"],[2023,10,4,"2023-10-02","2023-10-29"],[2023,11,4,"2023-10-30","2023-11-26"],[2023,12,4,"2023-11-27","2023-12-31"],[2024,1,1,"2024-01-01","2024-01-28"],[2024,2,1,"2024-01-29","2024-02-25"],[2024,3,1,"2024-02-26","2024-03-31"],[2024,4,2,"2024-04-01","2024-04-28"],[2024,5,2,"2024-04-29","2024-05-26"],[2024,6,2,"2024-05-27","2024-06-30"],[2024,7,3,"2024-07-01","2024-07-28"],[2024,8,3,"2024-07-29","2024-08-25"],[2024,9,3,"2024-08-26","2024-09-29"],[2024,10,4,"2024-09-30","2024-10-27"],[2024,11,4,"2024-10-28","2024-11-24"],[2024,12,4,"2024-11-25","2024-12-29"],[2025,1,1,"2024-12-30","2025-01-26"],[2025,2,1,"2025-01-27","2025-02-23"],[2025,3,1,"2025-02-24","2025-03-30"],[2025,4,2,"2025-03-31","2025-04-27"],[2025,5,2,"2025-04-28","2025-05-25"],[2025,6,2,"2025-05-26","2025-06-29"],[2025,7,3,"2025-06-30","2025-07-27"],[2025,8,3,"2025-07-28","2025-08-24"],[2025,9,3,"2025-08-25","2025-09-28"],[2025,10,4,"2025-09-29","2025-10-26"],[2025,11,4,"2025-10-27","2025-11-23"],[2025,12,4,"2025-11-24","2026-01-04"],[2026,1,1,"2026-01-05","2026-02-01"],[2026,2,1,"2026-02-02","2026-03-01"],[2026,3,1,"2026-03-02","2026-04-05"],[2026,4,2,"2026-04-06","2026-05-03"],[2026,5,2,"2026-05-04","2026-05-31"],[2026,6,2,"2026-06-01","2026-07-05"],[2026,7,3,"2026-07-06","2026-08-02"],[2026,8,3,"2026-08-03","2026-08-30"],[2026,9,3,"2026-08-31","2026-10-04"],[2026,10,4,"2026-10-05","2026-11-01"],[2026,11,4,"2026-11-02","2026-11-29"],[2026,12,4,"2026-11-30","2027-01-03"]];
+function fiscalPeriodFor(date){
+  const iso = toISO(date);
+  const hit = FISCAL_PERIODS.find(p=> iso>=p[3] && iso<=p[4]);
+  if (!hit) return null;
+  const start = new Date(hit[3]+'T00:00:00'), end = new Date(hit[4]+'T00:00:00');
+  const weeks = Math.round((end - start + 86400000) / (7*86400000));
+  const weekOf = Math.floor((new Date(iso+'T00:00:00') - start) / (7*86400000)) + 1;
+  return { fy: hit[0], period: hit[1], quarter: hit[2], start, end, weeks, weekOf, key: `FY${hit[0]}-P${String(hit[1]).padStart(2,'0')}` };
+}
+function budgetPeriodBounds(){
+  const today = new Date();
+  const fp = fiscalPeriodFor(today);
+  if (fp) return { start: fp.start, end: fp.end, key: fp.key, fiscal: fp };
+  // fallback: calendar month, flagged in the label
+  return { start: new Date(today.getFullYear(), today.getMonth(), 1), end: new Date(today.getFullYear(), today.getMonth()+1, 0),
+           key: `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`, fiscal: null };
+}
 let budget = { target: null, contracted: null };
-function budgetPeriodKey(){ const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
-function budgetPeriodLabel(){ return new Date().toLocaleDateString('en-US', {month:'long', year:'numeric'}); }
+function budgetPeriodKey(){ return budgetPeriodBounds().key; }
+function budgetPeriodLabel(){
+  const b = budgetPeriodBounds();
+  const f = (d)=> d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+  if (b.fiscal){
+    const fp = b.fiscal;
+    return `Period ${fp.period} · Q${fp.quarter} FY${fp.fy} · ${f(fp.start)} – ${f(fp.end)} · week ${fp.weekOf} of ${fp.weeks}`;
+  }
+  return `${b.start.toLocaleDateString('en-US',{month:'long',year:'numeric'})} (calendar month — fiscal calendar on file ends Jan 3, 2027)`;
+}
 function isBusinessDay(d){ const w = d.getDay(); return w!==0 && w!==6; }
 function businessDaysInclusive(from, to){
   let n = 0; const d = new Date(from.getFullYear(), from.getMonth(), from.getDate());
@@ -3542,8 +3572,8 @@ function renderBudgetPacing(){
   }
   line.innerHTML = `This period's budget target: <strong>${fmtMoney(budget.target)}</strong>`;
   const today = new Date();
-  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-  const monthEnd = new Date(today.getFullYear(), today.getMonth()+1, 0);
+  const bounds = budgetPeriodBounds();
+  const monthStart = bounds.start, monthEnd = bounds.end;
   const daysLeft = businessDaysInclusive(today, monthEnd);            // today counts — you can still sell today
   const daysTotal = businessDaysInclusive(monthStart, monthEnd);
   const daysElapsed = businessDaysInclusive(monthStart, today);        // through today
@@ -3555,7 +3585,7 @@ function renderBudgetPacing(){
   const hit = stillNeeded === 0;
   cards.innerHTML = `
     <div class="budget-card">
-      <div class="lbl">Contracted, month to date</div>
+      <div class="lbl">Contracted, period to date</div>
       <div class="val">${fmtMoney(contracted)}</div>
       <div class="sub">Definite + Guaranteed + Closed won · ${Math.round((contracted/budget.target)*100)}% of target</div>
     </div>
