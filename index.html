@@ -1,3 +1,6 @@
+Five Star Parks Prospecting Workspace — full source code (v38: Only-mine applied everywhere, prospect + account modals no longer close on outside click — includes v28–v37 (no Quo/email))
+Skip this intro block. Click right before <!DOCTYPE html> below, shift-click at the very end, copy just that, and paste into GitHub replacing everything in index.html.
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -121,6 +124,12 @@
  
   .segment-badge{display:inline-block;font-size:10px;font-weight:700;color:var(--blue);background:var(--blue-soft);border-radius:4px;padding:2px 6px;margin-left:6px;vertical-align:middle;}
   .segment-badge.subtle{font-weight:600;opacity:.85;}
+ 
+  .event-type-chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .etype-chip{font-family:inherit;font-size:11.5px;padding:4px 10px;border-radius:14px;border:1px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all .12s;}
+  .etype-chip:hover{border-color:var(--teal);color:var(--teal);}
+  .etype-chip.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600;}
+  .etype-chip:disabled{opacity:.6;cursor:wait;}
  
   /* budget pacing */
   .budget-topline{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;color:var(--text);margin-bottom:12px;}
@@ -619,6 +628,7 @@
       <select id="f-events"><option value="">All events statuses</option></select>
       <select id="f-rep"><option value="">All reps</option></select>
       <select id="f-segment"><option value="">All segments</option></select>
+      <select id="f-event-type"><option value="">Any event type</option></select>
       <label class="chk date-range-chk" title="Show accounts with an attempt in this date window">Activity from <input type="date" id="f-act-from"> to <input type="date" id="f-act-to"></label>
       <label class="chk"><input type="checkbox" id="f-due"> Due for follow-up only</label>
       <label class="chk"><input type="checkbox" id="f-flag"> ⚠️ Email-only (never called)</label>
@@ -1011,7 +1021,7 @@ async function loadLeadsFromSupabase(){
         id: row.id, b: row.brand, l: row.location, c: row.company, n: row.contact, t: row.title,
         p: row.phone, e: row.email, dc: row.date_called, de: row.date_emailed, li: row.linkedin,
         dt: row.date_contacted, s: row.base_status || 'No Status', note: row.notes,
-        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo, rep: row.assigned_rep || null, repEmail: row.assigned_rep_email || null, segment: row.segment || null
+        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo, rep: row.assigned_rep || null, repEmail: row.assigned_rep_email || null, segment: row.segment || null, eventTypes: Array.isArray(row.event_types) ? row.event_types : []
       };
       LEADS.push(r);
       LEAD_BY_ID.set(r.id, r);
@@ -1467,9 +1477,10 @@ function activeLocationFilter(){
 }
 function scopeSuffix(){
   const n = viewLocations.size;
-  if (!n) return '';
-  if (n===1){ const a = selectedLocsArray()[0]; return ` — ${a.brand} · ${a.location} only`; }
-  return ` — ${n} locations selected`;
+  const mine = onlyMine ? ' · only mine' : '';
+  if (!n) return mine ? ` —${mine.slice(2)}` : '';
+  if (n===1){ const a = selectedLocsArray()[0]; return ` — ${a.brand} · ${a.location} only${mine}`; }
+  return ` — ${n} locations selected${mine}`;
 }
 function newLeadsCountFor(brand, location){
   let n = 0;
@@ -1760,6 +1771,10 @@ function inferSegment(name){
   return 'Corporate';
 }
 function segmentOf(r){ return r.segment || inferSegment(r.c); }
+/* Event types = what an account would BOOK (learned in conversation, so tagged by reps, not guessed).
+   Multiple per account. Order here is the order chips appear in. */
+const EVENT_TYPES = ['Field trip','Birthday party','Team building / corporate outing','Holiday party','Youth group outing','Lock-in / overnight','Summer camp','Sports team / banquet','Fundraiser','End-of-year / graduation party'];
+function eventTypesOf(r){ return Array.isArray(r.eventTypes) ? r.eventTypes : []; }
  
 /* Per-lead ownership. Each lead has an explicit owner (assigned_rep) — this is what lets two
    reps share one park (Fairfax, Fredericksburg, Grand Rapids) and still each see only their own
@@ -1786,8 +1801,20 @@ function scopedLeads(){
   if (onlyMine) base = base.filter(ownedByMe);
   return base;
 }
+function taskIsMine(t){
+  const who = (t.assignedTo || '').trim();
+  if (who){
+    const e = rosterEmailForName(who);
+    if (e && authUserEmail) return e === authUserEmail;
+    return myName && who.toLowerCase() === myName.trim().toLowerCase();
+  }
+  const by = (t.createdBy || '').trim();
+  return myName && by.toLowerCase() === myName.trim().toLowerCase();
+}
 function scopedTasks(){
-  return viewLocations.size===0 ? tasks : tasks.filter(t=> !t.brand || inScope(t.brand, t.location));
+  let base = viewLocations.size===0 ? tasks : tasks.filter(t=> !t.brand || inScope(t.brand, t.location));
+  if (onlyMine) base = base.filter(taskIsMine);
+  return base;
 }
 function renderKPIs(){
   const leads = scopedLeads();
@@ -1927,8 +1954,8 @@ function renderNewProspects(){
   const today = todayISO();
   const wkStart = toISO(mondayOf(new Date()));
   const wkEnd = toISO(weekEndOf(mondayOf(new Date())));
-  const list = LEADS.filter(r=>{
-    if (!r.isNew || !inScope(r.b, r.l)) return false;
+  const list = scopedLeads().filter(r=>{
+    if (!r.isNew) return false;
     const addedDate = r.addedAt ? r.addedAt.slice(0,10) : null;
     if (!addedDate) return false;
     return newProspectsRange==='today' ? addedDate===today : (addedDate>=wkStart && addedDate<=wkEnd);
@@ -2254,7 +2281,7 @@ document.getElementById('add-prospect-btn').addEventListener('click', openAddPro
 document.getElementById('add-prospect-btn-2').addEventListener('click', openAddProspectModal);
 document.getElementById('add-prospect-close').addEventListener('click', closeAddProspectModal);
 document.getElementById('add-prospect-cancel').addEventListener('click', closeAddProspectModal);
-npOverlay.addEventListener('click', (e)=>{ if (e.target===npOverlay) closeAddProspectModal(); });
+// (deliberately no click-outside-to-close here — a half-filled prospect form shouldn't vanish on a stray click; use Cancel or ✕)
  
 document.getElementById('add-prospect-save').addEventListener('click', async ()=>{
   const company = document.getElementById('np-company').value.trim();
@@ -2660,6 +2687,7 @@ function computeLocRangeStats(brand, location){
   const contacted = new Set();
   LEADS.forEach(r=>{
     if (r.b!==brand || r.l!==location) return;
+    if (onlyMine && !ownedByMe(r)) return; // "Only mine" applies here too — same numbers as every other view
     const ov = overrides[r.id];
     if (!ov || !ov.activity) return;
     ov.activity.forEach(a=>{
@@ -2729,6 +2757,8 @@ const locSel = document.getElementById('f-location');
 const statusSel = document.getElementById('f-status');
 const eventsSel = document.getElementById('f-events');
 const repSel = document.getElementById('f-rep');
+const eventTypeSel = document.getElementById('f-event-type');
+EVENT_TYPES.forEach(t=> eventTypeSel.insertAdjacentHTML('beforeend', `<option value="${esc(t)}">${esc(t)}</option>`));
 const segmentSel = document.getElementById('f-segment');
 SEGMENTS.forEach(sg=> segmentSel.insertAdjacentHTML('beforeend', `<option value="${esc(sg)}">${esc(sg)}</option>`));
 const actFromInput = document.getElementById('f-act-from');
@@ -2778,6 +2808,7 @@ function applyFilters(resetPage){
   const ev = eventsSel.value;
   const rep = repSel.value;
   const segment = segmentSel.value;
+  const eventType = eventTypeSel.value;
   const q = searchInput.value.trim().toLowerCase();
   const dueOnly = dueCheckbox.checked;
   const actFrom = actFromInput.value || '';
@@ -2788,6 +2819,7 @@ function applyFilters(resetPage){
     if (l && r.l!==l) return false;
     if (rep && (leadOwner(r)||'').toLowerCase() !== rep.toLowerCase()) return false;
     if (segment && segmentOf(r) !== segment) return false;
+    if (eventType && !eventTypesOf(r).includes(eventType)) return false;
     const eff = getEffective(r);
     if (s && eff.status!==s) return false;
     if (ev && eff.eventsStatus!==ev) return false;
@@ -3055,7 +3087,7 @@ function closeAccountModal(){
   accountModalLeadId = null;
 }
 document.getElementById('account-modal-close').addEventListener('click', closeAccountModal);
-document.getElementById('account-overlay').addEventListener('click', (e)=>{ if (e.target.id==='account-overlay') closeAccountModal(); });
+// (no click-outside-to-close on the account modal either — a half-typed attempt note shouldn't vanish; use ✕)
 document.body.addEventListener('click', (e)=>{
   const el = e.target.closest('[data-view-account]');
   if (el){ e.stopPropagation(); openAccountModal(el.dataset.viewAccount); }
@@ -3104,6 +3136,13 @@ function renderAccountModal(leadId){
     ${r.note ? `<div class="account-section"><div class="account-section-head"><h4>Notes</h4></div><div style="font-size:13px;color:var(--text);">${esc(r.note)}</div></div>` : ''}
  
     <div class="account-section">
+      <div class="account-section-head"><h4>Event types</h4><span class="hint" style="font-size:11px;">What they'd book — click to toggle, saves instantly</span></div>
+      <div class="event-type-chips" id="acct-event-types">
+        ${EVENT_TYPES.map(t=>`<button type="button" class="etype-chip ${eventTypesOf(r).includes(t)?'on':''}" data-etype="${esc(t)}">${esc(t)}</button>`).join('')}
+      </div>
+    </div>
+ 
+    <div class="account-section">
       <div class="account-section-head"><h4>Status &amp; follow-up</h4><span class="hint" style="font-size:11px;">Change these without logging an attempt</span></div>
       <div class="status-quick">
         <div><label>Status</label><select id="acct-status-sel">${ALL_STATUSES.map(st=>`<option value="${esc(st)}" ${eff.status===st?'selected':''}>${esc(st)}</option>`).join('')}</select></div>
@@ -3129,6 +3168,21 @@ function renderAccountModal(leadId){
     btn.addEventListener('click', ()=> removeContact(leadId, btn.dataset.removeContact));
   });
  
+  document.querySelectorAll('#acct-event-types .etype-chip').forEach(chip=>{
+    chip.addEventListener('click', async ()=>{
+      const t = chip.dataset.etype;
+      const cur = new Set(eventTypesOf(r));
+      if (cur.has(t)) cur.delete(t); else cur.add(t);
+      const next = EVENT_TYPES.filter(x=>cur.has(x)); // keep canonical order
+      chip.classList.toggle('on'); chip.disabled = true;
+      try {
+        await supaUpdate('leads', `id=eq.${encodeURIComponent(leadId)}`, { event_types: next });
+        r.eventTypes = next;
+        applyFilters(); // in case an event-type filter is active
+      } catch(e){ console.error(e); chip.classList.toggle('on'); alert('Could not save — try again.'); }
+      finally { chip.disabled = false; }
+    });
+  });
   document.getElementById('acct-status-save').addEventListener('click', async ()=>{
     const status = document.getElementById('acct-status-sel').value;
     const next = document.getElementById('acct-next-input').value || null;
@@ -3338,7 +3392,7 @@ async function restoreAccount(id, rows){
         id: row.id, b: row.brand, l: row.location, c: row.company, n: row.contact, t: row.title,
         p: row.phone, e: row.email, dc: row.date_called, de: row.date_emailed, li: row.linkedin,
         dt: row.date_contacted, s: row.base_status || 'No Status', note: row.notes,
-        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo, rep: row.assigned_rep || null, repEmail: row.assigned_rep_email || null, segment: row.segment || null
+        isNew: !!row.is_new, addedBy: row.added_by, addedAt: row.created_at, isApollo: !!row.is_apollo, rep: row.assigned_rep || null, repEmail: row.assigned_rep_email || null, segment: row.segment || null, eventTypes: Array.isArray(row.event_types) ? row.event_types : []
       };
       LEADS.push(r);
       LEAD_BY_ID.set(r.id, r);
@@ -3409,12 +3463,13 @@ statusSel.addEventListener('change', ()=>applyFilters(true));
 eventsSel.addEventListener('change', ()=>applyFilters(true));
 repSel.addEventListener('change', ()=>applyFilters(true));
 segmentSel.addEventListener('change', ()=>applyFilters(true));
+eventTypeSel.addEventListener('change', ()=>applyFilters(true));
 actFromInput.addEventListener('change', ()=>applyFilters(true));
 actToInput.addEventListener('change', ()=>applyFilters(true));
 dueCheckbox.addEventListener('change', ()=>applyFilters(true));
 flagCheckbox.addEventListener('change', ()=>applyFilters(true));
 document.getElementById('f-clear').addEventListener('click', ()=>{
-  brandSel.value=''; locSel.value=''; statusSel.value=''; eventsSel.value=''; repSel.value=''; segmentSel.value=''; searchInput.value=''; dueCheckbox.checked=false; flagCheckbox.checked=false; actFromInput.value=''; actToInput.value='';
+  brandSel.value=''; locSel.value=''; statusSel.value=''; eventsSel.value=''; repSel.value=''; segmentSel.value=''; eventTypeSel.value=''; searchInput.value=''; dueCheckbox.checked=false; flagCheckbox.checked=false; actFromInput.value=''; actToInput.value='';
   updateLocationOptions();
   document.querySelectorAll('#loc-tbody tr').forEach(r=>r.classList.remove('active-row'));
   applyFilters(true);
@@ -3995,14 +4050,14 @@ function csvCell(v){
   return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
 }
 function buildLeadsCsv(rows){
-  const header = ['Brand','Location','Segment','Assigned Rep','Company','Contact','Title','Phone','Email','Status','Events Status','Last Contact Date','Next Follow-up','Coverage Flag','Notes','Activity Log'];
+  const header = ['Brand','Location','Segment','Event Types','Assigned Rep','Company','Contact','Title','Phone','Email','Status','Events Status','Last Contact Date','Next Follow-up','Coverage Flag','Notes','Activity Log'];
   const lines = [header.map(csvCell).join(',')];
   rows.forEach(r=>{
     const eff = getEffective(r);
     const flag = coverageFlag(r) || '';
     const activityStr = (eff.activity||[]).map(a=>`${a.date} ${a.by||''}: ${activitySummary(a)}${a.note?' - '+a.note:''}`).join(' | ');
     lines.push([
-      r.b, r.l, segmentOf(r), leadOwner(r)||'', r.c, r.n||'', r.t||'', r.p||'', r.e||'',
+      r.b, r.l, segmentOf(r), eventTypesOf(r).join('; '), leadOwner(r)||'', r.c, r.n||'', r.t||'', r.p||'', r.e||'',
       eff.status, eventsLabel(eff.eventsStatus), eff.lastDate||'', eff.nextFollowUp||'', flag, r.note||'', activityStr
     ].map(csvCell).join(','));
   });
@@ -4020,6 +4075,7 @@ document.getElementById('export-filtered-btn').addEventListener('click', ()=>{
   if (!filtered.length){ alert('Nothing to export — the current filters match no accounts.'); return; }
   const parts = [];
   if (segmentSel.value) parts.push(segmentSel.value.replace(/[^a-z0-9]+/gi,'_').toLowerCase());
+  if (eventTypeSel.value) parts.push(eventTypeSel.value.replace(/[^a-z0-9]+/gi,'_').toLowerCase());
   if (viewLocations.size===1) parts.push(selectedLocsArray()[0].location.replace(/[^a-z0-9]+/gi,'_'));
   else if (viewLocations.size>1) parts.push(`${viewLocations.size}_locations`);
   if (repSel.value) parts.push(repSel.value.replace(/[^a-z0-9]+/gi,'_'));
