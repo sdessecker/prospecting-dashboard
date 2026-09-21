@@ -4226,6 +4226,28 @@ if (restoreSession()){
     return r.secondary ? r.primary+', '+r.secondary : r.primary;
   };
 })();
+
+// Patch: fix Locations row split — use comma format to match updated repLabel
+(function(){
+  const _rlt3 = renderLocTable;
+  renderLocTable = function(){
+    _rlt3.apply(this, arguments);
+    const tbody = document.getElementById('loc-tbody');
+    if (!tbody) return;
+    [...tbody.querySelectorAll('tr')].forEach(tr=>{
+      const cell = tr.cells[2];
+      if (!cell) return;
+      const i = cell.textContent.indexOf(', ');
+      if (i === -1) return;
+      const primary = cell.textContent.slice(0, i).trim();
+      const secondary = cell.textContent.slice(i + 2).trim();
+      cell.textContent = primary;
+      const clone = tr.cloneNode(true);
+      clone.cells[2].textContent = secondary;
+      tr.after(clone);
+    });
+  };
+})();
 </script>
 </body>
 </html>
