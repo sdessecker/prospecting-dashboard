@@ -4195,6 +4195,26 @@ if (restoreSession()){
   const _rl=repLabel;
   repLabel=function(brand,location){if(leaderboardMode==='park') return '';return _rl(brand,location);};
 })();
+
+// Patch: split Locations table rows with multiple reps into separate rows
+(function(){
+  const _rlt = renderLocTable;
+  renderLocTable = function(){
+    _rlt.apply(this, arguments);
+    const tbody = document.getElementById('loc-tbody');
+    if (!tbody) return;
+    [...tbody.querySelectorAll('tr')].forEach(tr=>{
+      const cell = tr.cells[2];
+      if (!cell) return;
+      const m = cell.textContent.match(/^(.+?)\s*\(\+\s*(.+?)\)\s*$/);
+      if (!m) return;
+      cell.textContent = m[1].trim();
+      const clone = tr.cloneNode(true);
+      clone.cells[2].textContent = m[2].trim();
+      tr.after(clone);
+    });
+  };
+})();
 </script>
 </body>
 </html>
