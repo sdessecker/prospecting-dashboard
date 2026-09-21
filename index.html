@@ -4215,6 +4215,17 @@ if (restoreSession()){
     });
   };
 })();
+
+// Patch: repLabel comma-separated format for CSV export
+(function(){
+  const _rl2 = repLabel;
+  repLabel = function(brand,location){
+    if(leaderboardMode==='park') return '';
+    const r=repFor(brand,location);
+    if(!r) return _rl2(brand,location);
+    return r.secondary ? r.primary+', '+r.secondary : r.primary;
+  };
+})();
 </script>
 </body>
 </html>
