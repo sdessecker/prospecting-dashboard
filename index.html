@@ -4156,6 +4156,45 @@ document.getElementById('logout-btn').addEventListener('click', logout);
 if (restoreSession()){
   showApp();
 }
+
+// Patch: By Park leaderboard split by rep
+(function(){
+  const _cpb = computeParkLeaderboard;
+  computeParkLeaderboard = function(){
+    const scopedIds = new Set(scopedLeads().map(r=>r.id));
+    const byPR = {};
+    function ensure(key,brand,location,rep){
+      if(!byPR[key]) byPR[key]={brand,location,rep,total:0,call:0,email:0,linkedin:0,in_person:0,other:0,openTasks:0};
+      return byPR[key];
+    }
+    LEADS.forEach(r=>{
+      if(!scopedIds.has(r.id)) return;
+      const ov=overrides[r.id];
+      if(!ov||!ov.activity) return;
+      ov.activity.forEach(a=>{
+        if(a.date<rangeStart||a.date>rangeEnd) return;
+        const rk=identityKey(a.byEmail,a.by);
+        const rn=a.by||rk||'Unknown';
+        const key=locKey(r.b,r.l)+'|||'+rk;
+        const rec=ensure(key,r.b,r.l+' · '+rn,rn);
+        const chans=(a.channels&&a.channels.length)?a.channels:['other'];
+        chans.forEach(c=>{rec.total++;if(rec[c]!==undefined)rec[c]++;else rec.other++;});
+      });
+    });
+    scopedTasks().forEach(t=>{
+      if(t.done||!t.brand) return;
+      const who=(t.assignedTo||t.createdBy||'').trim();
+      const rk=identityKey(null,who);
+      const exact=Object.keys(byPR).find(k=>k.startsWith(locKey(t.brand,t.location))&&k.endsWith('|||'+rk));
+      if(exact){byPR[exact].openTasks++;return;}
+      const fb=Object.keys(byPR).find(k=>k.startsWith(locKey(t.brand,t.location)));
+      if(fb) byPR[fb].openTasks++;
+    });
+    return byPR;
+  };
+  const _rl=repLabel;
+  repLabel=function(brand,location){if(leaderboardMode==='park') return '';return _rl(brand,location);};
+})();
 </script>
 </body>
 </html>
