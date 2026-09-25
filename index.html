@@ -4269,6 +4269,204 @@ if (restoreSession()){
     return { days, elapsed, complete: today > rangeEnd };
   };
 })();
+
+// Patch: three team requests, Sept 25 — default park (Leah), move park (Derrick), parent group (Taylor/Amanda)
+(function(){
+  /* ---- shared: parent group helpers ---- */
+  function parentGroups(){
+    return [...new Set(LEADS.map(r=>(r.parentGroup||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  }
+  function refreshParentOptions(){
+    let dl = document.getElementById('parent-group-list');
+    if (!dl){ dl = document.createElement('datalist'); dl.id = 'parent-group-list'; document.body.appendChild(dl); }
+    const groups = parentGroups();
+    dl.innerHTML = groups.map(g=>`<option value="${esc(g)}">`).join('');
+    const sel = document.getElementById('f-parent');
+    if (sel){
+      const cur = sel.value;
+      sel.innerHTML = '<option value="">Any parent group</option>' + groups.map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join('');
+      if (groups.includes(cur)) sel.value = cur;
+    }
+  }
+
+  /* ---- data: stamp parentGroup onto LEADS after the main load ---- */
+  const _load = loadLeadsFromSupabase;
+  loadLeadsFromSupabase = async function(){
+    await _load.apply(this, arguments);
+    try {
+      const rows = await supaSelect('leads', 'select=id,parent_group&parent_group=not.is.null&deleted_at=is.null');
+      const byId = new Map(rows.map(x=>[String(x.id), x.parent_group]));
+      LEADS.forEach(r=>{ const pg = byId.get(String(r.id)); if (pg) r.parentGroup = pg; });
+    } catch(e){ console.warn('parent_group stamp skipped', e); }
+    refreshParentOptions();
+  };
+
+  /* ---- Lead Explorer: parent group filter + search ---- */
+  const filters = document.querySelector('.filters');
+  const segSel = document.getElementById('f-segment');
+  if (filters && segSel && !document.getElementById('f-parent')){
+    const sel = document.createElement('select');
+    sel.id = 'f-parent';
+    sel.innerHTML = '<option value="">Any parent group</option>';
+    segSel.after(sel);
+    sel.addEventListener('change', ()=>applyFilters(true));
+  }
+  applyFilters = function(resetPage){
+    const b = brandSel.value, l = locSel.value, s = statusSel.value, ev = eventsSel.value, rep = repSel.value;
+    const segment = segmentSel.value, eventType = eventTypeSel.value;
+    const parent = (document.getElementById('f-parent')||{}).value || '';
+    const q = searchInput.value.trim().toLowerCase();
+    const dueOnly = dueCheckbox.checked;
+    const actFrom = actFromInput.value || '', actTo = actToInput.value || '';
+    const today = todayISO();
+    filtered = scopedLeads().filter(r=>{
+      if (b && r.b!==b) return false;
+      if (l && r.l!==l) return false;
+      if (rep && (leadOwner(r)||'').toLowerCase() !== rep.toLowerCase()) return false;
+      if (segment && segmentOf(r) !== segment) return false;
+      if (eventType && !eventTypesOf(r).includes(eventType)) return false;
+      if (parent && (r.parentGroup||'') !== parent) return false;
+      const eff = getEffective(r);
+      if (s && eff.status!==s) return false;
+      if (ev && eff.eventsStatus!==ev) return false;
+      if (dueOnly && !(eff.nextFollowUp && eff.nextFollowUp<=today)) return false;
+      if (flagCheckbox.checked && !coverageFlag(r)) return false;
+      if (actFrom || actTo){
+        const dates = (eff.activity||[]).map(a=>a.date).filter(Boolean);
+        if (!dates.length && eff.lastDate) dates.push(eff.lastDate);
+        const hit = dates.some(d=> (!actFrom || d>=actFrom) && (!actTo || d<=actTo));
+        if (!hit) return false;
+      }
+      if (q){
+        const hay = `${r.c||''} ${r.n||''} ${r.note||''} ${r.e||''} ${r.parentGroup||''}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    if (resetPage === true) page = 1;
+    const totalPages = Math.max(1, Math.ceil(filtered.length/PAGE_SIZE));
+    if (page > totalPages) page = totalPages;
+    renderLeadList();
+    renderBulkBar();
+  };
+
+  /* ---- Account modal: show parent group in the subtitle ---- */
+  const _ram = renderAccountModal;
+  renderAccountModal = function(leadId){
+    _ram.apply(this, arguments);
+    const r = LEAD_BY_ID.get(Number(leadId)) || LEAD_BY_ID.get(leadId);
+    const sub = document.getElementById('account-modal-sub');
+    if (r && r.parentGroup && sub) sub.textContent += ' · ↳ ' + r.parentGroup;
+  };
+
+  /* ---- Edit account: park dropdown (move) + parent group field ---- */
+  toggleEditAccountForm = function(leadId){
+    const slot = document.getElementById('acct-edit-slot');
+    if (slot.innerHTML){ slot.innerHTML=''; return; }
+    const r = LEAD_BY_ID.get(Number(leadId)) || LEAD_BY_ID.get(leadId);
+    const curLoc = locKey(r.b, r.l);
+    slot.innerHTML = `
+      <div class="edit-account-form">
+        <label>Company</label><input type="text" id="ea-company" value="${esc(r.c)}">
+        <div class="grid2">
+          <div><label>Contact name</label><input type="text" id="ea-contact" value="${esc(r.n||'')}"></div>
+          <div><label>Title</label><input type="text" id="ea-title" value="${esc(r.t||'')}"></div>
+        </div>
+        <div class="grid2">
+          <div><label>Phone</label><input type="text" id="ea-phone" value="${esc(r.p||'')}"></div>
+          <div><label>Email</label><input type="text" id="ea-email" value="${esc(r.e||'')}"></div>
+        </div>
+        <label>Park / location</label>
+        <select id="ea-location">${LOCATION_OPTIONS.map(o=>{ const [bb,ll]=o.split('|||'); return `<option value="${esc(o)}" ${o===curLoc?'selected':''}>${esc(bb)} — ${esc(ll)}</option>`; }).join('')}</select>
+        <div class="grid2">
+          <div><label>Segment</label><select id="ea-segment">${SEGMENTS.map(sg=>`<option value="${esc(sg)}" ${segmentOf(r)===sg?'selected':''}>${esc(sg)}</option>`).join('')}</select></div>
+          <div><label>Parent group</label><input type="text" id="ea-parent" list="parent-group-list" value="${esc(r.parentGroup||'')}" placeholder="e.g. Pinellas County Schools"></div>
+        </div>
+        <label>Assigned to</label>
+        <select id="ea-rep">${allRepNames().map(n=>`<option value="${esc(n)}" ${(leadOwner(r)||'').toLowerCase()===n.toLowerCase()?'selected':''}>${esc(n)}</option>`).join('')}</select>
+        <label>Notes</label><textarea id="ea-notes">${esc(r.note||'')}</textarea>
+        <div class="modal-actions">
+          <button class="btn small ghost" id="ea-cancel">Cancel</button>
+          <button class="btn primary" id="ea-save">Save changes</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('ea-cancel').addEventListener('click', ()=>{ slot.innerHTML=''; });
+    document.getElementById('ea-save').addEventListener('click', async ()=>{
+      const [nb, nl] = (document.getElementById('ea-location').value || curLoc).split('|||');
+      const moved = nb !== r.b || nl !== r.l;
+      const pg = document.getElementById('ea-parent').value.trim() || null;
+      const patch = {
+        company: document.getElementById('ea-company').value.trim(),
+        contact: document.getElementById('ea-contact').value.trim(),
+        title: document.getElementById('ea-title').value.trim(),
+        phone: document.getElementById('ea-phone').value.trim(),
+        email: document.getElementById('ea-email').value.trim(),
+        notes: document.getElementById('ea-notes').value.trim(),
+        assigned_rep: document.getElementById('ea-rep').value || null,
+        assigned_rep_email: rosterEmailForName(document.getElementById('ea-rep').value) || null,
+        segment: document.getElementById('ea-segment').value || null,
+        parent_group: pg,
+        brand: nb, location: nl
+      };
+      if (!patch.company){ alert('Company name is required.'); return; }
+      if (moved && !confirm(`Move "${r.c}" from ${r.b} — ${r.l} to ${nb} — ${nl}? Its attempt history and open tasks move with it.`)) return;
+      try {
+        await supaUpdate('leads', `id=eq.${encodeURIComponent(leadId)}`, patch);
+        if (moved){
+          try { await supaUpdate('tasks', `lead_id=eq.${encodeURIComponent(String(leadId))}`, {brand: nb, location: nl}); } catch(e){ console.warn('task move skipped', e); }
+          tasks.forEach(t=>{ if (String(t.leadId)===String(leadId)){ t.brand = nb; t.location = nl; } });
+        }
+        r.c = patch.company; r.n = patch.contact; r.t = patch.title; r.p = patch.phone; r.e = patch.email; r.note = patch.notes;
+        r.rep = patch.assigned_rep; r.repEmail = patch.assigned_rep_email; r.segment = patch.segment; r.parentGroup = pg; r.b = nb; r.l = nl;
+        slot.innerHTML = '';
+        refreshParentOptions();
+        renderAccountModal(leadId);
+        renderKPIs(); renderQueue(); renderNewProspects(); renderLocTable(); applyFilters();
+        if (typeof renderLeaderboard === 'function') renderLeaderboard();
+        if (typeof renderTasks === 'function') renderTasks();
+      } catch(e){ console.error(e); alert('Could not save changes — try again.'); }
+    });
+  };
+
+  /* ---- New prospect: default park to the rep's own primary, and a parent group field ---- */
+  const notesLabel = [...document.querySelectorAll('#add-prospect-overlay label')].find(l=>l.textContent.trim()==='Notes');
+  if (notesLabel && !document.getElementById('np-parent')){
+    notesLabel.insertAdjacentHTML('beforebegin', '<label>Parent group <span class="hint" style="font-weight:400;">(optional — chamber, district, Apollo batch)</span></label><input type="text" id="np-parent" list="parent-group-list" placeholder="e.g. Pinellas County Schools">');
+  }
+  const _open = openAddProspectModal;
+  openAddProspectModal = function(){
+    _open.apply(this, arguments);
+    const np = document.getElementById('np-parent'); if (np) np.value = '';
+    if (viewLocations.size === 1) return;
+    const me = (myName||'').trim().toLowerCase();
+    if (!me) return;
+    const entries = Object.entries(REP_ASSIGNMENTS);
+    const hit = entries.find(([,a])=>(a.primary||'').trim().toLowerCase()===me) || entries.find(([,a])=>(a.secondary||'').trim().toLowerCase()===me);
+    if (hit) npLocSel.value = hit[0];
+  };
+  ['add-prospect-btn','add-prospect-btn-2'].forEach(id=>{
+    const b = document.getElementById(id); if (!b) return;
+    const c = b.cloneNode(true); b.replaceWith(c);
+    c.addEventListener('click', ()=>openAddProspectModal());
+  });
+  const _ins = supaInsert;
+  supaInsert = async function(table, rows){
+    let pg = null;
+    if (table === 'leads' && npOverlay && npOverlay.style.display === 'flex'){
+      pg = (document.getElementById('np-parent')?.value || '').trim() || null;
+      if (pg) rows = rows.map(x=>({ ...x, parent_group: pg }));
+    }
+    const res = await _ins.call(this, table, rows);
+    if (pg){
+      const id = rows[0] && rows[0].id;
+      setTimeout(()=>{ const rec = LEADS.find(x=>String(x.id)===String(id)); if (rec) rec.parentGroup = pg; refreshParentOptions(); }, 0);
+    }
+    return res;
+  };
+
+  refreshParentOptions();
+})();
 </script>
 </body>
 </html>
