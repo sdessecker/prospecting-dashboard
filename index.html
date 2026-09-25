@@ -4248,6 +4248,27 @@ if (restoreSession()){
     });
   };
 })();
+
+// Patch: goal is 10 per business day (Mon-Fri), not 50/7 per calendar day
+(function(){
+  const GOAL_PER_DAY = 10;
+  function bizDays(a, b){
+    let n = 0;
+    const d = new Date(a + 'T00:00:00'), e = new Date(b + 'T00:00:00');
+    while (d <= e){ const w = d.getDay(); if (w !== 0 && w !== 6) n++; d.setDate(d.getDate() + 1); }
+    return n;
+  }
+  goalForRange = function(){ return Math.max(GOAL_PER_DAY, bizDays(rangeStart, rangeEnd) * GOAL_PER_DAY); };
+  rangeProgress = function(){
+    const today = todayISO();
+    const days = Math.max(1, bizDays(rangeStart, rangeEnd));
+    let elapsed;
+    if (today < rangeStart) elapsed = 0;
+    else if (today > rangeEnd) elapsed = days;
+    else elapsed = bizDays(rangeStart, today);
+    return { days, elapsed, complete: today > rangeEnd };
+  };
+})();
 </script>
 </body>
 </html>
