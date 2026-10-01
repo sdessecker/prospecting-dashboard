@@ -4467,6 +4467,264 @@ if (restoreSession()){
 
   refreshParentOptions();
 })();
+
+// Patch Oct 1: bad-number call result, next-attempt date for every status, first attempt on New Prospect
+(function(){
+  /* ---- 1. Bad number as a call result ---- */
+  if (!CALL_RESULTS.some(x=>x.v==='bad_number')){
+    CALL_RESULTS.push({v:'bad_number', label:'Number not in service / wrong number'});
+  }
+
+  /* ---- 2. Log form: next-attempt date available for every status, plus bad-number nudge ---- */
+  renderLogForm = function(container, leadId){
+    const r = LEAD_BY_ID.get(Number(leadId)) || LEAD_BY_ID.get(leadId);
+    const eff = getEffective(r);
+    const flag = coverageFlag(r);
+    const todayLabel = new Date().toLocaleDateString('en-US',{weekday:'short', month:'short', day:'numeric'});
+    container.innerHTML = `
+      <div class="log-form">
+        <div class="lf-heading">Logging an attempt for <strong>${todayLabel}</strong> — current status: <span class="status-badge" style="background:${hexToSoft(STATUS_COLORS[eff.status]||'#8B95A1')};color:${STATUS_COLORS[eff.status]||'#8B95A1'}">${esc(eff.status)}</span></div>
+        ${flag ? `<div class="coverage-warning">⚠️ ${esc(flag)} — consider calling before another email.</div>` : ''}
+
+        <label>How did you reach out today? <span class="lf-optional">(pick at least one)</span></label>
+        <div class="channel-row">
+          ${CHANNELS.map(c=>`<label class="chk channel-chk"><input type="checkbox" class="lf-channel" value="${c.v}"> ${c.label}</label>`).join('')}
+        </div>
+
+        <div class="lf-call-result" style="display:none;">
+          <label>Result of the call</label>
+          <select class="lf-callresult">
+            ${CALL_RESULTS.map(cr=>`<option value="${cr.v}">${cr.label}</option>`).join('')}
+          </select>
+        </div>
+
+        <div class="grid">
+          <div>
+            <label>Outcome</label>
+            <select class="lf-outcome">
+              ${OUTCOME_OPTIONS.map(o=>`<option value="${o.v}">${o.label}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label>Status after this attempt</label>
+            <select class="lf-status">
+              ${ALL_STATUSES.map(s=>`<option value="${esc(s)}" ${s===eff.status?'selected':''}>${esc(s)}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="grid">
+          <div>
+            <label>Next attempt — when <span class="lf-optional">(optional for any status)</span></label>
+            <input type="date" class="lf-next" value="">
+          </div>
+          <div>
+            <label>Logged by</label>
+            <div class="logged-by-display">${esc(myName)}</div>
+          </div>
+        </div>
+        <div class="lf-next-hint" style="display:none;"></div>
+        <label>Note</label>
+        <textarea class="lf-note" placeholder="What happened, what's next…"></textarea>
+        <div class="actions">
+          <button class="btn small ghost lf-cancel">Cancel</button>
+          <button class="btn primary lf-save">Save attempt</button>
+        </div>
+        ${eff.activity.length ? `<div class="activity-log">${eff.activity.slice().reverse().map(a=>`
+          <div class="activity-entry" ${a.id!=null?`data-act-id="${a.id}"`:''}><span class="when">${esc(a.date)}</span> — <span class="who">${esc(a.by||'someone')}</span>: ${esc(activitySummary(a))}${a.note?' — '+esc(a.note):''}${a.source==='quo'?' <span class="quo-badge" title="Quo call summary attached">📞 Quo</span>':''}${a.id!=null?` <button class="act-edit" data-edit-act="${a.id}" title="Edit this attempt">✎</button>`:''}</div>
+        `).join('')}</div>` : ''}
+      </div>
+    `;
+    container.querySelectorAll('[data-edit-act]').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{ e.stopPropagation(); openEditAttempt(container, leadId, Number(btn.dataset.editAct)); });
+    });
+    const channelChecks = [...container.querySelectorAll('.lf-channel')];
+    const callResultWrap = container.querySelector('.lf-call-result');
+    const callResultSel = container.querySelector('.lf-callresult');
+    const outcomeSel = container.querySelector('.lf-outcome');
+    const statusSel = container.querySelector('.lf-status');
+    const nextInput = container.querySelector('.lf-next');
+    const nextHint = container.querySelector('.lf-next-hint');
+
+    function suggestStatus(){
+      const o = OUTCOME_OPTIONS.find(x=>x.v===outcomeSel.value);
+      if (o && o.status) return o.status;
+      return advanceSequence(eff.status);
+    }
+    function suggestedDate(){
+      const days = cadenceDaysForAttempt(Math.max(eff.attemptCount,0)+1);
+      const d = new Date(); d.setDate(d.getDate()+days);
+      return d.toISOString().slice(0,10);
+    }
+    function refreshNext(){
+      const newStatus = suggestStatus();
+      statusSel.value = newStatus;
+      nextInput.disabled = false;
+      // Cadence statuses get a suggested date; every other status leaves it blank but editable
+      nextInput.value = NO_FOLLOWUP.has(newStatus) ? '' : suggestedDate();
+
+      const callChecked = channelChecks.find(c=>c.value==='call').checked;
+      const chosenChannels = channelChecks.filter(c=>c.checked).map(c=>c.value);
+      const willHaveCalled = hasCalledEver(r) || chosenChannels.includes('call');
+      const willHaveEmailed = hasEmailedEver(r) || chosenChannels.includes('email');
+      const varietyMsg = channelVarietyHint(r, chosenChannels);
+      if (callChecked && callResultSel.value === 'bad_number'){
+        nextHint.style.display = 'block';
+        nextHint.textContent = '📵 Bad number — open Edit account and update the phone so the next attempt reaches someone.';
+      } else if (NO_FOLLOWUP.has(newStatus)){
+        nextHint.style.display = 'none';
+      } else if (varietyMsg){
+        nextHint.style.display = 'block';
+        nextHint.textContent = varietyMsg;
+      } else if (willHaveEmailed && !willHaveCalled){
+        nextHint.style.display = 'block';
+        nextHint.textContent = '💡 Next time, try calling — this account has only ever been emailed.';
+      } else {
+        nextHint.style.display = 'none';
+      }
+    }
+    channelChecks.forEach(cb=>{
+      cb.addEventListener('change', ()=>{
+        const callChecked = channelChecks.find(c=>c.value==='call').checked;
+        callResultWrap.style.display = callChecked ? 'block' : 'none';
+        refreshNext();
+      });
+    });
+    callResultSel.addEventListener('change', refreshNext);
+    outcomeSel.addEventListener('change', refreshNext);
+    statusSel.addEventListener('change', ()=>{
+      // Never lock the field. Fill a suggestion when moving to a cadence status and it's empty.
+      nextInput.disabled = false;
+      if (!NO_FOLLOWUP.has(statusSel.value) && !nextInput.value) nextInput.value = suggestedDate();
+    });
+    refreshNext();
+
+    container.querySelector('.lf-cancel').addEventListener('click', ()=>{ container.innerHTML=''; queueExpandedId=null; leadExpandedId=null; });
+    container.querySelector('.lf-save').addEventListener('click', async ()=>{
+      const selectedChannels = channelChecks.filter(c=>c.checked).map(c=>c.value);
+      if (!selectedChannels.length){ alert('Pick at least one way you reached out today (call, email, LinkedIn, or in person).'); return; }
+      if (!myName){ alert('Set your name up top before logging an attempt.'); return; }
+      const by = myName;
+      const note = container.querySelector('.lf-note').value.trim();
+      const today = todayISO();
+      const callChecked = selectedChannels.includes('call');
+      const entry = {
+        date: today, channels: selectedChannels,
+        callResult: callChecked ? callResultSel.value : null,
+        outcome: outcomeSel.value, note, by, byEmail: authUserEmail || null
+      };
+      const existing = overrides[leadId] || {activity:[]};
+      const activity = [...(existing.activity||[]), entry];
+      await saveOverride(leadId, {
+        status: statusSel.value,
+        lastContactDate: today,
+        nextFollowUp: nextInput.value || null,
+        activity
+      });
+      if (accountModalLeadId != null && String(accountModalLeadId) === String(leadId)){
+        closeAccountModal();
+      }
+    });
+  };
+
+  /* ---- 3. New Prospect: optional first attempt, saved through saveOverride like any other attempt ---- */
+  const notesLabel = [...document.querySelectorAll('#add-prospect-overlay label')].find(l=>l.textContent.trim()==='Notes');
+  if (notesLabel && !document.getElementById('np-fa-toggle')){
+    notesLabel.insertAdjacentHTML('beforebegin', `
+      <div id="np-first-attempt" style="margin:12px 0 6px;padding:10px 12px;border:1px dashed var(--border);border-radius:8px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;"><input type="checkbox" id="np-fa-toggle"> Log the first attempt now <span class="hint" style="font-weight:400;">(skip if you haven't reached out yet)</span></label>
+        <div id="np-fa-body" style="display:none;margin-top:10px;">
+          <label>How did you reach out?</label>
+          <div class="channel-row">${CHANNELS.map(c=>`<label class="chk channel-chk"><input type="checkbox" class="np-fa-channel" value="${c.v}"> ${c.label}</label>`).join('')}</div>
+          <div id="np-fa-callwrap" style="display:none;">
+            <label>Result of the call</label>
+            <select id="np-fa-callresult">${CALL_RESULTS.map(cr=>`<option value="${cr.v}">${cr.label}</option>`).join('')}</select>
+          </div>
+          <div class="grid2">
+            <div><label>Outcome</label><select id="np-fa-outcome">${OUTCOME_OPTIONS.map(o=>`<option value="${o.v}">${o.label}</option>`).join('')}</select></div>
+            <div><label>Next attempt — when</label><input type="date" id="np-fa-next"></div>
+          </div>
+          <label>Attempt note</label>
+          <textarea id="np-fa-note" placeholder="What happened, what's next…"></textarea>
+        </div>
+      </div>
+    `);
+    const toggle = document.getElementById('np-fa-toggle');
+    const body = document.getElementById('np-fa-body');
+    const callWrap = document.getElementById('np-fa-callwrap');
+    const outcome = document.getElementById('np-fa-outcome');
+    const next = document.getElementById('np-fa-next');
+    const chans = [...document.querySelectorAll('.np-fa-channel')];
+    function faStatus(){
+      const o = OUTCOME_OPTIONS.find(x=>x.v===outcome.value);
+      if (o && o.status) return o.status;
+      return advanceSequence(npStatusSel.value || 'No Status');
+    }
+    function faSuggest(){
+      const st = faStatus();
+      if (NO_FOLLOWUP.has(st)){ next.value = ''; return; }
+      const d = new Date(); d.setDate(d.getDate() + cadenceDaysForAttempt(1));
+      next.value = d.toISOString().slice(0,10);
+    }
+    toggle.addEventListener('change', ()=>{ body.style.display = toggle.checked ? 'block' : 'none'; if (toggle.checked) faSuggest(); });
+    chans.forEach(cb=>cb.addEventListener('change', ()=>{ callWrap.style.display = chans.find(c=>c.value==='call').checked ? 'block' : 'none'; }));
+    outcome.addEventListener('change', faSuggest);
+  }
+
+  // Reset the first-attempt block whenever the modal opens
+  const _open2 = openAddProspectModal;
+  openAddProspectModal = function(){
+    _open2.apply(this, arguments);
+    const t = document.getElementById('np-fa-toggle'); if (t) t.checked = false;
+    const b = document.getElementById('np-fa-body'); if (b) b.style.display = 'none';
+    document.querySelectorAll('.np-fa-channel').forEach(c=>c.checked=false);
+    const cw = document.getElementById('np-fa-callwrap'); if (cw) cw.style.display = 'none';
+    const o = document.getElementById('np-fa-outcome'); if (o) o.value = 'continue';
+    const n = document.getElementById('np-fa-next'); if (n) n.value = '';
+    const nt = document.getElementById('np-fa-note'); if (nt) nt.value = '';
+  };
+  ['add-prospect-btn','add-prospect-btn-2'].forEach(id=>{
+    const b = document.getElementById(id); if (!b) return;
+    const c = b.cloneNode(true); b.replaceWith(c);
+    c.addEventListener('click', ()=>openAddProspectModal());
+  });
+
+  // Capture the first attempt before the insert, write it right after the prospect exists
+  const _ins2 = supaInsert;
+  supaInsert = async function(table, rows){
+    let fa = null;
+    if (table === 'leads' && npOverlay && npOverlay.style.display === 'flex'){
+      const t = document.getElementById('np-fa-toggle');
+      const chans = [...document.querySelectorAll('.np-fa-channel')].filter(c=>c.checked).map(c=>c.value);
+      if (t && t.checked && chans.length){
+        const callChecked = chans.includes('call');
+        const outcomeVal = document.getElementById('np-fa-outcome').value;
+        const o = OUTCOME_OPTIONS.find(x=>x.v===outcomeVal);
+        fa = {
+          id: rows[0] && rows[0].id,
+          status: (o && o.status) || advanceSequence(npStatusSel.value || 'No Status'),
+          next: document.getElementById('np-fa-next').value || null,
+          entry: {
+            date: todayISO(), channels: chans,
+            callResult: callChecked ? document.getElementById('np-fa-callresult').value : null,
+            outcome: outcomeVal,
+            note: document.getElementById('np-fa-note').value.trim(),
+            by: myName || 'someone', byEmail: authUserEmail || null
+          }
+        };
+      } else if (t && t.checked && !chans.length){
+        alert('You ticked "Log the first attempt now" but didn\'t pick how you reached out. Untick it or choose a channel.');
+        throw new Error('first attempt incomplete');
+      }
+    }
+    const res = await _ins2.call(this, table, rows);
+    if (fa){
+      setTimeout(()=>{
+        saveOverride(fa.id, { status: fa.status, lastContactDate: fa.entry.date, nextFollowUp: fa.next, activity: [fa.entry] });
+      }, 0);
+    }
+    return res;
+  };
+})();
 </script>
 </body>
 </html>
