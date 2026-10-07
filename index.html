@@ -4725,6 +4725,188 @@ if (restoreSession()){
     return res;
   };
 })();
+
+// Patch Oct 7: sales coordinators — on the roster, no attempt goal, shown only once they log
+(function(){
+  let COORDINATOR_EMAILS = new Set();
+  window.isCoordinatorKey = function(key){
+    if (!key) return false;
+    const k = String(key).trim().toLowerCase();
+    if (COORDINATOR_EMAILS.has(k)) return true;
+    const viaName = rosterEmailForName(key);
+    return !!(viaName && COORDINATOR_EMAILS.has(viaName.toLowerCase()));
+  };
+  async function loadRoles(){
+    try {
+      const rows = await supaSelect('rep_profile', 'select=user_email,role&role=eq.coordinator');
+      COORDINATOR_EMAILS = new Set(rows.map(r=>(r.user_email||'').trim().toLowerCase()).filter(Boolean));
+    } catch(e){ console.warn('role load skipped', e); }
+  }
+  const _lr = loadRoster;
+  loadRoster = async function(){ await _lr.apply(this, arguments); await loadRoles(); };
+  loadRoles().then(()=>{ if (typeof renderMetrics === 'function') try { renderMetrics(); } catch(e){} });
+
+  /* Leaderboard, person mode: coordinators excluded from goal/pace math and hidden at zero */
+renderMetrics = function(){
+  const headerRow = document.getElementById('lb-header-row');
+  const weekLabelEl = document.getElementById('week-label');
+  const weekKpisEl = document.getElementById('week-kpis');
+  const listEl = document.getElementById('leaderboard-list');
+  const goal = goalForRange();
+  const rangeSuffix = ` (${rangeLabel()})`;
+ 
+  if (leaderboardMode === 'accounts'){
+    document.getElementById('leaderboard-hint').textContent = `Distinct companies each person has logged activity against${rangeSuffix}` + scopeSuffix();
+    weekLabelEl.textContent = rangeLabel();
+    weekKpisEl.innerHTML = '';
+    headerRow.innerHTML = `<div class="lb-header-rank"></div><div class="lb-header-info">Rep</div><div class="lb-header-bar">Accounts reached</div><div class="lb-header-status"></div>`;
+    const board = computeAccountsReachedLeaderboard();
+    const people = Object.entries(board).sort((a,b)=>b[1].total-a[1].total);
+    if (!people.length){
+      listEl.innerHTML = `<div class="empty-state">No accounts logged in this range${scopeSuffix()}.</div>`;
+      return;
+    }
+    const max = Math.max(...people.map(p=>p[1].total), 1);
+    listEl.innerHTML = people.map((p,i)=>{
+      const [key, d] = p;
+      const name = identityLabel(key);
+      const rank = i+1;
+      const isMe = (authUserEmail && key===authUserEmail) || (myName && name.toLowerCase()===myName.toLowerCase());
+      const pctBar = Math.round((d.total/max)*100);
+      return `<div class="lb-row rank-${rank<=3?rank:''}">
+        <div class="lb-rank">${rank<=3 ? ['🥇','🥈','🥉'][rank-1] : rank}</div>
+        <div class="lb-info"><div class="lb-name ${isMe?'me':''}">${esc(name)}${isMe?' (you)':''}</div></div>
+        <div class="lb-bar-wrap">
+          <div class="lb-bar"><i style="width:${pctBar}%;background:#35638F;"></i></div>
+          <div class="lb-count">${fmt(d.total)} companies</div>
+        </div>
+        <div class="lb-status-wrap"></div>
+      </div>`;
+    }).join('');
+    return;
+  }
+ 
+  document.getElementById('leaderboard-hint').textContent = (leaderboardMode==='park'
+    ? `Prospecting attempts by park${rangeSuffix}`
+    : `Goal: ${fmt(goal)} prospecting attempts per person${rangeSuffix}`) + scopeSuffix();
+  weekLabelEl.textContent = rangeLabel();
+ 
+  const prog = rangeProgress();
+  const expected = Math.round(goal * Math.min(prog.elapsed,prog.days)/prog.days);
+ 
+  if (leaderboardMode === 'park'){
+    headerRow.innerHTML = `<div class="lb-header-rank"></div><div class="lb-header-info">Park</div><div class="lb-header-tasks">Open tasks</div><div class="lb-header-bar">Attempts</div><div class="lb-header-status"></div>`;
+    const board = computeParkLeaderboard();
+    const parks = Object.entries(board).sort((a,b)=>b[1].total-a[1].total);
+    const teamTotal = parks.reduce((s,p)=>s+p[1].total,0);
+    const teamAvg = parks.length ? Math.round(teamTotal/parks.length) : 0;
+    weekKpisEl.innerHTML = `
+      <div class="week-kpi"><div class="lbl">Team attempts in range</div><div class="val">${fmt(teamTotal)}</div></div>
+      <div class="week-kpi"><div class="lbl">Average per park</div><div class="val">${fmt(teamAvg)}</div></div>
+      <div class="week-kpi"><div class="lbl">Parks active in range</div><div class="val">${parks.length}</div></div>
+    `;
+    if (!parks.length){
+      listEl.innerHTML = `<div class="empty-state">No attempts logged in this range${scopeSuffix()}.</div>`;
+      return;
+    }
+    const max = Math.max(...parks.map(p=>p[1].total), 1);
+    listEl.innerHTML = parks.map((p,i)=>{
+      const [key, d] = p;
+      const rank = i+1;
+      const pctBar = Math.round((d.total/max)*100);
+      const rep = repLabel(d.brand, d.location);
+      const breakdown = [d.call?`${d.call} calls`:null, d.email?`${d.email} emails`:null, d.linkedin?`${d.linkedin} LinkedIn`:null, d.in_person?`${d.in_person} in-person`:null, d.other?`${d.other} other`:null].filter(Boolean).join(' · ');
+      return `<div class="lb-row rank-${rank<=3?rank:''}">
+        <div class="lb-rank">${rank<=3 ? ['🥇','🥈','🥉'][rank-1] : rank}</div>
+        <div class="lb-info">
+          <div class="lb-name">${esc(d.brand)} — ${esc(d.location)}</div>
+          <div class="lb-breakdown">${rep?esc(rep)+' · ':''}${breakdown||'—'}</div>
+        </div>
+        <div class="lb-tasks">${d.openTasks ? `<span class="task-count-badge">${d.openTasks}</span>` : '<span class="task-count-zero">0</span>'}</div>
+        <div class="lb-bar-wrap">
+          <div class="lb-bar"><i style="width:${pctBar}%;background:${BRAND_COLORS[d.brand]||'#1F7A6C'};"></i></div>
+          <div class="lb-count">${fmt(d.total)} attempts</div>
+        </div>
+        <div class="lb-status-wrap"></div>
+      </div>`;
+    }).join('');
+    return;
+  }
+ 
+  // person mode (default)
+  headerRow.innerHTML = `<div class="lb-header-rank"></div><div class="lb-header-info">Rep</div><div class="lb-header-tasks">Open tasks</div><div class="lb-header-bar">Attempts</div><div class="lb-header-status">To hit ${goal}</div>`;
+  const board = computeLeaderboard();
+  const people = Object.entries(board)
+    .filter(([key,d]) => !isCoordinatorKey(key) || d.total > 0)   // coordinators only appear once they log something
+    .sort((a,b)=>b[1].total-a[1].total);
+  const graded = people.filter(([key]) => !isCoordinatorKey(key)); // goal + pace stats are reps only
+  const teamTotal = people.reduce((s,p)=>s+p[1].total,0);
+  const repTotal = graded.reduce((s,p)=>s+p[1].total,0);
+  const teamAvg = graded.length ? Math.round(repTotal/graded.length) : 0;
+  const behindCount = graded.filter(p=> p[1].total < expected).length;
+  const prevTotal = previousPeriodTeamTotal();
+ 
+  weekKpisEl.innerHTML = `
+    <div class="week-kpi"><div class="lbl">Team attempts in range</div><div class="val" style="display:flex;align-items:baseline;gap:8px;">${fmt(teamTotal)} ${trendBadge(teamTotal, prevTotal)}</div></div>
+    <div class="week-kpi"><div class="lbl">Average per person</div><div class="val">${fmt(teamAvg)} <span style="font-size:12px;color:var(--muted);font-weight:500;">/ ${goal} goal</span></div></div>
+    <div class="week-kpi"><div class="lbl">${prog.complete?'Missed goal':'Behind pace'}</div><div class="val" style="color:${behindCount?'var(--coral)':'var(--teal)'};">${behindCount} ${behindCount===1?'person':'people'}</div></div>
+  `;
+ 
+  if (!people.length){
+    listEl.innerHTML = `<div class="empty-state">No attempts logged in this range${scopeSuffix()}. Log an outcome above to get on the board.</div>`;
+    return;
+  }
+  listEl.innerHTML = people.map((p,i)=>{
+    const [key, d] = p;
+    const name = identityLabel(key);
+    const rank = i+1;
+    if (isCoordinatorKey(key)){
+      const isMeC = (authUserEmail && key===authUserEmail) || (myName && name.toLowerCase()===myName.toLowerCase());
+      const bdC = [d.call?`${d.call} calls`:null, d.email?`${d.email} emails`:null, d.linkedin?`${d.linkedin} LinkedIn`:null, d.in_person?`${d.in_person} in-person`:null, d.other?`${d.other} other`:null].filter(Boolean).join(' · ');
+      return `<div class="lb-row">
+        <div class="lb-rank">${rank}</div>
+        <div class="lb-info">
+          <div class="lb-name ${isMeC?'me':''}">${esc(name)}${isMeC?' (you)':''} <span class="apollo-badge" title="Sales coordinator — supports the park, no attempt goal">Coordinator</span>${d.booked?`<span class="lb-booked-badge">🏆 ${d.booked} booked</span>`:''}</div>
+          <div class="lb-breakdown">${bdC||'—'}</div>
+        </div>
+        <div class="lb-tasks">${d.openTasks ? `<span class="task-count-badge">${d.openTasks}</span>` : '<span class="task-count-zero">0</span>'}</div>
+        <div class="lb-bar-wrap"><div class="lb-count" style="margin-top:0;">${fmt(d.total)} attempts</div></div>
+        <div class="lb-status-wrap"><span class="lb-status" style="color:var(--muted);">no goal</span></div>
+      </div>`;
+    }
+    const remaining = Math.max(0, goal - d.total);
+    const pctOfGoal = Math.min(100, Math.round((d.total/goal)*100));
+    const hitGoal = d.total>=goal;
+    const onPace = d.total>=expected;
+    const barColor = hitGoal ? '#1F7A6C' : (onPace ? '#E0932E' : '#D9583D');
+    let statusHtml;
+    if (hitGoal){
+      statusHtml = `<span class="lb-status ahead">Goal hit 🎉</span>`;
+    } else if (prog.complete){
+      statusHtml = `<span class="lb-status behind">${remaining} short of goal</span>`;
+    } else if (onPace){
+      statusHtml = `<span class="lb-status ahead">${remaining} more to go</span>`;
+    } else {
+      statusHtml = `<span class="lb-status behind">${remaining} more — behind pace</span>`;
+    }
+    const isMe = (authUserEmail && key===authUserEmail) || (myName && name.toLowerCase()===myName.toLowerCase());
+    const breakdown = [d.call?`${d.call} calls`:null, d.email?`${d.email} emails`:null, d.linkedin?`${d.linkedin} LinkedIn`:null, d.in_person?`${d.in_person} in-person`:null, d.other?`${d.other} other`:null].filter(Boolean).join(' · ');
+    return `<div class="lb-row rank-${rank<=3?rank:''}">
+      <div class="lb-rank">${rank<=3 ? ['🥇','🥈','🥉'][rank-1] : rank}</div>
+      <div class="lb-info">
+        <div class="lb-name ${isMe?'me':''}">${esc(name)}${isMe?' (you)':''}${d.booked?`<span class="lb-booked-badge">🏆 ${d.booked} booked</span>`:''}</div>
+        <div class="lb-breakdown">${breakdown||'—'}</div>
+      </div>
+      <div class="lb-tasks">${d.openTasks ? `<span class="task-count-badge">${d.openTasks}</span>` : '<span class="task-count-zero">0</span>'}</div>
+      <div class="lb-bar-wrap">
+        <div class="lb-bar"><i style="width:${pctOfGoal}%;background:${barColor};"></i></div>
+        <div class="lb-count">${fmt(d.total)} / ${goal}</div>
+      </div>
+      <div class="lb-status-wrap">${statusHtml}</div>
+    </div>`;
+  }).join('');
+};
+})();
 </script>
 </body>
 </html>
